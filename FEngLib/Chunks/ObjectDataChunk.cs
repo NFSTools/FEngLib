@@ -3,7 +3,7 @@ using System.IO;
 
 namespace FEngLib.Chunks
 {
-    public class ObjectDataChunk : FrontendChunk
+    public class ObjectDataChunk : FrontendObjectChunk
     {
         public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock, FrontendChunkReader chunkReader, BinaryReader reader)
         {
@@ -18,6 +18,10 @@ namespace FEngLib.Chunks
         public override FrontendChunkType GetChunkType()
         {
             return FrontendChunkType.ObjectData;
+        }
+
+        public ObjectDataChunk(FrontendObject frontendObject) : base(frontendObject)
+        {
         }
     }
 }

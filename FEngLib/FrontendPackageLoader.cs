@@ -18,7 +18,7 @@ namespace FEngLib
             FrontendPackage package = new FrontendPackage();
             FrontendChunkReader chunkReader = new FrontendChunkReader(package, br);
 
-            foreach (var chunk in chunkReader.ReadChunks())
+            foreach (var chunk in chunkReader.ReadMainChunks())
             {
                 Debug.WriteLine(chunk);
             }

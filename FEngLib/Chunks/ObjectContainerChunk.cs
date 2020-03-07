@@ -7,7 +7,8 @@ namespace FEngLib.Chunks
     {
         public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock, FrontendChunkReader chunkReader, BinaryReader reader)
         {
-            foreach (var chunk in chunkReader.ReadChunks(chunkBlock.Size))
+            FrontendObject frontendObject = new FrontendObject();
+            foreach (var chunk in chunkReader.ReadObjectChunks(frontendObject, chunkBlock.Size))
             {
                 Debugger.Break();
             }

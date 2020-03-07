@@ -9,7 +9,7 @@ namespace FEngLib.Chunks
         {
             ResourceNamesChunk resourceNamesChunk = null;
 
-            foreach (var chunk in chunkReader.ReadChunks(chunkBlock.Size))
+            foreach (var chunk in chunkReader.ReadMainChunks(chunkBlock.Size))
             {
                 if (chunk is ResourceNamesChunk rnc)
                 {

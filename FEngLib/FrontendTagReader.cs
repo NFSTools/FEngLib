@@ -26,6 +26,7 @@ namespace FEngLib
                     0x744F => new ObjectTypeTag(),
                     0x684F => new ObjectHashTag(),
                     0x504F => new ObjectReferenceTag(),
+                    0x6649 => new ImageInfoTag(),
                     _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
                 };
 

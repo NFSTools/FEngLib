@@ -23,12 +23,12 @@ namespace FEngLib
         /// Reads chunks
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<FrontendChunk> ReadChunks()
+        public IEnumerable<FrontendChunk> ReadMainChunks()
         {
-            return ReadChunks(Reader.BaseStream.Length);
+            return ReadMainChunks(Reader.BaseStream.Length);
         }
 
-        public IEnumerable<FrontendChunk> ReadChunks(long length)
+        public IEnumerable<FrontendChunk> ReadMainChunks(long length)
         {
             var endPos = Reader.BaseStream.Position + length;
 
@@ -49,9 +49,6 @@ namespace FEngLib
                     FrontendChunkType.ResourceNames => new ResourceNamesChunk(),
                     FrontendChunkType.ResourceRequests => new ResourceRequestsChunk(),
                     FrontendChunkType.ObjectContainer => new ObjectContainerChunk(),
-                    FrontendChunkType.ButtonMapCount => new ButtonMapCountChunk(),
-                    FrontendChunkType.FrontendObjectContainer => new FrontendObjectContainerChunk(),
-                    FrontendChunkType.ObjectData => new ObjectDataChunk(),
                     _ => throw new ChunkReadingException($"Unknown chunk type: 0x{((int)block.ChunkType):X8}")
                 };
 
@@ -63,7 +60,38 @@ namespace FEngLib
                 }
 
                 yield return chunk;
-                //FrontendChunk frontendChunk =
+            }
+        }
+
+        public IEnumerable<FrontendChunk> ReadObjectChunks(FrontendObject frontendObject, long length)
+        {
+            var endPos = Reader.BaseStream.Position + length;
+
+            while (Reader.BaseStream.Position < endPos)
+            {
+                FrontendChunkBlock block = new FrontendChunkBlock
+                {
+                    Offset = Reader.BaseStream.Position,
+                    ChunkType = (FrontendChunkType)Reader.ReadUInt32(),
+                    Size = Reader.ReadInt32()
+                };
+
+                FrontendChunk chunk = block.ChunkType switch
+                {
+                    FrontendChunkType.FrontendObjectContainer => new FrontendObjectContainerChunk(frontendObject),
+                    FrontendChunkType.ButtonMapCount => new ButtonMapCountChunk(),
+                    FrontendChunkType.ObjectData => new ObjectDataChunk(frontendObject),
+                    _ => throw new ChunkReadingException($"Unknown chunk type: 0x{((int)block.ChunkType):X8}")
+                };
+
+                chunk.Read(Package, block, this, Reader);
+
+                if (Reader.BaseStream.Position - block.DataOffset != block.Size)
+                {
+                    throw new ChunkReadingException($"ERROR: Expected '{chunk.GetType()}' to read {block.Size} bytes, but it read {Reader.BaseStream.Position - block.DataOffset} bytes instead.");
+                }
+
+                yield return chunk;
             }
         }
     }
