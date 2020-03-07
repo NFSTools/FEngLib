@@ -5,4 +5,8 @@
     <Platforms>x86</Platforms>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="NFSTools.Core.IO" Version="1.0.3" />
+  </ItemGroup>
+
 </Project>

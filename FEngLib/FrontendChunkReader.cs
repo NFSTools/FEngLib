@@ -44,7 +44,7 @@ namespace FEngLib
                 FrontendChunk chunk = block.ChunkType switch
                 {
                     FrontendChunkType.PackageHeader => new PackageHeaderChunk(),
-                    _ => throw new IndexOutOfRangeException()
+                    _ => throw new ChunkReadingException($"Unknown chunk type: 0x{((int)block.ChunkType):X8}")
                 };
 
                 chunk.Read(Package, Reader);
