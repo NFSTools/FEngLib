@@ -37,17 +37,21 @@ namespace FEngLib
                 FrontendChunkBlock block = new FrontendChunkBlock
                 {
                     Offset = Reader.BaseStream.Position,
-                    ChunkType = (FrontendChunkType)Reader.ReadInt32(),
+                    ChunkType = (FrontendChunkType)Reader.ReadUInt32(),
                     Size = Reader.ReadInt32()
                 };
 
                 FrontendChunk chunk = block.ChunkType switch
                 {
                     FrontendChunkType.PackageHeader => new PackageHeaderChunk(),
+                    FrontendChunkType.TypeList => new TypeListChunk(),
+                    FrontendChunkType.ResourcesContainer => new ResourcesContainerChunk(),
+                    FrontendChunkType.ResourceNames => new ResourceNamesChunk(),
+                    FrontendChunkType.ResourceRequests => new ResourceRequestsChunk(),
                     _ => throw new ChunkReadingException($"Unknown chunk type: 0x{((int)block.ChunkType):X8}")
                 };
 
-                chunk.Read(Package, Reader);
+                chunk.Read(Package, block, this, Reader);
 
                 if (Reader.BaseStream.Position - block.DataOffset != block.Size)
                 {

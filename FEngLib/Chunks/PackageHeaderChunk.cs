@@ -21,7 +21,8 @@ namespace FEngLib.Chunks
         /// </summary>
         public string Filename { get; set; }
 
-        public override void Read(FrontendPackage package, BinaryReader reader)
+        public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock,
+            FrontendChunkReader chunkReader, BinaryReader reader)
         {
             if (reader.ReadUInt32() != 0x20000)
             {

@@ -9,4 +9,8 @@
     <PackageReference Include="NFSTools.Core.IO" Version="1.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Objects\" />
+  </ItemGroup>
+
 </Project>
