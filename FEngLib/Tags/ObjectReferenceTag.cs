@@ -18,5 +18,9 @@ namespace FEngLib.Tags
             Flags = br.ReadEnum<FE_ObjectFlags>();
             ResourceIndex = br.ReadInt32();
         }
+
+        public ObjectReferenceTag(FrontendObject frontendObject) : base(frontendObject)
+        {
+        }
     }
 }

@@ -14,5 +14,9 @@ namespace FEngLib.Tags
             if (Value != 0)
                 Debugger.Break();
         }
+
+        public ImageInfoTag(FrontendObject frontendObject) : base(frontendObject)
+        {
+        }
     }
 }

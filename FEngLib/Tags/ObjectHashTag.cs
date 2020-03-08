@@ -12,5 +12,9 @@ namespace FEngLib.Tags
         {
             Hash = br.ReadUInt32();
         }
+
+        public ObjectHashTag(FrontendObject frontendObject) : base(frontendObject)
+        {
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace FEngLib
             Reader = reader;
         }
 
-        public IEnumerable<FrontendTag> ReadTags(long length)
+        public IEnumerable<FrontendTag> ReadObjectTags(FrontendObject frontendObject, long length)
         {
             var endPos = Reader.BaseStream.Position + length;
 
@@ -23,10 +23,11 @@ namespace FEngLib
                 var pos = Reader.BaseStream.Position;
                 FrontendTag tag = id switch
                 {
-                    0x744F => new ObjectTypeTag(),
-                    0x684F => new ObjectHashTag(),
-                    0x504F => new ObjectReferenceTag(),
-                    0x6649 => new ImageInfoTag(),
+                    0x744F => new ObjectTypeTag(frontendObject),
+                    0x684F => new ObjectHashTag(frontendObject),
+                    0x504F => new ObjectReferenceTag(frontendObject),
+                    0x6649 => new ImageInfoTag(frontendObject),
+                    0x4153 => new ObjectDataTag(frontendObject),
                     _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
                 };
 

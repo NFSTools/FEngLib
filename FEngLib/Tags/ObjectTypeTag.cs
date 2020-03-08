@@ -12,5 +12,9 @@ namespace FEngLib.Tags
         {
             Type = br.ReadEnum<FEObjType>();
         }
+
+        public ObjectTypeTag(FrontendObject frontendObject) : base(frontendObject)
+        {
+        }
     }
 }
