@@ -12,5 +12,6 @@
         FrontendObjectContainer = 0xEA624F46,
         ObjectData = 0x446A624F,
         ScriptData = 0x70726353,
+        MessageResponses = 0x5267734D
     }
 }

@@ -112,6 +112,7 @@ namespace FEngLib
                 {
                     FrontendChunkType.ObjectData => new ObjectDataChunk(frontendObject),
                     FrontendChunkType.ScriptData => new ScriptDataChunk(frontendObject),
+                    FrontendChunkType.MessageResponses => new MessageResponsesDataChunk(frontendObject),
                     _ => throw new ChunkReadingException($"Unknown chunk type: 0x{((int)block.ChunkType):X8}")
                 };
 
