@@ -7,7 +7,12 @@ namespace FEngLib
     {
         public FEObjType Type { get; set; }
         public FE_ObjectFlags Flags { get; set; }
-        public uint NameHash { get; set; }
+
+        public uint NameHash
+        {
+            get; 
+            set;
+        }
         public List<FrontendScript> Scripts { get; set; }
         public List<FEMessageResponse> MessageResponses { get; set; }
         public FrontendPackage Package { get; set; }

@@ -16,7 +16,7 @@ namespace FEngLib.Tags
             ushort length)
         {
             Leading = br.ReadInt32();
-            Debug.WriteLine(Leading);
+            //Debug.WriteLine(Leading);
         }
     }
 }

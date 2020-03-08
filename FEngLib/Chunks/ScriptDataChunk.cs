@@ -14,11 +14,11 @@ namespace FEngLib.Chunks
             while (tagStream.HasTag())
             {
                 FrontendTag tag = tagStream.NextTag(FrontendObject, script);
-                Debug.WriteLine("SCRIPT TAG {0}", tag);
+                //Debug.WriteLine("SCRIPT TAG {0}", tag);
                 ProcessTag(FrontendObject, script, tag);
             }
 
-            Debug.WriteLine("ADD SCRIPT: id={0:X8}", script.Id);
+            //Debug.WriteLine("ADD SCRIPT: id={0:X8}", script.Id);
             FrontendObject.Scripts.Add(script);
 
             return FrontendObject;

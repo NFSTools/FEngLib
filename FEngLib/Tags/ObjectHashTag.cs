@@ -11,7 +11,7 @@ namespace FEngLib.Tags
             ushort length)
         {
             Hash = br.ReadUInt32();
-            Debug.WriteLine("Object hash: {0:X8}", Hash);
+            //Debug.WriteLine("Object hash: {0:X8}", Hash);
         }
 
         public ObjectHashTag(FrontendObject frontendObject) : base(frontendObject)

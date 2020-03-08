@@ -15,7 +15,7 @@ namespace FEngLib.Chunks
             while (tagStream.HasTag())
             {
                 FrontendTag tag = tagStream.NextTag(null);
-                Debug.WriteLine("PKG RESPONSES TAG {0}", tag);
+                //Debug.WriteLine("PKG RESPONSES TAG {0}", tag);
                 package = ProcessTag(package, tag);
             }
         }

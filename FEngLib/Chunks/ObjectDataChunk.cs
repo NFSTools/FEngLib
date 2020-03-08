@@ -17,7 +17,7 @@ namespace FEngLib.Chunks
             while (tagStream.HasTag())
             {
                 FrontendTag tag = tagStream.NextTag(newFrontendObject);
-                Debug.WriteLine("OBJECT TAG {0}", tag);
+                //Debug.WriteLine("OBJECT TAG {0}", tag);
                 newFrontendObject = ProcessTag(newFrontendObject, tag);
             }
 
@@ -42,7 +42,7 @@ namespace FEngLib.Chunks
                     ProcessImageInfoTag(frontendImage, imageInfoTag);
                     break;
                 default:
-                    Debug.WriteLine("WARN: Unprocessed tag - {0}", tag.GetType());
+                    //Debug.WriteLine("WARN: Unprocessed tag - {0}", tag.GetType());
                     break;
             }
 
@@ -81,14 +81,14 @@ namespace FEngLib.Chunks
 
         private void ProcessImageInfoTag(FrontendImage frontendImage, ImageInfoTag imageInfoTag)
         {
-            Debug.WriteLine("FEObject {0:X8} has ImageInfo: value={1}", frontendImage.NameHash, imageInfoTag.ImageFlags);
+            //Debug.WriteLine("FEObject {0:X8} has ImageInfo: value={1}", frontendImage.NameHash, imageInfoTag.ImageFlags);
             frontendImage.ImageFlags = imageInfoTag.ImageFlags;
         }
 
         private void ProcessObjectReferenceTag(FrontendObject frontendObject, ObjectReferenceTag objectReferenceTag)
         {
-            Debug.WriteLine("FEObject {0:X8} references object {1:X8}; flags={2}", frontendObject.NameHash,
-                objectReferenceTag.ReferencedObjectGuid, objectReferenceTag.Flags);
+            //Debug.WriteLine("FEObject {0:X8} references object {1:X8}; flags={2}", frontendObject.NameHash,
+                //objectReferenceTag.ReferencedObjectGuid, objectReferenceTag.Flags);
         }
 
         public override FrontendChunkType GetChunkType()

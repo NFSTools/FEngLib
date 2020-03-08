@@ -16,7 +16,7 @@ namespace FEngLib.Tags
             ushort length)
         {
             Formatting = br.ReadEnum<FEStringFormatting>();
-            Debug.WriteLine(Formatting.ToString());
+            //Debug.WriteLine(Formatting.ToString());
         }
     }
 }

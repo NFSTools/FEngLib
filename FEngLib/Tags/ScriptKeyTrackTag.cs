@@ -24,8 +24,8 @@ namespace FEngLib.Tags
             uint value = br.ReadUInt32();
             uint trackLength = value & 0xffffff;
             uint trackOffset = (value >> 24) & 0xff;
-            Debug.WriteLine("PT {0} PS {1} IT {2} IA {3} LEN {4} OFF {5}", ParamType, ParamSize, InterpType,
-                InterpAction, trackLength, trackOffset);
+            //Debug.WriteLine("PT {0} PS {1} IT {2} IA {3} LEN {4} OFF {5}", ParamType, ParamSize, InterpType,
+                //InterpAction, trackLength, trackOffset);
 
             FEKeyTrack keyTrack = new FEKeyTrack
             {

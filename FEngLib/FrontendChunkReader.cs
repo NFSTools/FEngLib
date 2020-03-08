@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using FEngLib.Chunks;
 
@@ -64,7 +65,7 @@ namespace FEngLib
             }
         }
 
-        public IEnumerable<FrontendObject> ReadObjects(long length)
+        public void ReadObjects(long length)
         {
             var endPos = Reader.BaseStream.Position + length;
 
@@ -77,18 +78,42 @@ namespace FEngLib
                     Size = Reader.ReadInt32()
                 };
 
-                FrontendObject frontendObject = new FrontendObject
-                {
-                    Package = Package
-                };
-                FrontendObjectChunk chunk = block.ChunkType switch
-                {
-                    FrontendChunkType.ButtonMapCount => new ButtonMapCountChunk(frontendObject),
-                    FrontendChunkType.FrontendObjectContainer => new FrontendObjectContainerChunk(frontendObject),
-                    _ => throw new ChunkReadingException($"Unknown chunk type: 0x{((int)block.ChunkType):X8}")
-                };
+                //FrontendObject frontendObject = new FrontendObject
+                //{
+                //    Package = Package
+                //};
+                //FrontendObjectChunk chunk = block.ChunkType switch
+                //{
+                //    FrontendChunkType.ButtonMapCount => new ButtonMapCountChunk(frontendObject),
+                //    FrontendChunkType.FrontendObjectContainer => new FrontendObjectContainerChunk(frontendObject),
+                //    _ => throw new ChunkReadingException($"Unknown chunk type: 0x{((int)block.ChunkType):X8}")
+                //};
 
-                ObjectReaderState readerState = new ObjectReaderState(block, this);
+                switch (block.ChunkType)
+                {
+                    case FrontendChunkType.ButtonMapCount:
+                        ButtonMapCountChunk buttonMapCountChunk = new ButtonMapCountChunk();
+                        buttonMapCountChunk.Read(Package, block, this, Reader);
+                        break;
+                    case FrontendChunkType.FrontendObjectContainer:
+                        FrontendObject frontendObject = new FrontendObject();
+                        FrontendObjectContainerChunk objectContainerChunk = new FrontendObjectContainerChunk(frontendObject);
+                        frontendObject = objectContainerChunk.Read(Package, new ObjectReaderState(block, this), Reader);
+                        Package.Objects.Add(frontendObject);
+                        break;
+                    default:
+                        throw new IndexOutOfRangeException();
+                }
+
+                if (Reader.BaseStream.Position - block.DataOffset != block.Size)
+                {
+                    throw new ChunkReadingException($"ERROR: Expected to read {block.Size} bytes, but it read {Reader.BaseStream.Position - block.DataOffset} bytes instead.");
+                }
+            }
+        }
+
+        /*
+         *                 ObjectReaderState readerState = new ObjectReaderState(block, this);
                 frontendObject = chunk.Read(Package, readerState, Reader);
 
                 if (Reader.BaseStream.Position - block.DataOffset != block.Size)
@@ -96,9 +121,8 @@ namespace FEngLib
                     throw new ChunkReadingException($"ERROR: Expected '{chunk.GetType()}' to read {block.Size} bytes, but it read {Reader.BaseStream.Position - block.DataOffset} bytes instead.");
                 }
 
-                yield return frontendObject;
-            }
-        }
+                Package.Objects.Add(frontendObject);
+         */
 
         public FrontendObject ReadFrontendObjectChunks(FrontendObject frontendObject, long length)
         {

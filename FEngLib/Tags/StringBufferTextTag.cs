@@ -16,7 +16,7 @@ namespace FEngLib.Tags
             ushort length)
         {
             Value = Encoding.Unicode.GetString(br.ReadBytes(length)).Trim('\0');
-            Debug.WriteLine(Value);
+            //Debug.WriteLine(Value);
         }
     }
 }

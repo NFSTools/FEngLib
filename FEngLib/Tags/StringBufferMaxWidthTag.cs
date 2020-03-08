@@ -16,7 +16,7 @@ namespace FEngLib.Tags
             ushort length)
         {
             MaxWidth = br.ReadUInt32();
-            Debug.WriteLine(MaxWidth);
+            //Debug.WriteLine(MaxWidth);
         }
     }
 }

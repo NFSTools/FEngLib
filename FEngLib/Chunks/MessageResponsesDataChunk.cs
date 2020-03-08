@@ -16,7 +16,7 @@ namespace FEngLib.Chunks
             while (tagStream.HasTag())
             {
                 FrontendTag tag = tagStream.NextTag(newFrontendObject);
-                Debug.WriteLine("MESSAGES TAG {0}", tag);
+                //Debug.WriteLine("MESSAGES TAG {0}", tag);
                 newFrontendObject = ProcessTag(newFrontendObject, readerState.CurrentChunkBlock, tag);
             }
 

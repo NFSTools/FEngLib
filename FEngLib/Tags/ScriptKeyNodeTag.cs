@@ -23,7 +23,7 @@ namespace FEngLib.Tags
 
             uint numKeys = length / keyDataSize;
 
-            Debug.WriteLine("KNT: kds={0} ts={1} nk={2}", keyDataSize, length, numKeys);
+            //Debug.WriteLine("KNT: kds={0} ts={1} nk={2}", keyDataSize, length, numKeys);
 
             for (int i = 0; i < numKeys; i++)
             {

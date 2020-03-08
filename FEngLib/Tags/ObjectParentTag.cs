@@ -15,7 +15,7 @@ namespace FEngLib.Tags
             ushort length)
         {
             ParentId = br.ReadUInt32();
-            Debug.WriteLine("FEObject {0:X8} has parent {1:X8}", FrontendObject.NameHash, ParentId);
+            //Debug.WriteLine("FEObject {0:X8} has parent {1:X8}", FrontendObject.NameHash, ParentId);
         }
     }
 }

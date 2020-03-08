@@ -11,21 +11,23 @@ namespace FEngLib.Chunks
 
             foreach (var chunk in chunkReader.ReadMainChunks(chunkBlock.Size))
             {
-                if (chunk is ResourceNamesChunk rnc)
+                switch (chunk)
                 {
-                    resourceNamesChunk = rnc;
-                } else if (chunk is ResourceRequestsChunk rrc)
-                {
-                    if (resourceNamesChunk == null)
-                    {
+                    case ResourceNamesChunk rnc:
+                        resourceNamesChunk = rnc;
+                        break;
+                    case ResourceRequestsChunk _ when resourceNamesChunk == null:
                         throw new ChunkReadingException("RsRq came before RsNm?!");
-                    }
-
-                    foreach (var resourceRequest in rrc.ResourceRequests)
+                    case ResourceRequestsChunk rrc:
                     {
-                        resourceRequest.Name = resourceNamesChunk.Names[resourceRequest.NameOffset];
+                        foreach (var resourceRequest in rrc.ResourceRequests)
+                        {
+                            resourceRequest.Name = resourceNamesChunk.Names[resourceRequest.NameOffset];
+                        }
 
-                        // TODO: add request to package?
+                        package.ResourceRequests.AddRange(rrc.ResourceRequests);
+
+                        break;
                     }
                 }
             }

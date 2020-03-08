@@ -11,7 +11,7 @@ namespace FEngLib.Tags
             ushort length)
         {
             ImageFlags = br.ReadUInt32();
-            Debug.WriteLine("ImageFlags for {2}[{1:X8}]: {0}", ImageFlags, FrontendObject.NameHash, package.Name);
+            //Debug.WriteLine("ImageFlags for {2}[{1:X8}]: {0}", ImageFlags, FrontendObject.NameHash, package.Name);
         }
 
         public ImageInfoTag(FrontendObject frontendObject) : base(frontendObject)

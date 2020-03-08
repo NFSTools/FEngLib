@@ -14,10 +14,11 @@ namespace FEngLib.Chunks
 
         public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock, FrontendChunkReader chunkReader, BinaryReader reader)
         {
-            foreach (var frontendObject in chunkReader.ReadObjects(chunkBlock.Size))
-            {
-                Objects.Add(frontendObject);
-            }
+            chunkReader.ReadObjects(chunkBlock.Size);
+            //foreach (var frontendObject in chunkReader.ReadObjects(chunkBlock.Size))
+            //{
+            //    Objects.Add(frontendObject);
+            //}
         }
 
         public override FrontendChunkType GetChunkType()

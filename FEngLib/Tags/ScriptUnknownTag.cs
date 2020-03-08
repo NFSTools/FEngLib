@@ -13,7 +13,7 @@ namespace FEngLib.Tags
             ushort length)
         {
             uint val = br.ReadUInt32();
-            Debug.WriteLine(val);
+            //Debug.WriteLine(val);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace FEngLib.Tags
             ushort length)
         {
             Hash = br.ReadUInt32();
-            Debug.WriteLine("LabelHash={0:X8}", Hash);
+            //Debug.WriteLine("LabelHash={0:X8}", Hash);
         }
     }
 }

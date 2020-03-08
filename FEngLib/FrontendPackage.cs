@@ -13,12 +13,14 @@ namespace FEngLib
         public List<FrontendObject> Objects { get; set; }
         public List<FEMessageResponse> MessageResponses { get; set; }
         public List<FEMessageTargetList> MessageTargetLists { get; set; }
+        public List<FEResourceRequest> ResourceRequests { get; set; }
 
         public FrontendPackage()
         {
             Objects = new List<FrontendObject>();
             MessageResponses = new List<FEMessageResponse>();
             MessageTargetLists = new List<FEMessageTargetList>();
+            ResourceRequests = new List<FEResourceRequest>();
         }
     }
 }
