@@ -41,12 +41,45 @@ namespace FEngLib.Chunks
                 case ImageInfoTag imageInfoTag when frontendObject is FrontendImage frontendImage:
                     ProcessImageInfoTag(frontendImage, imageInfoTag);
                     break;
+                case ObjectDataTag objectDataTag:
+                    ProcessObjectDataTag(frontendObject, objectDataTag);
+                    break;
                 default:
                     //Debug.WriteLine("WARN: Unprocessed tag - {0}", tag.GetType());
                     break;
             }
 
             return frontendObject;
+        }
+
+        private void ProcessObjectDataTag(FrontendObject frontendObject, ObjectDataTag objectDataTag)
+        {
+            frontendObject.Position = objectDataTag.Data.Position;
+            frontendObject.Pivot = objectDataTag.Data.Pivot;
+            frontendObject.Color = objectDataTag.Data.Color;
+            frontendObject.Rotation = objectDataTag.Data.Rotation;
+            frontendObject.Size = objectDataTag.Data.Size;
+
+            if (objectDataTag.Data is FEImageData imageData)
+            {
+                FrontendImage image = (FrontendImage) frontendObject;
+                image.UpperLeft = imageData.UpperLeft;
+                image.LowerRight = imageData.LowerRight;
+            }
+
+            if (objectDataTag.Data is FEMultiImageData multiImageData)
+            {
+                FrontendMultiImage multiImage = (FrontendMultiImage) frontendObject;
+                multiImage.PivotRotation = multiImageData.PivotRotation;
+                multiImage.TopLeftUV = multiImageData.TopLeftUV;
+                multiImage.BottomRightUV = multiImageData.BottomRightUV;
+            }
+
+            if (objectDataTag.Data is FEColoredImageData coloredImageData)
+            {
+                FrontendColoredImage coloredImage = (FrontendColoredImage) frontendObject;
+                coloredImage.VertexColors = coloredImageData.VertexColors;
+            }
         }
 
         private FrontendObject ProcessStringBufferTextTag(FrontendString frontendString, StringBufferTextTag stringBufferTextTag)
@@ -93,8 +126,9 @@ namespace FEngLib.Chunks
 
         private void ProcessObjectReferenceTag(FrontendObject frontendObject, ObjectReferenceTag objectReferenceTag)
         {
+            frontendObject.Flags = objectReferenceTag.Flags;
             //Debug.WriteLine("FEObject {0:X8} references object {1:X8}; flags={2}", frontendObject.NameHash,
-                //objectReferenceTag.ReferencedObjectGuid, objectReferenceTag.Flags);
+            //objectReferenceTag.ReferencedObjectGuid, objectReferenceTag.Flags);
         }
 
         public override FrontendChunkType GetChunkType()
