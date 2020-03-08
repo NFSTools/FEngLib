@@ -16,7 +16,7 @@ namespace FEngLib.Tags
 
             if (chunkBlock.ChunkType == FrontendChunkType.MessageResponses)
             {
-                Debug.WriteLine("MsgResponse {0:X8} has {1} responses", FrontendObject.Responses[^1].Id, value);
+                Debug.WriteLine("MsgResponse {0:X8} has {1} responses", FrontendObject.MessageResponses[^1].Id, value);
             }
             else
             {
