@@ -11,6 +11,7 @@ namespace FEngLib
             FrontendObject = frontendObject;
         }
 
-        public abstract void Read(BinaryReader br, ushort length);
+        public abstract void Read(BinaryReader br, FrontendChunkBlock chunkBlock, FrontendPackage package,
+            ushort length);
     }
 }

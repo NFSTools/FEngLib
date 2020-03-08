@@ -10,7 +10,8 @@ namespace FEngLib.Tags
         {
         }
 
-        public override void Read(BinaryReader br, ushort length)
+        public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, FrontendPackage package,
+            ushort length)
         {
             FEKeyTrack track = FrontendScript.Tracks[^1];
             uint keyDataSize = track.ParamSize + 4u;

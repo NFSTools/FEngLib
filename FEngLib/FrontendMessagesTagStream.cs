@@ -6,7 +6,8 @@ namespace FEngLib
 {
     public class FrontendMessagesTagStream : FrontendTagStream
     {
-        public FrontendMessagesTagStream(BinaryReader reader, long length) : base(reader, length)
+        public FrontendMessagesTagStream(BinaryReader reader, FrontendChunkBlock frontendChunkBlock, long length) :
+            base(reader, frontendChunkBlock, length)
         {
         }
 
@@ -16,10 +17,12 @@ namespace FEngLib
             var pos = Reader.BaseStream.Position;
             FrontendTag tag = id switch
             {
+                0x694D => new MessageResponseInfoTag(frontendObject),
+                0x434D => new MessageResponseCountTag(frontendObject),
                 _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
             };
 
-            tag.Read(Reader, size);
+            tag.Read(Reader, FrontendChunkBlock, frontendObject.Package, size);
 
             if (Reader.BaseStream.Position - pos != size)
             {

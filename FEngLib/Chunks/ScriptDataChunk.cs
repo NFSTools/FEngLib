@@ -8,7 +8,7 @@ namespace FEngLib.Chunks
     {
         public override FrontendObject Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader)
         {
-            FrontendScriptTagStream tagStream = new FrontendScriptTagStream(reader, readerState.CurrentChunkBlock.Size);
+            FrontendScriptTagStream tagStream = new FrontendScriptTagStream(reader, readerState.CurrentChunkBlock, readerState.CurrentChunkBlock.Size);
             FrontendScript script = new FrontendScript();
 
             while (tagStream.HasTag())

@@ -9,10 +9,13 @@ namespace FEngLib
         public FE_ObjectFlags Flags { get; set; }
         public uint NameHash { get; set; }
         public List<FrontendScript> Scripts { get; set; }
+        public List<FEMessageResponse> Responses { get; set; }
+        public FrontendPackage Package { get; set; }
 
         public FrontendObject()
         {
             Scripts = new List<FrontendScript>();
+            Responses = new List<FEMessageResponse>();
         }
 
         public FrontendObject(FrontendObject original) : this()

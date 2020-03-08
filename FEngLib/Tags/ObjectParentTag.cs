@@ -11,7 +11,8 @@ namespace FEngLib.Tags
         {
         }
 
-        public override void Read(BinaryReader br, ushort length)
+        public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, FrontendPackage package,
+            ushort length)
         {
             ParentId = br.ReadUInt32();
             Debug.WriteLine("FEObject {0:X8} has parent {1:X8}", FrontendObject.NameHash, ParentId);

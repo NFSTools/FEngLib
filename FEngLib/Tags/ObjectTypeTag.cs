@@ -8,7 +8,8 @@ namespace FEngLib.Tags
     {
         public FEObjType Type { get; set; }
 
-        public override void Read(BinaryReader br, ushort length)
+        public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, FrontendPackage package,
+            ushort length)
         {
             Type = br.ReadEnum<FEObjType>();
         }

@@ -75,7 +75,10 @@ namespace FEngLib
                     Size = Reader.ReadInt32()
                 };
 
-                FrontendObject frontendObject = new FrontendObject();
+                FrontendObject frontendObject = new FrontendObject
+                {
+                    Package = Package
+                };
                 FrontendObjectChunk chunk = block.ChunkType switch
                 {
                     FrontendChunkType.ButtonMapCount => new ButtonMapCountChunk(frontendObject),
@@ -84,7 +87,7 @@ namespace FEngLib
                 };
 
                 ObjectReaderState readerState = new ObjectReaderState(block, this);
-                chunk.Read(Package, readerState, Reader);
+                frontendObject = chunk.Read(Package, readerState, Reader);
 
                 if (Reader.BaseStream.Position - block.DataOffset != block.Size)
                 {

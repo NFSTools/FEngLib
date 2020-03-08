@@ -7,7 +7,8 @@ namespace FEngLib.Tags
     {
         public FEObjData Data { get; set; }
 
-        public override void Read(BinaryReader br, ushort length)
+        public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, FrontendPackage package,
+            ushort length)
         {
             Data = FrontendObject.Type switch
             {
