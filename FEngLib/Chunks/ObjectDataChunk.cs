@@ -73,6 +73,9 @@ namespace FEngLib.Chunks
                 case FEObjType.FE_MultiImage:
                     newInstance = new FrontendMultiImage(frontendObject);
                     break;
+                case FEObjType.FE_ColoredImage:
+                    newInstance = new FrontendColoredImage(frontendObject);
+                    break;
                 default:
                     throw new IndexOutOfRangeException($"cannot handle object type: {objectTypeTag.Type}");
             }

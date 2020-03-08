@@ -15,6 +15,7 @@ namespace FEngLib.Tags
             {
                 FEObjType.FE_Image => new FEImageData(),
                 FEObjType.FE_MultiImage => new FEMultiImageData(),
+                FEObjType.FE_ColoredImage => new FEColoredImageData(),
                 _ => new FEObjData()
             };
 
