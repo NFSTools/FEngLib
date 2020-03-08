@@ -11,7 +11,7 @@ namespace FEngLib.Tags
         public FE_ObjectFlags Flags { get; set; }
         public int ResourceIndex { get; set; }
 
-        public override void Read(BinaryReader br)
+        public override void Read(BinaryReader br, ushort length)
         {
             ReferencedObjectGuid = br.ReadUInt32();
             NameHash = br.ReadUInt32();

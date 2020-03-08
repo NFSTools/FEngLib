@@ -25,5 +25,10 @@ namespace FEngLib.Structures
             bw.Write(Red);
             bw.Write(Alpha);
         }
+
+        public override string ToString()
+        {
+            return $"{Red}/{Green}/{Blue} [{Alpha}]";
+        }
     }
 }

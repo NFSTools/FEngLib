@@ -8,7 +8,7 @@ namespace FEngTestLoader
     {
         static void Main(string[] args)
         {
-            FrontendPackage package = LoadDumpedChunk(@"test-data\mw\UI_OL_Disconnect_BG.fng");
+            FrontendPackage package = LoadDumpedChunk(@"test-data\mw\InGameRivalBio.fng");
         }
 
         private static FrontendPackage LoadDumpedChunk(string path)

@@ -7,7 +7,7 @@ namespace FEngLib.Tags
     {
         public uint Value { get; set; }
 
-        public override void Read(BinaryReader br)
+        public override void Read(BinaryReader br, ushort length)
         {
             Value = br.ReadUInt32();
 

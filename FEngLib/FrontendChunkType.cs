@@ -11,5 +11,6 @@
         ButtonMapCount = 0x6E747542,
         FrontendObjectContainer = 0xEA624F46,
         ObjectData = 0x446A624F,
+        ScriptData = 0x70726353,
     }
 }

@@ -36,10 +36,11 @@ namespace FEngLib.Chunks
 
             NumResourceNames = reader.ReadInt32();
 
-            if (reader.ReadUInt32() != 3)
-            {
-                throw new InvalidDataException("Invalid header version");
-            }
+            reader.ReadUInt32();
+            //if (reader.ReadUInt32() != 3)
+            //{
+            //    throw new InvalidDataException("Invalid header version");
+            //}
 
             int nameLength = reader.ReadInt32();
 

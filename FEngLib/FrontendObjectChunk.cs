@@ -2,7 +2,7 @@
 
 namespace FEngLib
 {
-    public abstract class FrontendObjectChunk : FrontendChunk
+    public abstract class FrontendObjectChunk
     {
         public FrontendObject FrontendObject { get; }
 
@@ -10,5 +10,9 @@ namespace FEngLib
         {
             FrontendObject = frontendObject;
         }
+
+        public abstract FrontendObject Read(FrontendPackage package, FrontendChunkBlock chunkBlock,
+            FrontendChunkReader chunkReader, BinaryReader reader);
+        public abstract FrontendChunkType GetChunkType();
     }
 }

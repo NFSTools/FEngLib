@@ -20,5 +20,6 @@ namespace FEngLib.Data
         FF_DontNavigate = 0x80000,
         FF_SaveStaticTracks = 0x40000,
         FF_MouseObject = 0x20000,
+        FF_Unknown = 0x8
     }
 }

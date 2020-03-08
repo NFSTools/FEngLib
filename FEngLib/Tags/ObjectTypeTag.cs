@@ -8,7 +8,7 @@ namespace FEngLib.Tags
     {
         public FEObjType Type { get; set; }
 
-        public override void Read(BinaryReader br)
+        public override void Read(BinaryReader br, ushort length)
         {
             Type = br.ReadEnum<FEObjType>();
         }

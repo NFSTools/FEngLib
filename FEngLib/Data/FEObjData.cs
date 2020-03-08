@@ -12,7 +12,7 @@ namespace FEngLib.Data
         public FEQuaternion Rotation { get; set; }
         public FEVector3 Size { get; set; }
 
-        public void Read(BinaryReader br)
+        public virtual void Read(BinaryReader br)
         {
             Color = new FEColor();
             Pivot = new FEVector3();
@@ -27,7 +27,7 @@ namespace FEngLib.Data
             Size.Read(br);
         }
 
-        public void Write(BinaryWriter bw)
+        public virtual void Write(BinaryWriter bw)
         {
             Color.Write(bw);
             Pivot.Write(bw);

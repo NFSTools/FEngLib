@@ -22,5 +22,10 @@ namespace FEngLib.Structures
             bw.Write(Y);
             bw.Write(Z);
         }
+
+        public override string ToString()
+        {
+            return $"({X}, {Y}, {Z})";
+        }
     }
 }

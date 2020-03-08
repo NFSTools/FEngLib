@@ -7,10 +7,11 @@ namespace FEngLib.Tags
     {
         public FEObjData Data { get; set; }
 
-        public override void Read(BinaryReader br)
+        public override void Read(BinaryReader br, ushort length)
         {
             Data = FrontendObject.Type switch
             {
+                FEObjType.FE_Image => new FEImageData(),
                 _ => new FEObjData()
             };
 

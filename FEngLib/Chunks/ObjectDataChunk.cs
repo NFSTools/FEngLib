@@ -1,28 +1,33 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
+using FEngLib.Data;
+using FEngLib.Objects;
 using FEngLib.Tags;
 
 namespace FEngLib.Chunks
 {
     public class ObjectDataChunk : FrontendObjectChunk
     {
-        public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock, FrontendChunkReader chunkReader, BinaryReader reader)
+        public override FrontendObject Read(FrontendPackage package, FrontendChunkBlock chunkBlock, FrontendChunkReader chunkReader, BinaryReader reader)
         {
             FrontendTagReader tagReader = new FrontendTagReader(reader);
+            FrontendObject newFrontendObject = FrontendObject;
 
             foreach (var tag in tagReader.ReadObjectTags(FrontendObject, chunkBlock.Size))
             {
-                this.ProcessTag(FrontendObject, tag);
+                newFrontendObject = this.ProcessTag(FrontendObject, tag);
             }
+
+            return newFrontendObject;
         }
 
-        private void ProcessTag(FrontendObject frontendObject, FrontendTag tag)
+        private FrontendObject ProcessTag(FrontendObject frontendObject, FrontendTag tag)
         {
             switch (tag)
             {
                 case ObjectTypeTag objectTypeTag:
-                    frontendObject.Type = objectTypeTag.Type;
-                    break;
+                    return ProcessObjectTypeTag(frontendObject, objectTypeTag);
                 case ObjectHashTag objectHashTag:
                     frontendObject.NameHash = objectHashTag.Hash;
                     break;
@@ -33,6 +38,27 @@ namespace FEngLib.Chunks
                     ProcessImageInfoTag(frontendObject, imageInfoTag);
                     break;
             }
+
+            return frontendObject;
+        }
+
+        private FrontendObject ProcessObjectTypeTag(FrontendObject frontendObject, ObjectTypeTag objectTypeTag)
+        {
+            FrontendObject newInstance = frontendObject;
+
+            switch (objectTypeTag.Type)
+            {
+                case FEObjType.FE_Image:
+                    newInstance = new FrontendImage(frontendObject);
+                    break;
+                case FEObjType.FE_Group:
+                    newInstance = new FrontendGroup(frontendObject);
+                    break;
+                default:
+                    throw new IndexOutOfRangeException($"cannot handle object type: {objectTypeTag.Type}");
+            }
+
+            return newInstance;
         }
 
         private void ProcessImageInfoTag(FrontendObject frontendObject, ImageInfoTag imageInfoTag)

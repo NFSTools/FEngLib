@@ -5,12 +5,9 @@ namespace FEngLib.Chunks
 {
     public class FrontendObjectContainerChunk : FrontendObjectChunk
     {
-        public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock, FrontendChunkReader chunkReader, BinaryReader reader)
+        public override FrontendObject Read(FrontendPackage package, FrontendChunkBlock chunkBlock, FrontendChunkReader chunkReader, BinaryReader reader)
         {
-            foreach (var chunk in chunkReader.ReadObjectChunks(FrontendObject, chunkBlock.Size))
-            {
-                Debugger.Break();
-            }
+            return chunkReader.ReadFrontendObjectChunks(FrontendObject, chunkBlock.Size);
         }
 
         public override FrontendChunkType GetChunkType()
