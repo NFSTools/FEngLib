@@ -25,6 +25,8 @@ namespace FEngLib
                 0x6952 => new ResponseIdTag(frontendObject),
                 0x7552 => new ResponseParamTag(frontendObject),
                 0x7452 => new ResponseTargetTag(frontendObject),
+                0x6354 => new MessageTargetCountTag(frontendObject),
+                0x744D => new MessageTargetListTag(frontendObject),
                 _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
             };
 
