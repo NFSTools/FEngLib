@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using FEngLib.Chunks;
 
@@ -84,7 +83,8 @@ namespace FEngLib
                     _ => throw new ChunkReadingException($"Unknown chunk type: 0x{((int)block.ChunkType):X8}")
                 };
 
-                chunk.Read(Package, block, this, Reader);
+                ObjectReaderState readerState = new ObjectReaderState(block, this);
+                chunk.Read(Package, readerState, Reader);
 
                 if (Reader.BaseStream.Position - block.DataOffset != block.Size)
                 {
@@ -115,7 +115,8 @@ namespace FEngLib
                     _ => throw new ChunkReadingException($"Unknown chunk type: 0x{((int)block.ChunkType):X8}")
                 };
 
-                frontendObject = chunk.Read(Package, block, this, Reader);
+                ObjectReaderState readerState = new ObjectReaderState(block, this);
+                frontendObject = chunk.Read(Package, readerState, Reader);
 
                 if (Reader.BaseStream.Position - block.DataOffset != block.Size)
                 {

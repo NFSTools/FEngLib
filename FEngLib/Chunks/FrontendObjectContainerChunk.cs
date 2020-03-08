@@ -1,13 +1,12 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 
 namespace FEngLib.Chunks
 {
     public class FrontendObjectContainerChunk : FrontendObjectChunk
     {
-        public override FrontendObject Read(FrontendPackage package, FrontendChunkBlock chunkBlock, FrontendChunkReader chunkReader, BinaryReader reader)
+        public override FrontendObject Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader)
         {
-            return chunkReader.ReadFrontendObjectChunks(FrontendObject, chunkBlock.Size);
+            return readerState.ChunkReader.ReadFrontendObjectChunks(FrontendObject, readerState.CurrentChunkBlock.Size);
         }
 
         public override FrontendChunkType GetChunkType()

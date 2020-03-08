@@ -14,7 +14,7 @@ namespace FEngLib.Tags
 
         public override void Read(BinaryReader br, ushort length)
         {
-            Value = Encoding.Unicode.GetString(br.ReadBytes(length));
+            Value = Encoding.Unicode.GetString(br.ReadBytes(length)).Trim('\0');
             Debug.WriteLine(Value);
         }
     }

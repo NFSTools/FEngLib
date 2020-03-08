@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using FEngLib.Tags;
+﻿using System.IO;
 
 namespace FEngLib
 {
@@ -13,61 +11,29 @@ namespace FEngLib
             Reader = reader;
         }
 
-        public IEnumerable<FrontendTag> ReadObjectTags(FrontendObject frontendObject, long length)
-        {
-            var endPos = Reader.BaseStream.Position + length;
+        //public IEnumerable<FrontendTag> ReadScriptTags(FrontendObject frontendObject, FrontendScript frontendScript, long length)
+        //{
+        //    var endPos = Reader.BaseStream.Position + length;
 
-            while (Reader.BaseStream.Position < endPos)
-            {
-                var (id, size) = (Reader.ReadUInt16(), Reader.ReadUInt16());
-                var pos = Reader.BaseStream.Position;
-                FrontendTag tag = id switch
-                {
-                    0x744F => new ObjectTypeTag(frontendObject),
-                    0x684F => new ObjectHashTag(frontendObject),
-                    0x504F => new ObjectReferenceTag(frontendObject),
-                    0x6649 => new ImageInfoTag(frontendObject),
-                    0x4153 => new ObjectDataTag(frontendObject),
-                    0x4150 => new ObjectParentTag(frontendObject),
-                    0x6253 => new StringBufferLengthTag(frontendObject),
-                    0x7453 => new StringBufferTextTag(frontendObject),
-                    _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
-                };
+        //    while (Reader.BaseStream.Position < endPos)
+        //    {
+        //        var (id, size) = (Reader.ReadUInt16(), Reader.ReadUInt16());
+        //        var pos = Reader.BaseStream.Position;
+        //        FrontendScriptTag tag = id switch
+        //        {
+        //            0x6853 => new ScriptHeaderTag(frontendObject, frontendScript),
+        //            _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
+        //        };
 
-                tag.Read(Reader, size);
+        //        tag.Read(Reader, size);
 
-                if (Reader.BaseStream.Position - pos != size)
-                {
-                    throw new ChunkReadingException($"Expected {size} bytes to be read by {tag.GetType()} but {Reader.BaseStream.Position - pos} bytes were read");
-                }
+        //        if (Reader.BaseStream.Position - pos != size)
+        //        {
+        //            throw new ChunkReadingException($"Expected {size} bytes to be read by {tag.GetType()} but {Reader.BaseStream.Position - pos} bytes were read");
+        //        }
 
-                yield return tag;
-            }
-        }
-
-        public IEnumerable<FrontendTag> ReadScriptTags(FrontendObject frontendObject, FrontendScript frontendScript, long length)
-        {
-            var endPos = Reader.BaseStream.Position + length;
-
-            while (Reader.BaseStream.Position < endPos)
-            {
-                var (id, size) = (Reader.ReadUInt16(), Reader.ReadUInt16());
-                var pos = Reader.BaseStream.Position;
-                FrontendScriptTag tag = id switch
-                {
-                    0x6853 => new ScriptHeaderTag(frontendObject, frontendScript),
-                    _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
-                };
-
-                tag.Read(Reader, size);
-
-                if (Reader.BaseStream.Position - pos != size)
-                {
-                    throw new ChunkReadingException($"Expected {size} bytes to be read by {tag.GetType()} but {Reader.BaseStream.Position - pos} bytes were read");
-                }
-
-                yield return tag;
-            }
-        }
+        //        yield return tag;
+        //    }
+        //}
     }
 }

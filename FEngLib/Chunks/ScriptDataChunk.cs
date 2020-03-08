@@ -1,19 +1,25 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using FEngLib.Tags;
 
 namespace FEngLib.Chunks
 {
     public class ScriptDataChunk : FrontendObjectChunk
     {
-        public override FrontendObject Read(FrontendPackage package, FrontendChunkBlock chunkBlock, FrontendChunkReader chunkReader, BinaryReader reader)
+        public override FrontendObject Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader)
         {
-            FrontendTagReader tagReader = new FrontendTagReader(reader);
+            FrontendScriptTagStream tagStream = new FrontendScriptTagStream(reader, readerState.CurrentChunkBlock.Size);
             FrontendScript script = new FrontendScript();
 
-            foreach (var tag in tagReader.ReadScriptTags(FrontendObject, script, chunkBlock.Size))
+            while (tagStream.HasTag())
             {
-                this.ProcessTag(FrontendObject, script, tag);
+                FrontendTag tag = tagStream.NextTag(FrontendObject, script);
+                Debug.WriteLine("SCRIPT TAG {0}", tag);
+                ProcessTag(FrontendObject, script, tag);
             }
+
+            Debug.WriteLine("ADD SCRIPT: id={0:X8}", script.Id);
+            FrontendObject.Scripts.Add(script);
 
             return FrontendObject;
         }

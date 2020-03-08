@@ -6,7 +6,7 @@ namespace FEngLib.Chunks
     {
         public uint NumEntries { get; set; }
 
-        public override FrontendObject Read(FrontendPackage package, FrontendChunkBlock chunkBlock, FrontendChunkReader chunkReader, BinaryReader reader)
+        public override FrontendObject Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader)
         {
             NumEntries = reader.ReadUInt32();
             return FrontendObject;

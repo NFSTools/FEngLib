@@ -11,8 +11,7 @@ namespace FEngLib
             FrontendObject = frontendObject;
         }
 
-        public abstract FrontendObject Read(FrontendPackage package, FrontendChunkBlock chunkBlock,
-            FrontendChunkReader chunkReader, BinaryReader reader);
+        public abstract FrontendObject Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader);
         public abstract FrontendChunkType GetChunkType();
     }
 }

@@ -9,14 +9,16 @@ namespace FEngLib.Chunks
 {
     public class ObjectDataChunk : FrontendObjectChunk
     {
-        public override FrontendObject Read(FrontendPackage package, FrontendChunkBlock chunkBlock, FrontendChunkReader chunkReader, BinaryReader reader)
+        public override FrontendObject Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader)
         {
-            FrontendTagReader tagReader = new FrontendTagReader(reader);
             FrontendObject newFrontendObject = FrontendObject;
+            FrontendTagStream tagStream = new FrontendObjectTagStream(reader, readerState.CurrentChunkBlock.Size);
 
-            foreach (var tag in tagReader.ReadObjectTags(FrontendObject, chunkBlock.Size))
+            while (tagStream.HasTag())
             {
-                newFrontendObject = this.ProcessTag(FrontendObject, tag);
+                FrontendTag tag = tagStream.NextTag(newFrontendObject);
+                Debug.WriteLine("OBJECT TAG {0}", tag);
+                newFrontendObject = ProcessTag(newFrontendObject, tag);
             }
 
             return newFrontendObject;
@@ -28,6 +30,8 @@ namespace FEngLib.Chunks
             {
                 case ObjectTypeTag objectTypeTag:
                     return ProcessObjectTypeTag(frontendObject, objectTypeTag);
+                case StringBufferTextTag stringBufferTextTag when frontendObject is FrontendString frontendString:
+                    return ProcessStringBufferTextTag(frontendString, stringBufferTextTag);
                 case ObjectHashTag objectHashTag:
                     frontendObject.NameHash = objectHashTag.Hash;
                     break;
@@ -37,14 +41,23 @@ namespace FEngLib.Chunks
                 case ImageInfoTag imageInfoTag:
                     ProcessImageInfoTag(frontendObject, imageInfoTag);
                     break;
+                default:
+                    Debug.WriteLine("WARN: Unprocessed tag - {0}", tag.GetType());
+                    break;
             }
 
             return frontendObject;
         }
 
+        private FrontendObject ProcessStringBufferTextTag(FrontendString frontendString, StringBufferTextTag stringBufferTextTag)
+        {
+            frontendString.Value = stringBufferTextTag.Value;
+            return frontendString;
+        }
+
         private FrontendObject ProcessObjectTypeTag(FrontendObject frontendObject, ObjectTypeTag objectTypeTag)
         {
-            FrontendObject newInstance = frontendObject;
+            FrontendObject newInstance;
 
             switch (objectTypeTag.Type)
             {
@@ -54,9 +67,14 @@ namespace FEngLib.Chunks
                 case FEObjType.FE_Group:
                     newInstance = new FrontendGroup(frontendObject);
                     break;
+                case FEObjType.FE_String:
+                    newInstance = new FrontendString(frontendObject);
+                    break;
                 default:
                     throw new IndexOutOfRangeException($"cannot handle object type: {objectTypeTag.Type}");
             }
+
+            newInstance.Type = objectTypeTag.Type;
 
             return newInstance;
         }

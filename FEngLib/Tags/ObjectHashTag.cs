@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics;
 using System.IO;
-using CoreLibraries.IO;
-using FEngLib.Data;
 
 namespace FEngLib.Tags
 {
