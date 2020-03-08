@@ -1,10 +1,18 @@
-﻿namespace FEngLib
+﻿using System.Collections.Generic;
+using FEngLib.Data;
+
+namespace FEngLib
 {
     public class FrontendScript
     {
         public uint Id { get; set; }
         public uint Length { get; set; }
         public uint Flags { get; set; }
-        public uint TrackCount { get; set; }
+        public List<FEKeyTrack> Tracks { get; set; }
+
+        public FrontendScript()
+        {
+            Tracks = new List<FEKeyTrack>();
+        }
     }
 }

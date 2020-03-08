@@ -42,7 +42,6 @@ namespace FEngLib.Chunks
         private void ProcessScriptHeaderTag(FrontendObject frontendObject, FrontendScript frontendScript, ScriptHeaderTag scriptHeaderTag)
         {
             frontendScript.Id = scriptHeaderTag.Id;
-            frontendScript.TrackCount = scriptHeaderTag.TrackCount;
             frontendScript.Flags = scriptHeaderTag.Flags;
             frontendScript.Length = scriptHeaderTag.Length;
         }
