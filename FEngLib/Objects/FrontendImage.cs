@@ -13,6 +13,7 @@
         }
         public FrontendImage(FrontendImage original) : this(original as FrontendObject)
         {
+            ImageFlags = original.ImageFlags;
         }
     }
 }

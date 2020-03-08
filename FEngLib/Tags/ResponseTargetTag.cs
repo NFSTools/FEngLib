@@ -11,7 +11,8 @@ namespace FEngLib.Tags
         {
         }
 
-        public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, FrontendPackage package, ushort length)
+        public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, FrontendPackage package, ushort id,
+            ushort length)
         {
             Target = br.ReadUInt32();
             //Debug.WriteLine("ResponseTarget: {0:X8}", Target);

@@ -13,6 +13,7 @@ namespace FEngLib.Tags
         }
 
         public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, FrontendPackage package,
+            ushort id,
             ushort length)
         {
             Value = Encoding.Unicode.GetString(br.ReadBytes(length)).Trim('\0');

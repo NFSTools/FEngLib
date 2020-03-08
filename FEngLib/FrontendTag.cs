@@ -12,6 +12,7 @@ namespace FEngLib
         }
 
         public abstract void Read(BinaryReader br, FrontendChunkBlock chunkBlock, FrontendPackage package,
+            ushort id,
             ushort length);
     }
 }

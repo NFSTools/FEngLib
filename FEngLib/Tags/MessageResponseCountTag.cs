@@ -10,6 +10,7 @@ namespace FEngLib.Tags
         }
 
         public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, FrontendPackage package,
+            ushort id,
             ushort length)
         {
             uint value = br.ReadUInt32();

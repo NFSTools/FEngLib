@@ -12,7 +12,7 @@ namespace FEngTestLoader
         static void Main(string[] args)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-            var path = @"test-data\mw\InGameRivalBio.fng";
+            var path = @"test-data\mw\HUD_SingleRace.fng";
             FrontendPackage package = LoadDumpedChunk(path);
             stopwatch.Stop();
             long elapsed = stopwatch.ElapsedMilliseconds;

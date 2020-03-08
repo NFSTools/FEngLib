@@ -8,6 +8,7 @@ namespace FEngLib.Tags
         public uint ImageFlags { get; set; }
 
         public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, FrontendPackage package,
+            ushort id,
             ushort length)
         {
             ImageFlags = br.ReadUInt32();

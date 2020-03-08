@@ -12,6 +12,7 @@ namespace FEngLib.Tags
         public int ResourceIndex { get; set; }
 
         public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, FrontendPackage package,
+            ushort id,
             ushort length)
         {
             ReferencedObjectGuid = br.ReadUInt32();

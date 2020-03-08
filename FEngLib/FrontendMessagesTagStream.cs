@@ -30,7 +30,7 @@ namespace FEngLib
                 _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
             };
 
-            tag.Read(Reader, FrontendChunkBlock, Package, size);
+            tag.Read(Reader, FrontendChunkBlock, Package, id, size);
 
             if (Reader.BaseStream.Position - pos != size)
             {

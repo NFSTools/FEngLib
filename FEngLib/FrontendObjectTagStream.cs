@@ -28,10 +28,16 @@ namespace FEngLib
                 0x6C53 => new StringBufferLeadingTag(frontendObject),
                 0x7753 => new StringBufferMaxWidthTag(frontendObject),
                 0x4853 => new StringBufferLabelHashTag(frontendObject),
+                0x314D => new MultiImageTextureTag(frontendObject),
+                0x324D => new MultiImageTextureTag(frontendObject),
+                0x334D => new MultiImageTextureTag(frontendObject),
+                0x614D => new MultiImageTextureFlagsTag(frontendObject),
+                0x624D => new MultiImageTextureFlagsTag(frontendObject),
+                0x634D => new MultiImageTextureFlagsTag(frontendObject),
                 _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
             };
 
-            tag.Read(Reader, FrontendChunkBlock, frontendObject.Package, size);
+            tag.Read(Reader, FrontendChunkBlock, frontendObject.Package, id, size);
 
             if (Reader.BaseStream.Position - pos != size)
             {
