@@ -38,8 +38,8 @@ namespace FEngLib.Chunks
                 case ObjectReferenceTag objectReferenceTag:
                     ProcessObjectReferenceTag(frontendObject, objectReferenceTag);
                     break;
-                case ImageInfoTag imageInfoTag:
-                    ProcessImageInfoTag(frontendObject, imageInfoTag);
+                case ImageInfoTag imageInfoTag when frontendObject is FrontendImage frontendImage:
+                    ProcessImageInfoTag(frontendImage, imageInfoTag);
                     break;
                 default:
                     Debug.WriteLine("WARN: Unprocessed tag - {0}", tag.GetType());
@@ -79,9 +79,10 @@ namespace FEngLib.Chunks
             return newInstance;
         }
 
-        private void ProcessImageInfoTag(FrontendObject frontendObject, ImageInfoTag imageInfoTag)
+        private void ProcessImageInfoTag(FrontendImage frontendImage, ImageInfoTag imageInfoTag)
         {
-            Debug.WriteLine("FEObject {0:X8} has ImageInfo: value={1}", frontendObject.NameHash, imageInfoTag.Value);
+            Debug.WriteLine("FEObject {0:X8} has ImageInfo: value={1}", frontendImage.NameHash, imageInfoTag.ImageFlags);
+            frontendImage.ImageFlags = imageInfoTag.ImageFlags;
         }
 
         private void ProcessObjectReferenceTag(FrontendObject frontendObject, ObjectReferenceTag objectReferenceTag)

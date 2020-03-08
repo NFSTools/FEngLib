@@ -48,6 +48,8 @@ namespace FEngLib
                     FrontendChunkType.ResourceNames => new ResourceNamesChunk(),
                     FrontendChunkType.ResourceRequests => new ResourceRequestsChunk(),
                     FrontendChunkType.ObjectContainer => new ObjectContainerChunk(),
+                    FrontendChunkType.PackageResponses => new PackageResponsesChunk(),
+                    FrontendChunkType.Targets => new PackageMessageTargetsChunk(),
                     _ => throw new ChunkReadingException($"Unknown chunk type: 0x{((int)block.ChunkType):X8}")
                 };
 

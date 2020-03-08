@@ -2,6 +2,8 @@
 {
     public class FrontendImage : FrontendObject
     {
+        public uint ImageFlags { get; set; }
+
         public FrontendImage()
         {
         }

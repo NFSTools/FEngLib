@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using FEngLib.Chunks;
 
 namespace FEngLib
 {
@@ -20,10 +21,29 @@ namespace FEngLib
 
             foreach (var chunk in chunkReader.ReadMainChunks())
             {
-                Debug.WriteLine(chunk);
+                switch (chunk)
+                {
+                    case PackageHeaderChunk packageHeaderChunk:
+                        this.ProcessPackageHeaderChunk(package, packageHeaderChunk);
+                        break;
+                    case ObjectContainerChunk objectContainerChunk:
+                        ProcessObjectContainerChunk(package, objectContainerChunk);
+                        break;
+                }
             }
 
             return package;
+        }
+
+        private void ProcessObjectContainerChunk(FrontendPackage package, ObjectContainerChunk objectContainerChunk)
+        {
+            package.Objects.AddRange(objectContainerChunk.Objects);
+        }
+
+        private void ProcessPackageHeaderChunk(FrontendPackage package, PackageHeaderChunk packageHeaderChunk)
+        {
+            package.Filename = packageHeaderChunk.Filename;
+            package.Name = packageHeaderChunk.Name;
         }
     }
 }

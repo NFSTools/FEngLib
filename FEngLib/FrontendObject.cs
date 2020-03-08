@@ -23,6 +23,7 @@ namespace FEngLib
             Type = original.Type;
             NameHash = original.NameHash;
             Flags = original.Flags;
+            Package = original.Package;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FEngLib.Data;
 
 namespace FEngLib
 {
@@ -10,11 +11,14 @@ namespace FEngLib
         public string Name { get; set; }
         public string Filename { get; set; }
         public List<FrontendObject> Objects { get; set; }
-        public FrontendObject LastObject => Objects.Count > 0 ? Objects[^1] : null;
+        public List<FEMessageResponse> MessageResponses { get; set; }
+        public List<FEMessageTargetList> MessageTargetLists { get; set; }
 
         public FrontendPackage()
         {
             Objects = new List<FrontendObject>();
+            MessageResponses = new List<FEMessageResponse>();
+            MessageTargetLists = new List<FEMessageTargetList>();
         }
     }
 }
