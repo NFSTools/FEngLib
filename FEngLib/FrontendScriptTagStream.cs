@@ -27,6 +27,7 @@ namespace FEngLib
                 0x4946 => new ScriptKeyTrackTag(frontendObject, frontendScript),
                 0x6F54 => new ScriptUnknownTag(frontendObject, frontendScript),
                 0x644B => new ScriptKeyNodeTag(frontendObject, frontendScript),
+                0x5645 => new ScriptEventsTag(frontendObject, frontendScript),
                 _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
             };
 

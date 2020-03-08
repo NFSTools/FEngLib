@@ -23,19 +23,23 @@ namespace FEngLib.Tags
 
             uint numKeys = length / keyDataSize;
 
+            Debug.WriteLine("KNT: kds={0} ts={1} nk={2}", keyDataSize, length, numKeys);
+
             for (int i = 0; i < numKeys; i++)
             {
                 FEKeyNode keyNode = new FEKeyNode
                 {
                     Time = br.ReadInt32(),
-                    Val =
-                    {
-                        [0] = br.ReadUInt32(),   
-                        [1] = br.ReadUInt32(),   
-                        [2] = br.ReadUInt32(),   
-                        [3] = br.ReadUInt32(),   
-                    }
+                    Val = new uint[4]
                 };
+
+                if (keyDataSize >> 2 != 1)
+                {
+                    for (int j = 0; j < (keyDataSize >> 2) - 1; j++)
+                    {
+                        keyNode.Val[j] = br.ReadUInt32();
+                    }
+                }
 
                 if (i == 0)
                 {

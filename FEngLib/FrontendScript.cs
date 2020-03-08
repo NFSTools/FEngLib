@@ -9,10 +9,12 @@ namespace FEngLib
         public uint Length { get; set; }
         public uint Flags { get; set; }
         public List<FEKeyTrack> Tracks { get; set; }
+        public List<FEEvent> Events { get; set; }
 
         public FrontendScript()
         {
             Tracks = new List<FEKeyTrack>();
+            Events = new List<FEEvent>();
         }
     }
 }
