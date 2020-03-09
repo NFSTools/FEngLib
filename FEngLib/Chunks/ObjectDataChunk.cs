@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using FEngLib.Data;
 using FEngLib.Objects;
@@ -32,6 +31,14 @@ namespace FEngLib.Chunks
                     return ProcessObjectTypeTag(frontendObject, objectTypeTag);
                 case StringBufferTextTag stringBufferTextTag when frontendObject is FrontendString frontendString:
                     return ProcessStringBufferTextTag(frontendString, stringBufferTextTag);
+                case StringBufferFormattingTag stringBufferFormattingTag when frontendObject is FrontendString frontendString:
+                    return ProcessStringBufferFormattingTag(frontendString, stringBufferFormattingTag);
+                case StringBufferLeadingTag stringBufferLeadingTag when frontendObject is FrontendString frontendString:
+                    return ProcessStringBufferLeadingTag(frontendString, stringBufferLeadingTag);
+                case StringBufferLabelHashTag stringBufferLabelHashTag when frontendObject is FrontendString frontendString:
+                    return ProcessStringBufferLabelHashTag(frontendString, stringBufferLabelHashTag);
+                case StringBufferMaxWidthTag stringBufferMaxWidthTag when frontendObject is FrontendString frontendString:
+                    return ProcessStringBufferMaxWidthTag(frontendString, stringBufferMaxWidthTag);
                 case ObjectHashTag objectHashTag:
                     frontendObject.NameHash = objectHashTag.Hash;
                     break;
@@ -50,6 +57,30 @@ namespace FEngLib.Chunks
             }
 
             return frontendObject;
+        }
+
+        private FrontendObject ProcessStringBufferMaxWidthTag(FrontendString frontendString, StringBufferMaxWidthTag stringBufferMaxWidthTag)
+        {
+            frontendString.MaxWidth = stringBufferMaxWidthTag.MaxWidth;
+            return frontendString;
+        }
+
+        private FrontendObject ProcessStringBufferLabelHashTag(FrontendString frontendString, StringBufferLabelHashTag stringBufferLabelHashTag)
+        {
+            frontendString.Hash = stringBufferLabelHashTag.Hash;
+            return frontendString;
+        }
+
+        private FrontendObject ProcessStringBufferLeadingTag(FrontendString frontendString, StringBufferLeadingTag stringBufferLeadingTag)
+        {
+            frontendString.Leading = stringBufferLeadingTag.Leading;
+            return frontendString;
+        }
+
+        private FrontendObject ProcessStringBufferFormattingTag(FrontendString frontendString, StringBufferFormattingTag stringBufferFormattingTag)
+        {
+            frontendString.Formatting = stringBufferFormattingTag.Formatting;
+            return frontendString;
         }
 
         private void ProcessObjectDataTag(FrontendObject frontendObject, ObjectDataTag objectDataTag)
