@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FEngLib", "FEngLib\FEngLib.csproj", "{52976D61-7019-4B7C-B939-835E35739063}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FEngCli", "FEngCli\FEngCli.csproj", "{146FE215-25BC-4AA6-9546-B6E8CC9C163A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -15,6 +17,10 @@ Global
 		{52976D61-7019-4B7C-B939-835E35739063}.Debug|x86.Build.0 = Debug|x86
 		{52976D61-7019-4B7C-B939-835E35739063}.Release|x86.ActiveCfg = Release|x86
 		{52976D61-7019-4B7C-B939-835E35739063}.Release|x86.Build.0 = Release|x86
+		{146FE215-25BC-4AA6-9546-B6E8CC9C163A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{146FE215-25BC-4AA6-9546-B6E8CC9C163A}.Debug|x86.Build.0 = Debug|Any CPU
+		{146FE215-25BC-4AA6-9546-B6E8CC9C163A}.Release|x86.ActiveCfg = Release|Any CPU
+		{146FE215-25BC-4AA6-9546-B6E8CC9C163A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
