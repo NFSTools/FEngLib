@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using FEngLib.Data;
 using FEngLib.Objects;
@@ -8,22 +9,27 @@ namespace FEngLib.Chunks
 {
     public class ObjectDataChunk : FrontendObjectChunk
     {
+        public ObjectDataChunk(FrontendObject frontendObject) : base(frontendObject)
+        {
+        }
+
         public override FrontendObject Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader)
         {
-            FrontendObject newFrontendObject = FrontendObject;
-            FrontendTagStream tagStream = new FrontendObjectTagStream(reader, readerState.CurrentChunkBlock, readerState.CurrentChunkBlock.Size);
+            var newFrontendObject = FrontendObject;
+            FrontendTagStream tagStream = new FrontendObjectTagStream(reader, readerState.CurrentChunkBlock,
+                readerState.CurrentChunkBlock.Size);
 
             while (tagStream.HasTag())
             {
-                FrontendTag tag = tagStream.NextTag(newFrontendObject);
+                var tag = tagStream.NextTag(newFrontendObject);
                 //Debug.WriteLine("OBJECT TAG {0}", tag);
-                newFrontendObject = ProcessTag(newFrontendObject, tag);
+                newFrontendObject = ProcessTag(package, newFrontendObject, tag);
             }
 
             return newFrontendObject;
         }
 
-        private FrontendObject ProcessTag(FrontendObject frontendObject, FrontendTag tag)
+        private FrontendObject ProcessTag(FrontendPackage package, FrontendObject frontendObject, FrontendTag tag)
         {
             switch (tag)
             {
@@ -31,14 +37,19 @@ namespace FEngLib.Chunks
                     return ProcessObjectTypeTag(frontendObject, objectTypeTag);
                 case StringBufferTextTag stringBufferTextTag when frontendObject is FrontendString frontendString:
                     return ProcessStringBufferTextTag(frontendString, stringBufferTextTag);
-                case StringBufferFormattingTag stringBufferFormattingTag when frontendObject is FrontendString frontendString:
+                case StringBufferFormattingTag stringBufferFormattingTag
+                    when frontendObject is FrontendString frontendString:
                     return ProcessStringBufferFormattingTag(frontendString, stringBufferFormattingTag);
                 case StringBufferLeadingTag stringBufferLeadingTag when frontendObject is FrontendString frontendString:
                     return ProcessStringBufferLeadingTag(frontendString, stringBufferLeadingTag);
-                case StringBufferLabelHashTag stringBufferLabelHashTag when frontendObject is FrontendString frontendString:
+                case StringBufferLabelHashTag stringBufferLabelHashTag
+                    when frontendObject is FrontendString frontendString:
                     return ProcessStringBufferLabelHashTag(frontendString, stringBufferLabelHashTag);
-                case StringBufferMaxWidthTag stringBufferMaxWidthTag when frontendObject is FrontendString frontendString:
+                case StringBufferMaxWidthTag stringBufferMaxWidthTag
+                    when frontendObject is FrontendString frontendString:
                     return ProcessStringBufferMaxWidthTag(frontendString, stringBufferMaxWidthTag);
+                case StringBufferLengthTag stringBufferLengthTag:
+                    break;
                 case ObjectHashTag objectHashTag:
                     frontendObject.NameHash = objectHashTag.Hash;
                     break;
@@ -51,33 +62,45 @@ namespace FEngLib.Chunks
                 case ObjectDataTag objectDataTag:
                     ProcessObjectDataTag(frontendObject, objectDataTag);
                     break;
-                default:
-                    //Debug.WriteLine("WARN: Unprocessed tag - {0}", tag.GetType());
+                case ObjectParentTag objectParentTag:
+                    ProcessObjectParentTag(package, frontendObject, objectParentTag);
                     break;
+                default:
+                    throw new InvalidDataException($"Unknown tag: {tag}");
             }
 
             return frontendObject;
         }
 
-        private FrontendObject ProcessStringBufferMaxWidthTag(FrontendString frontendString, StringBufferMaxWidthTag stringBufferMaxWidthTag)
+        private void ProcessObjectParentTag(FrontendPackage package, FrontendObject frontendObject,
+            ObjectParentTag objectParentTag)
+        {
+            frontendObject.Parent = package.FindObjectByGuid(objectParentTag.ParentId);
+        }
+
+        private FrontendObject ProcessStringBufferMaxWidthTag(FrontendString frontendString,
+            StringBufferMaxWidthTag stringBufferMaxWidthTag)
         {
             frontendString.MaxWidth = stringBufferMaxWidthTag.MaxWidth;
             return frontendString;
         }
 
-        private FrontendObject ProcessStringBufferLabelHashTag(FrontendString frontendString, StringBufferLabelHashTag stringBufferLabelHashTag)
+        private FrontendObject ProcessStringBufferLabelHashTag(FrontendString frontendString,
+            StringBufferLabelHashTag stringBufferLabelHashTag)
         {
             frontendString.Hash = stringBufferLabelHashTag.Hash;
             return frontendString;
         }
 
-        private FrontendObject ProcessStringBufferLeadingTag(FrontendString frontendString, StringBufferLeadingTag stringBufferLeadingTag)
+        private FrontendObject ProcessStringBufferLeadingTag(FrontendString frontendString,
+            StringBufferLeadingTag stringBufferLeadingTag)
         {
             frontendString.Leading = stringBufferLeadingTag.Leading;
             return frontendString;
         }
 
-        private FrontendObject ProcessStringBufferFormattingTag(FrontendString frontendString, StringBufferFormattingTag stringBufferFormattingTag)
+        private FrontendObject ProcessStringBufferFormattingTag(FrontendString frontendString,
+            StringBufferFormattingTag stringBufferFormattingTag)
         {
             frontendString.Formatting = stringBufferFormattingTag.Formatting;
             return frontendString;
@@ -93,14 +116,14 @@ namespace FEngLib.Chunks
 
             if (objectDataTag.Data is FEImageData imageData)
             {
-                FrontendImage image = (FrontendImage) frontendObject;
+                var image = (FrontendImage) frontendObject;
                 image.UpperLeft = imageData.UpperLeft;
                 image.LowerRight = imageData.LowerRight;
             }
 
             if (objectDataTag.Data is FEMultiImageData multiImageData)
             {
-                FrontendMultiImage multiImage = (FrontendMultiImage) frontendObject;
+                var multiImage = (FrontendMultiImage) frontendObject;
                 multiImage.PivotRotation = multiImageData.PivotRotation;
                 multiImage.TopLeftUV = multiImageData.TopLeftUV;
                 multiImage.BottomRightUV = multiImageData.BottomRightUV;
@@ -108,12 +131,13 @@ namespace FEngLib.Chunks
 
             if (objectDataTag.Data is FEColoredImageData coloredImageData)
             {
-                FrontendColoredImage coloredImage = (FrontendColoredImage) frontendObject;
+                var coloredImage = (FrontendColoredImage) frontendObject;
                 coloredImage.VertexColors = coloredImageData.VertexColors;
             }
         }
 
-        private FrontendObject ProcessStringBufferTextTag(FrontendString frontendString, StringBufferTextTag stringBufferTextTag)
+        private FrontendObject ProcessStringBufferTextTag(FrontendString frontendString,
+            StringBufferTextTag stringBufferTextTag)
         {
             frontendString.Value = stringBufferTextTag.Value;
             return frontendString;
@@ -157,18 +181,16 @@ namespace FEngLib.Chunks
 
         private void ProcessObjectReferenceTag(FrontendObject frontendObject, ObjectReferenceTag objectReferenceTag)
         {
+            Debug.WriteLine("FEObject {0:X8} references object {1:X8}; flags={2}", frontendObject.NameHash,
+                objectReferenceTag.Guid, objectReferenceTag.Flags);
             frontendObject.Flags = objectReferenceTag.Flags;
-            //Debug.WriteLine("FEObject {0:X8} references object {1:X8}; flags={2}", frontendObject.NameHash,
-            //objectReferenceTag.ReferencedObjectGuid, objectReferenceTag.Flags);
+            frontendObject.Guid = objectReferenceTag.Guid;
+            frontendObject.ResourceIndex = objectReferenceTag.ResourceIndex;
         }
 
         public override FrontendChunkType GetChunkType()
         {
             return FrontendChunkType.ObjectData;
-        }
-
-        public ObjectDataChunk(FrontendObject frontendObject) : base(frontendObject)
-        {
         }
     }
 }

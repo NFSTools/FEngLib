@@ -4,10 +4,18 @@ using FEngLib.Data;
 namespace FEngLib
 {
     /// <summary>
-    /// Stores frontend objects, resource names, etc.
+    ///     Stores frontend objects, resource names, etc.
     /// </summary>
     public class FrontendPackage
     {
+        public FrontendPackage()
+        {
+            Objects = new List<FrontendObject>();
+            MessageResponses = new List<FEMessageResponse>();
+            MessageTargetLists = new List<FEMessageTargetList>();
+            ResourceRequests = new List<FEResourceRequest>();
+        }
+
         public string Name { get; set; }
         public string Filename { get; set; }
         public List<FrontendObject> Objects { get; set; }
@@ -15,12 +23,16 @@ namespace FEngLib
         public List<FEMessageTargetList> MessageTargetLists { get; set; }
         public List<FEResourceRequest> ResourceRequests { get; set; }
 
-        public FrontendPackage()
+        public FrontendObject FindObjectByGuid(uint guid)
         {
-            Objects = new List<FrontendObject>();
-            MessageResponses = new List<FEMessageResponse>();
-            MessageTargetLists = new List<FEMessageTargetList>();
-            ResourceRequests = new List<FEResourceRequest>();
+            return Objects.Find(o => o.Guid == guid) ??
+                   throw new KeyNotFoundException($"Could not find object with GUID: 0x{guid:X8}");
+        }
+
+        public FrontendObject FindObjectByHash(uint hash)
+        {
+            return Objects.Find(o => o.NameHash == hash) ??
+                   throw new KeyNotFoundException($"Could not find object with hash: 0x{hash:X8}");
         }
     }
 }
