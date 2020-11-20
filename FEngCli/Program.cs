@@ -2,19 +2,13 @@
 using System.IO;
 using CommandLine;
 using FEngLib;
+using FEngLib.Objects;
 using JetBrains.Annotations;
 
 namespace FEngCli
 {
     internal static class Program
     {
-        [UsedImplicitly]
-        private class Options
-        {
-            [Option('i', "input", Required = true)]
-            public string InputFile { get; set; }
-        }
-
         private static int Main(string[] args)
         {
             return Parser.Default.ParseArguments<Options>(args)
@@ -30,10 +24,35 @@ namespace FEngCli
             }
 
             var package = LoadPackageFromChunk(options.InputFile);
-            Console.WriteLine(package.Name);
-            Console.WriteLine(package.Filename);
-
+            DumpPackageInfo(package);
             return 0;
+        }
+
+        private static void DumpPackageInfo(FrontendPackage package)
+        {
+            foreach (var frontendObject in package.Objects) DumpObjectInfo(frontendObject);
+        }
+
+        private static void DumpObjectInfo(FrontendObject frontendObject)
+        {
+            Console.WriteLine(frontendObject);
+            Console.WriteLine("\tPosition : {0}", frontendObject.Position);
+            Console.WriteLine("\tPivot    : {0}", frontendObject.Pivot);
+            Console.WriteLine("\tRotation : {0}", frontendObject.Rotation);
+            Console.WriteLine("\tSize     : {0}", frontendObject.Size);
+            Console.WriteLine("\tColor    : {0}", frontendObject.Color);
+            Console.WriteLine("\tType     : {0}", frontendObject.Type);
+
+            switch (frontendObject)
+            {
+                case FrontendString frontendString:
+                    Console.WriteLine("\t\tText          : {0}", frontendString.Value);
+                    Console.WriteLine("\t\tString hash   : {0:X8}", frontendString.Hash);
+                    Console.WriteLine("\t\tMaximum width : {0}", frontendString.MaxWidth);
+                    Console.WriteLine("\t\tText leading  : {0}", frontendString.Leading);
+                    Console.WriteLine("\t\tText format   : {0}", frontendString.Formatting);
+                    break;
+            }
         }
 
         private static FrontendPackage LoadPackageFromChunk(string path)
@@ -41,10 +60,7 @@ namespace FEngCli
             using var fs = new FileStream(path, FileMode.Open);
             using var fr = new BinaryReader(fs);
 
-            if (fr.ReadUInt32() != 197123)
-            {
-                throw new InvalidDataException($"Invalid FEng chunk file: {path}");
-            }
+            if (fr.ReadUInt32() != 197123) throw new InvalidDataException($"Invalid FEng chunk file: {path}");
 
             fs.Seek(0x10, SeekOrigin.Begin);
 
@@ -54,6 +70,13 @@ namespace FEngCli
 
             using var mr = new BinaryReader(ms);
             return new FrontendPackageLoader().Load(mr);
+        }
+
+        [UsedImplicitly]
+        private class Options
+        {
+            [Option('i', "input", Required = true)]
+            public string InputFile { get; set; }
         }
     }
 }
