@@ -1,11 +1,11 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 
 namespace FEngLib.Tags
 {
     public class ScriptUnknownTag : FrontendScriptTag
     {
-        public ScriptUnknownTag(FrontendObject frontendObject, FrontendScript frontendScript) : base(frontendObject, frontendScript)
+        public ScriptUnknownTag(FrontendObject frontendObject, FrontendScript frontendScript) : base(frontendObject,
+            frontendScript)
         {
         }
 
@@ -13,8 +13,7 @@ namespace FEngLib.Tags
             ushort id,
             ushort length)
         {
-            uint val = br.ReadUInt32();
-            //Debug.WriteLine(val);
+            var val = br.ReadUInt32();
         }
     }
 }

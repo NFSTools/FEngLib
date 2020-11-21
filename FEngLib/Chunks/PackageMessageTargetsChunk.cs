@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using FEngLib.Data;
 using FEngLib.Tags;
 
@@ -7,15 +6,15 @@ namespace FEngLib.Chunks
 {
     public class PackageMessageTargetsChunk : FrontendChunk
     {
-        public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock, FrontendChunkReader chunkReader, BinaryReader reader)
+        public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock,
+            FrontendChunkReader chunkReader, BinaryReader reader)
         {
             FrontendTagStream tagStream = new FrontendMessagesTagStream(reader, package, chunkBlock,
                 chunkBlock.Size);
 
             while (tagStream.HasTag())
             {
-                FrontendTag tag = tagStream.NextTag(null);
-                //Debug.WriteLine("PKG RESPONSES TAG {0}", tag);
+                var tag = tagStream.NextTag(null);
                 package = ProcessTag(package, tag);
             }
         }
@@ -56,7 +55,7 @@ namespace FEngLib.Chunks
         private void ProcessResponseIdTag(FrontendPackage frontendPackage,
             ResponseIdTag responseIdTag)
         {
-            FEResponse response = new FEResponse { Id = responseIdTag.Id };
+            var response = new FEResponse {Id = responseIdTag.Id};
             frontendPackage.MessageResponses[^1].Responses.Add(response);
         }
 
@@ -71,7 +70,7 @@ namespace FEngLib.Chunks
             }
             else
             {
-                var response = new FEMessageResponse { Id = tag.Hash };
+                var response = new FEMessageResponse {Id = tag.Hash};
 
                 frontendPackage.MessageResponses.Add(response);
             }

@@ -1,24 +1,26 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using FEngLib.Tags;
 
 namespace FEngLib.Chunks
 {
     public class ScriptDataChunk : FrontendObjectChunk
     {
+        public ScriptDataChunk(FrontendObject frontendObject) : base(frontendObject)
+        {
+        }
+
         public override FrontendObject Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader)
         {
-            FrontendScriptTagStream tagStream = new FrontendScriptTagStream(reader, readerState.CurrentChunkBlock, readerState.CurrentChunkBlock.Size);
-            FrontendScript script = new FrontendScript();
+            var tagStream = new FrontendScriptTagStream(reader, readerState.CurrentChunkBlock,
+                readerState.CurrentChunkBlock.Size);
+            var script = new FrontendScript();
 
             while (tagStream.HasTag())
             {
-                FrontendTag tag = tagStream.NextTag(FrontendObject, script);
-                //Debug.WriteLine("SCRIPT TAG {0}", tag);
+                var tag = tagStream.NextTag(FrontendObject, script);
                 ProcessTag(FrontendObject, script, tag);
             }
 
-            //Debug.WriteLine("ADD SCRIPT: id={0:X8}", script.Id);
             FrontendObject.Scripts.Add(script);
 
             return FrontendObject;
@@ -39,15 +41,12 @@ namespace FEngLib.Chunks
             }
         }
 
-        private void ProcessScriptHeaderTag(FrontendObject frontendObject, FrontendScript frontendScript, ScriptHeaderTag scriptHeaderTag)
+        private void ProcessScriptHeaderTag(FrontendObject frontendObject, FrontendScript frontendScript,
+            ScriptHeaderTag scriptHeaderTag)
         {
             frontendScript.Id = scriptHeaderTag.Id;
             frontendScript.Flags = scriptHeaderTag.Flags;
             frontendScript.Length = scriptHeaderTag.Length;
-        }
-
-        public ScriptDataChunk(FrontendObject frontendObject) : base(frontendObject)
-        {
         }
     }
 }

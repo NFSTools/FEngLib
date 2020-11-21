@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 
 namespace FEngLib.Tags
 {
@@ -13,16 +12,7 @@ namespace FEngLib.Tags
             ushort id,
             ushort length)
         {
-            uint value = br.ReadUInt32();
-
-            if (chunkBlock.ChunkType == FrontendChunkType.MessageResponses)
-            {
-                //Debug.WriteLine("MsgResponse {0:X8} has {1} responses", FrontendObject.MessageResponses[^1].Id, value);
-            }
-            else
-            {
-
-            }
+            var value = br.ReadUInt32();
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using FEngLib.Data;
 using FEngLib.Tags;
 
@@ -7,23 +6,28 @@ namespace FEngLib.Chunks
 {
     public class MessageResponsesDataChunk : FrontendObjectChunk
     {
+        public MessageResponsesDataChunk(FrontendObject frontendObject) : base(frontendObject)
+        {
+        }
+
         public override FrontendObject Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader)
         {
-            FrontendObject newFrontendObject = FrontendObject;
-            FrontendTagStream tagStream = new FrontendMessagesTagStream(reader, newFrontendObject.Package, readerState.CurrentChunkBlock,
+            var newFrontendObject = FrontendObject;
+            FrontendTagStream tagStream = new FrontendMessagesTagStream(reader, newFrontendObject.Package,
+                readerState.CurrentChunkBlock,
                 readerState.CurrentChunkBlock.Size);
 
             while (tagStream.HasTag())
             {
-                FrontendTag tag = tagStream.NextTag(newFrontendObject);
-                //Debug.WriteLine("MESSAGES TAG {0}", tag);
+                var tag = tagStream.NextTag(newFrontendObject);
                 newFrontendObject = ProcessTag(newFrontendObject, readerState.CurrentChunkBlock, tag);
             }
 
             return newFrontendObject;
         }
 
-        private FrontendObject ProcessTag(FrontendObject frontendObject, FrontendChunkBlock frontendChunkBlock, FrontendTag tag)
+        private FrontendObject ProcessTag(FrontendObject frontendObject, FrontendChunkBlock frontendChunkBlock,
+            FrontendTag tag)
         {
             switch (tag)
             {
@@ -59,7 +63,7 @@ namespace FEngLib.Chunks
         private void ProcessResponseIdTag(FrontendObject frontendObject, FrontendChunkBlock frontendChunkBlock,
             ResponseIdTag responseIdTag)
         {
-            FEResponse response = new FEResponse { Id = responseIdTag.Id };
+            var response = new FEResponse {Id = responseIdTag.Id};
             frontendObject.MessageResponses[^1].Responses.Add(response);
         }
 
@@ -74,7 +78,7 @@ namespace FEngLib.Chunks
             }
             else
             {
-                var response = new FEMessageResponse { Id = tag.Hash };
+                var response = new FEMessageResponse {Id = tag.Hash};
 
                 frontendObject.MessageResponses.Add(response);
             }
@@ -83,10 +87,6 @@ namespace FEngLib.Chunks
         public override FrontendChunkType GetChunkType()
         {
             return FrontendChunkType.MessageResponses;
-        }
-
-        public MessageResponsesDataChunk(FrontendObject frontendObject) : base(frontendObject)
-        {
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using FEngLib.Data;
 using FEngLib.Objects;
@@ -22,7 +21,6 @@ namespace FEngLib.Chunks
             while (tagStream.HasTag())
             {
                 var tag = tagStream.NextTag(newFrontendObject);
-                //Debug.WriteLine("OBJECT TAG {0}", tag);
                 newFrontendObject = ProcessTag(package, newFrontendObject, tag);
             }
 
@@ -175,14 +173,11 @@ namespace FEngLib.Chunks
 
         private void ProcessImageInfoTag(FrontendImage frontendImage, ImageInfoTag imageInfoTag)
         {
-            //Debug.WriteLine("FEObject {0:X8} has ImageInfo: value={1}", frontendImage.NameHash, imageInfoTag.ImageFlags);
             frontendImage.ImageFlags = imageInfoTag.ImageFlags;
         }
 
         private void ProcessObjectReferenceTag(FrontendObject frontendObject, ObjectReferenceTag objectReferenceTag)
         {
-            Debug.WriteLine("FEObject {0:X8} references object {1:X8}; flags={2}", frontendObject.NameHash,
-                objectReferenceTag.Guid, objectReferenceTag.Flags);
             frontendObject.Flags = objectReferenceTag.Flags;
             frontendObject.Guid = objectReferenceTag.Guid;
             frontendObject.ResourceIndex = objectReferenceTag.ResourceIndex;
