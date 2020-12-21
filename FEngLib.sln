@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FEngLib", "FEngLib\FEngLib.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FEngCli", "FEngCli\FEngCli.csproj", "{146FE215-25BC-4AA6-9546-B6E8CC9C163A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FEngTestBench", "FEngTestBench\FEngTestBench.csproj", "{A6E4B7E2-A217-4EE5-B2A4-9CFCF7ABE084}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -21,6 +23,10 @@ Global
 		{146FE215-25BC-4AA6-9546-B6E8CC9C163A}.Debug|x86.Build.0 = Debug|Any CPU
 		{146FE215-25BC-4AA6-9546-B6E8CC9C163A}.Release|x86.ActiveCfg = Release|Any CPU
 		{146FE215-25BC-4AA6-9546-B6E8CC9C163A}.Release|x86.Build.0 = Release|Any CPU
+		{A6E4B7E2-A217-4EE5-B2A4-9CFCF7ABE084}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A6E4B7E2-A217-4EE5-B2A4-9CFCF7ABE084}.Debug|x86.Build.0 = Debug|Any CPU
+		{A6E4B7E2-A217-4EE5-B2A4-9CFCF7ABE084}.Release|x86.ActiveCfg = Release|Any CPU
+		{A6E4B7E2-A217-4EE5-B2A4-9CFCF7ABE084}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
