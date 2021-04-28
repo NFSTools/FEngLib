@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using FEngLib;
 using JetBrains.Annotations;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace FEngCli
 {
@@ -33,27 +33,38 @@ namespace FEngCli
         public void RenderToPng([NotNull] string imagePath)
         {
             if (imagePath == null) throw new ArgumentNullException(nameof(imagePath));
+            using var img = new Image<Rgba32>(640, 480, Rgba32.ParseHex("#000000ff"));
 
-            var (x, y) = ComputeCoordinateExtremes();
-            var width = (int) (x.max - x.min);
-            var height = (int) (y.max - y.min);
+            // img.Mutate(x => x.DrawText("Player One Press START", SystemFonts.CreateFont("Segoe UI", 18), Color.FromRgb(204, 244, 138), new PointF(320, 240)));
+            // img.Mutate(x => x.DrawText("Paint Appropreate Layer", SystemFonts.CreateFont("Segoe UI", 12), Color.FromRgb(202, 244, 138), new PointF(224.854164f, 86.5f)));
+            // img.Mutate(x => 
+            //     x.Draw(
+            //             new ShapeGraphicsOptions(), 
+            //             Pens.Solid(Color.Aqua, 1), 
+            //             new RectangularPolygon(
+            //                 113, 344, 16, 16)));
+            //
 
-            Debug.WriteLine("Computed extremes : X={0}, Y={1}", x, y);
-            Debug.WriteLine("Computed canvas   : {0} by {1}", width, height);
+            img.Mutate(mutator =>
+            {
+                float width = 16;
+                float height = 16;
 
-            using var img = new Image<Rgba32>(width, height, Rgba32.ParseHex("#ff0000ff"));
+                float x = 0;
+                float y = 0;
+
+                // float x = 113;
+                // float y = (480 / 2) + 130;
+                // float x = (640 - width) / 2;
+                // float y = (480 - height) / 2;
+                mutator.Fill(Color.FromRgb(0, 128, 192),
+                    new RectangleF(new PointF(x, y), new SizeF(width, height)));
+                // x.Fill().Draw(new ShapeGraphicsOptions(), Pens.Solid(Color.White, 1),
+                //     new RectangularPolygon((640 - width) / 2f, (480 - height) / 2f, width, height));
+            });
+
             using var fs = File.OpenWrite(imagePath);
             img.SaveAsPng(fs);
-        }
-
-        private ((float min, float max) x, (float min, float max) y) ComputeCoordinateExtremes()
-        {
-            var minX = _package.Objects.Min(o => o.Position.X);
-            var maxX = _package.Objects.Max(o => o.Position.X + o.Size.X);
-            var minY = _package.Objects.Min(o => o.Position.Y);
-            var maxY = _package.Objects.Max(o => o.Position.Y + o.Size.Y);
-
-            return ((minX, maxX), (minY, maxY));
         }
     }
 }

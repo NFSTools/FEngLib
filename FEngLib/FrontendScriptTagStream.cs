@@ -25,18 +25,18 @@ namespace FEngLib
                 0x6853 => new ScriptHeaderTag(frontendObject, frontendScript),
                 0x6353 => new ScriptChainTag(frontendObject, frontendScript),
                 0x4946 => new ScriptKeyTrackTag(frontendObject, frontendScript),
-                0x6F54 => new ScriptUnknownTag(frontendObject, frontendScript),
+                0x6F54 => new ScriptTrackOffsetTag(frontendObject, frontendScript),
                 0x644B => new ScriptKeyNodeTag(frontendObject, frontendScript),
                 0x5645 => new ScriptEventsTag(frontendObject, frontendScript),
+                0x6E53 => new ScriptNameTag(frontendObject, frontendScript),
                 _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
             };
 
             tag.Read(Reader, FrontendChunkBlock, frontendObject.Package, id, size);
 
             if (Reader.BaseStream.Position - pos != size)
-            {
-                throw new ChunkReadingException($"Expected {size} bytes to be read by {tag.GetType()} but {Reader.BaseStream.Position - pos} bytes were read");
-            }
+                throw new ChunkReadingException(
+                    $"Expected {size} bytes to be read by {tag.GetType()} but {Reader.BaseStream.Position - pos} bytes were read");
 
             return tag;
         }

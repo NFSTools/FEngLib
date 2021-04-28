@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using CommandLine;
 using FEngLib;
@@ -28,7 +27,7 @@ namespace FEngCli
             var renderer = new PackageRenderer(package);
             var imagePath = $"{package.Name}.png";
             renderer.RenderToPng(imagePath);
-            Process.Start(new ProcessStartInfo(imagePath) {UseShellExecute = true});
+            // Process.Start(new ProcessStartInfo(imagePath) {UseShellExecute = true});
             return 0;
         }
 
@@ -36,10 +35,18 @@ namespace FEngCli
         {
             using var fs = new FileStream(path, FileMode.Open);
             using var fr = new BinaryReader(fs);
-
-            if (fr.ReadUInt32() != 197123) throw new InvalidDataException($"Invalid FEng chunk file: {path}");
-
-            fs.Seek(0x10, SeekOrigin.Begin);
+            var marker = fr.ReadUInt32();
+            switch (marker)
+            {
+                case 0x30203:
+                    fs.Seek(0x10, SeekOrigin.Begin);
+                    break;
+                case 0xE76E4546:
+                    fs.Seek(0x8, SeekOrigin.Begin);
+                    break;
+                default:
+                    throw new InvalidDataException($"Invalid FEng chunk file: {path}");
+            }
 
             using var ms = new MemoryStream();
             fs.CopyTo(ms);

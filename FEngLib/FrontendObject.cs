@@ -18,12 +18,14 @@ namespace FEngLib
             NameHash = original.NameHash;
             Flags = original.Flags;
             Package = original.Package;
+            Name = original.Name;
         }
 
         public FEObjType Type { get; set; }
         public FE_ObjectFlags Flags { get; set; }
 
         public int ResourceIndex { get; set; }
+        public string Name { get; set; }
         public uint NameHash { get; set; }
         public uint Guid { get; set; }
         public FrontendObject Parent { get; set; }

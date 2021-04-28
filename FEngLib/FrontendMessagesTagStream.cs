@@ -1,18 +1,18 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using FEngLib.Tags;
 
 namespace FEngLib
 {
     public class FrontendMessagesTagStream : FrontendTagStream
     {
-        public FrontendPackage Package { get; }
-
-        public FrontendMessagesTagStream(BinaryReader reader, FrontendPackage package, FrontendChunkBlock frontendChunkBlock, long length) :
+        public FrontendMessagesTagStream(BinaryReader reader, FrontendPackage package,
+            FrontendChunkBlock frontendChunkBlock, long length) :
             base(reader, frontendChunkBlock, length)
         {
             Package = package;
         }
+
+        public FrontendPackage Package { get; }
 
         public override FrontendTag NextTag(FrontendObject frontendObject)
         {
@@ -23,7 +23,8 @@ namespace FEngLib
                 0x694D => new MessageResponseInfoTag(frontendObject),
                 0x434D => new MessageResponseCountTag(frontendObject),
                 0x6952 => new ResponseIdTag(frontendObject),
-                0x7552 => new ResponseParamTag(frontendObject),
+                0x7552 => new ResponseIntParamTag(frontendObject),
+                0x7352 => new ResponseStringParamTag(frontendObject),
                 0x7452 => new ResponseTargetTag(frontendObject),
                 0x6354 => new MessageTargetCountTag(frontendObject),
                 0x744D => new MessageTargetListTag(frontendObject),
@@ -33,9 +34,8 @@ namespace FEngLib
             tag.Read(Reader, FrontendChunkBlock, Package, id, size);
 
             if (Reader.BaseStream.Position - pos != size)
-            {
-                throw new ChunkReadingException($"Expected {size} bytes to be read by {tag.GetType()} but {Reader.BaseStream.Position - pos} bytes were read");
-            }
+                throw new ChunkReadingException(
+                    $"Expected {size} bytes to be read by {tag.GetType()} but {Reader.BaseStream.Position - pos} bytes were read");
 
             return tag;
         }

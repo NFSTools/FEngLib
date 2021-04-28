@@ -38,6 +38,10 @@ namespace FEngLib.Chunks
                 case ScriptHeaderTag scriptHeaderTag:
                     ProcessScriptHeaderTag(frontendObject, frontendScript, scriptHeaderTag);
                     break;
+                case ScriptNameTag scriptNameTag:
+                    frontendScript.Name = scriptNameTag.Name;
+                    frontendScript.Id = scriptNameTag.NameHash;
+                    break;
             }
         }
 

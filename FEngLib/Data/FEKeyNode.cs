@@ -2,13 +2,13 @@
 {
     public class FEKeyNode
     {
-        public int Time { get; set; }
-
-        public uint[] Val { get; set; }
-
         public FEKeyNode()
         {
-            Val = new uint[4];
+            Val = default;
         }
+
+        public int Time { get; set; }
+
+        public object Val { get; set; }
     }
 }

@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using FEngLib.Data;
+using FEngLib.Structures;
 
 namespace FEngLib.Tags
 {
@@ -26,13 +28,41 @@ namespace FEngLib.Tags
             {
                 var keyNode = new FEKeyNode
                 {
-                    Time = br.ReadInt32(),
-                    Val = new uint[4]
+                    Time = br.ReadInt32()
                 };
 
-                if (keyDataSize >> 2 != 1)
-                    for (var j = 0; j < (keyDataSize >> 2) - 1; j++)
-                        keyNode.Val[j] = br.ReadUInt32();
+                object nodeValue;
+
+                if (track.ParamType == FEParamType.PT_Color)
+                {
+                    var feColor = new FEColor();
+                    feColor.Read(br);
+                    nodeValue = feColor;
+                }
+                else if (track.ParamType == FEParamType.PT_Vector2)
+                {
+                    var feVec2 = new FEVector2();
+                    feVec2.Read(br);
+                    nodeValue = feVec2;
+                }
+                else if (track.ParamType == FEParamType.PT_Vector3)
+                {
+                    var feVec3 = new FEVector3();
+                    feVec3.Read(br);
+                    nodeValue = feVec3;
+                }
+                else if (track.ParamType == FEParamType.PT_Quaternion)
+                {
+                    var feQuaternion = new FEQuaternion();
+                    feQuaternion.Read(br);
+                    nodeValue = feQuaternion;
+                }
+                else
+                {
+                    throw new Exception("unhandled ParamType: " + track.ParamType);
+                }
+
+                keyNode.Val = nodeValue;
 
                 if (i == 0)
                     track.BaseKey = keyNode;

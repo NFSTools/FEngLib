@@ -30,8 +30,8 @@ namespace FEngLib.Tags
             var keyTrack = new FEKeyTrack
             {
                 ParamSize = ParamSize,
-                ParamType = ParamType,
-                InterpType = InterpType,
+                ParamType = (FEParamType) ParamType,
+                InterpType = (FEInterpMethod) InterpType,
                 InterpAction = InterpAction,
                 Length = trackLength,
                 Offset = trackOffset

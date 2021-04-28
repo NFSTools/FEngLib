@@ -46,6 +46,10 @@ namespace FEngLib.Chunks
                 case StringBufferMaxWidthTag stringBufferMaxWidthTag
                     when frontendObject is FrontendString frontendString:
                     return ProcessStringBufferMaxWidthTag(frontendString, stringBufferMaxWidthTag);
+                case StringBufferLabelTag stringBufferLabelTag when frontendObject is FrontendString frontendString:
+                    frontendString.Label = stringBufferLabelTag.Label;
+                    frontendString.Hash = Hashing.BinHash(stringBufferLabelTag.Label.ToUpper());
+                    break;
                 case StringBufferLengthTag stringBufferLengthTag:
                     break;
                 case ObjectHashTag objectHashTag:
@@ -62,6 +66,10 @@ namespace FEngLib.Chunks
                     break;
                 case ObjectParentTag objectParentTag:
                     ProcessObjectParentTag(package, frontendObject, objectParentTag);
+                    break;
+                case ObjectNameTag objectNameTag:
+                    frontendObject.Name = objectNameTag.Name;
+                    frontendObject.NameHash = objectNameTag.NameHash;
                     break;
                 default:
                     throw new InvalidDataException($"Unknown tag: {tag}");
@@ -161,6 +169,12 @@ namespace FEngLib.Chunks
                     break;
                 case FEObjType.FE_ColoredImage:
                     newInstance = new FrontendColoredImage(frontendObject);
+                    break;
+                case FEObjType.FE_SimpleImage:
+                    newInstance = new FrontendSimpleImage(frontendObject);
+                    break;
+                case FEObjType.FE_Movie:
+                    newInstance = new FrontendMovie(frontendObject);
                     break;
                 default:
                     throw new IndexOutOfRangeException($"cannot handle object type: {objectTypeTag.Type}");

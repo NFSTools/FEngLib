@@ -34,15 +34,16 @@ namespace FEngLib
                 0x614D => new MultiImageTextureFlagsTag(frontendObject),
                 0x624D => new MultiImageTextureFlagsTag(frontendObject),
                 0x634D => new MultiImageTextureFlagsTag(frontendObject),
+                0x6E4F => new ObjectNameTag(frontendObject),
+                0x4C53 => new StringBufferLabelTag(frontendObject),
                 _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
             };
 
             tag.Read(Reader, FrontendChunkBlock, frontendObject.Package, id, size);
 
             if (Reader.BaseStream.Position - pos != size)
-            {
-                throw new ChunkReadingException($"Expected {size} bytes to be read by {tag.GetType()} but {Reader.BaseStream.Position - pos} bytes were read");
-            }
+                throw new ChunkReadingException(
+                    $"Expected {size} bytes to be read by {tag.GetType()} but {Reader.BaseStream.Position - pos} bytes were read");
 
             return tag;
         }

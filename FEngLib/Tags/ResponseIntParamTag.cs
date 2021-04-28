@@ -2,9 +2,9 @@
 
 namespace FEngLib.Tags
 {
-    public class ResponseParamTag : FrontendTag
+    public class ResponseIntParamTag : FrontendTag
     {
-        public ResponseParamTag(FrontendObject frontendObject) : base(frontendObject)
+        public ResponseIntParamTag(FrontendObject frontendObject) : base(frontendObject)
         {
         }
 

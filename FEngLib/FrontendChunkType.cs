@@ -15,5 +15,8 @@
         MessageResponses = 0x5267734D,
         PackageResponses = 0x52676B50,
         Targets = 0x67726154,
+        TypeInfoList = 0xF4734C54,
+        MessageDefinitions = 0x4E67734D,
+        EventData = 0x74614445
     }
 }

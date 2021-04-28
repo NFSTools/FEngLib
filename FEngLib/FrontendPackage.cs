@@ -11,6 +11,7 @@ namespace FEngLib
         public FrontendPackage()
         {
             Objects = new List<FrontendObject>();
+            MessageDefinitions = new List<MessageDefinition>();
             MessageResponses = new List<FEMessageResponse>();
             MessageTargetLists = new List<FEMessageTargetList>();
             ResourceRequests = new List<FEResourceRequest>();
@@ -19,6 +20,7 @@ namespace FEngLib
         public string Name { get; set; }
         public string Filename { get; set; }
         public List<FrontendObject> Objects { get; set; }
+        public List<MessageDefinition> MessageDefinitions { get; set; }
         public List<FEMessageResponse> MessageResponses { get; set; }
         public List<FEMessageTargetList> MessageTargetLists { get; set; }
         public List<FEResourceRequest> ResourceRequests { get; set; }
@@ -33,6 +35,12 @@ namespace FEngLib
         {
             return Objects.Find(o => o.NameHash == hash) ??
                    throw new KeyNotFoundException($"Could not find object with hash: 0x{hash:X8}");
+        }
+
+        public class MessageDefinition
+        {
+            public string Name { get; set; }
+            public string Category { get; set; }
         }
     }
 }

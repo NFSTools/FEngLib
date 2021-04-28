@@ -29,7 +29,7 @@ namespace FEngLib.Chunks
                 case ResponseIdTag responseIdTag:
                     ProcessResponseIdTag(frontendPackage, responseIdTag);
                     break;
-                case ResponseParamTag responseParamTag:
+                case ResponseIntParamTag responseParamTag:
                     ProcessResponseParamTag(frontendPackage, responseParamTag);
                     break;
                 case ResponseTargetTag responseTargetTag:
@@ -41,9 +41,9 @@ namespace FEngLib.Chunks
         }
 
         private void ProcessResponseParamTag(FrontendPackage frontendPackage,
-            ResponseParamTag responseParamTag)
+            ResponseIntParamTag responseIntParamTag)
         {
-            frontendPackage.MessageResponses[^1].Responses[^1].Param = responseParamTag.Param;
+            frontendPackage.MessageResponses[^1].Responses[^1].Param = responseIntParamTag.Param;
         }
 
         private void ProcessResponseTargetTag(FrontendPackage frontendPackage,

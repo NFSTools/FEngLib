@@ -2,9 +2,9 @@
 
 namespace FEngLib.Tags
 {
-    public class ScriptUnknownTag : FrontendScriptTag
+    public class ScriptTrackOffsetTag : FrontendScriptTag
     {
-        public ScriptUnknownTag(FrontendObject frontendObject, FrontendScript frontendScript) : base(frontendObject,
+        public ScriptTrackOffsetTag(FrontendObject frontendObject, FrontendScript frontendScript) : base(frontendObject,
             frontendScript)
         {
         }
@@ -13,7 +13,7 @@ namespace FEngLib.Tags
             ushort id,
             ushort length)
         {
-            var val = br.ReadUInt32();
+            FrontendScript.Tracks[^1].Offset = br.ReadUInt32();
         }
     }
 }

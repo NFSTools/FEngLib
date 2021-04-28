@@ -4,16 +4,6 @@ namespace FEngLib.Objects
 {
     public class FrontendString : FrontendObject
     {
-        public string Value { get; set; }
-
-        public uint Hash { get; set; }
-
-        public FEStringFormatting Formatting { get; set; }
-
-        public int Leading { get; set; }
-
-        public uint MaxWidth { get; set; }
-
         public FrontendString()
         {
         }
@@ -21,6 +11,7 @@ namespace FEngLib.Objects
         public FrontendString(FrontendObject original) : base(original)
         {
         }
+
         public FrontendString(FrontendString original) : this(original as FrontendObject)
         {
             Value = new string(original.Value.ToCharArray());
@@ -29,5 +20,16 @@ namespace FEngLib.Objects
             Leading = original.Leading;
             MaxWidth = original.MaxWidth;
         }
+
+        public string Value { get; set; }
+        public string Label { get; set; }
+
+        public uint Hash { get; set; }
+
+        public FEStringFormatting Formatting { get; set; }
+
+        public int Leading { get; set; }
+
+        public uint MaxWidth { get; set; }
     }
 }

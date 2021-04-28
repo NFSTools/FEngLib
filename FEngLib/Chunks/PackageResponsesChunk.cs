@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using FEngLib.Data;
 using FEngLib.Tags;
 
@@ -7,14 +6,15 @@ namespace FEngLib.Chunks
 {
     public class PackageResponsesChunk : FrontendChunk
     {
-        public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock, FrontendChunkReader chunkReader, BinaryReader reader)
+        public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock,
+            FrontendChunkReader chunkReader, BinaryReader reader)
         {
             FrontendTagStream tagStream = new FrontendMessagesTagStream(reader, package, chunkBlock,
                 chunkBlock.Size);
 
             while (tagStream.HasTag())
             {
-                FrontendTag tag = tagStream.NextTag(null);
+                var tag = tagStream.NextTag(null);
                 //Debug.WriteLine("PKG RESPONSES TAG {0}", tag);
                 package = ProcessTag(package, tag);
             }
@@ -30,8 +30,11 @@ namespace FEngLib.Chunks
                 case ResponseIdTag responseIdTag:
                     ProcessResponseIdTag(frontendPackage, responseIdTag);
                     break;
-                case ResponseParamTag responseParamTag:
-                    ProcessResponseParamTag(frontendPackage, responseParamTag);
+                case ResponseIntParamTag responseParamTag:
+                    ProcessResponseIntParamTag(frontendPackage, responseParamTag);
+                    break;
+                case ResponseStringParamTag responseParamTag:
+                    ProcessResponseStringParamTag(frontendPackage, responseParamTag);
                     break;
                 case ResponseTargetTag responseTargetTag:
                     ProcessResponseTargetTag(frontendPackage, responseTargetTag);
@@ -41,10 +44,16 @@ namespace FEngLib.Chunks
             return frontendPackage;
         }
 
-        private void ProcessResponseParamTag(FrontendPackage frontendPackage,
-            ResponseParamTag responseParamTag)
+        private void ProcessResponseIntParamTag(FrontendPackage frontendPackage,
+            ResponseIntParamTag responseIntParamTag)
         {
-            frontendPackage.MessageResponses[^1].Responses[^1].Param = responseParamTag.Param;
+            frontendPackage.MessageResponses[^1].Responses[^1].Param = responseIntParamTag.Param;
+        }
+
+        private void ProcessResponseStringParamTag(FrontendPackage frontendPackage,
+            ResponseStringParamTag responseStringParamTag)
+        {
+            frontendPackage.MessageResponses[^1].Responses[^1].Param = responseStringParamTag.Param;
         }
 
         private void ProcessResponseTargetTag(FrontendPackage frontendPackage,
@@ -56,7 +65,7 @@ namespace FEngLib.Chunks
         private void ProcessResponseIdTag(FrontendPackage frontendPackage,
             ResponseIdTag responseIdTag)
         {
-            FEResponse response = new FEResponse { Id = responseIdTag.Id };
+            var response = new FEResponse {Id = responseIdTag.Id};
             frontendPackage.MessageResponses[^1].Responses.Add(response);
         }
 
@@ -71,7 +80,7 @@ namespace FEngLib.Chunks
             }
             else
             {
-                var response = new FEMessageResponse { Id = tag.Hash };
+                var response = new FEMessageResponse {Id = tag.Hash};
 
                 frontendPackage.MessageResponses.Add(response);
             }
