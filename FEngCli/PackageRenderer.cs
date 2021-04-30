@@ -5,8 +5,11 @@ using System.Linq;
 using System.Numerics;
 using FEngLib;
 using FEngLib.Data;
+using FEngLib.Objects;
 using JetBrains.Annotations;
+using SixLabors.Fonts;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
@@ -39,7 +42,7 @@ namespace FEngCli
         public void RenderToPng([NotNull] string imagePath)
         {
             if (imagePath == null) throw new ArgumentNullException(nameof(imagePath));
-            using var img = new Image<Rgba32>(640, 480, /*Rgba32.ParseHex("#000000ff")*/ Color.Black);
+            using var img = new Image<Rgba32>(640, 480, /*Rgba32.ParseHex("#000000ff")*/ Color.Transparent);
 
             var renderOrderItems = new List<RenderOrderItem>();
             var goodGuids = new HashSet<uint>
@@ -53,9 +56,8 @@ namespace FEngCli
 
             foreach (var frontendObject in _package.Objects)
             {
-                if (frontendObject.Type != FEObjType.FE_Image /* || !goodGuids.Contains(frontendObject.Guid)*/
-                ) continue;
-                if (frontendObject.Color.Alpha == 0) continue;
+                if (frontendObject.Type != FEObjType.FE_Image && frontendObject.Type != FEObjType.FE_String) continue;
+                if (frontendObject.Color.Alpha == 0 || IsInvisible(frontendObject)) continue;
 
                 var computedMatrix = ComputeObjectMatrix(frontendObject);
                 renderOrderItems.Add(new RenderOrderItem(computedMatrix, frontendObject));
@@ -67,98 +69,143 @@ namespace FEngCli
                 var x = renderOrderItem.GetX();
                 var y = renderOrderItem.GetY();
 
+                Console.WriteLine(
+                    "Object 0x{0:X}: OriginalPos={1}, Size={4}, NewPos=({2}, {3}), Color={5}, Type={6}, Rotation={7}",
+                    frontendObject.Guid, frontendObject.Position, x, y, frontendObject.Size,
+                    frontendObject.Color, frontendObject.Type, frontendObject.Rotation);
+
                 if (x < 0 || x > 640 || y < 0 || y > 480)
                 {
-                    Console.WriteLine("off-screen, not rendering");
+                    Console.WriteLine("Object out of bounds. Skipping.");
                     continue;
                 }
 
-                var resource = _package.ResourceRequests[frontendObject.ResourceIndex];
+                Console.WriteLine(renderOrderItem.ObjectMatrix);
 
-                if (resource.Type != FEResourceType.RT_Image)
+                if (frontendObject.Type == FEObjType.FE_Image)
                 {
-                    Console.WriteLine($"Expected resource type to be RT_Image, but it was {resource.Type}");
-                    continue;
-                }
+                    var resource = _package.ResourceRequests[frontendObject.ResourceIndex];
 
-                var resourceFile = Path.Combine(_textureDir, $"{resource.Name.Split('.')[0]}.png");
-
-                if (!File.Exists(resourceFile))
-                {
-                    Console.WriteLine($"Cannot find resource file: {resourceFile}");
-                    continue;
-                }
-
-                img.Mutate(m =>
-                {
-                    var image = Image.Load(resourceFile);
-                    image.Mutate(c =>
+                    if (resource.Type != FEResourceType.RT_Image)
                     {
-                        var scaleX = frontendObject.Size.X;
-                        var scaleY = frontendObject.Size.Y;
-                        var objectRotation = ComputeObjectRotation(frontendObject);
-                        var rotateDeg = ExtractZRotation(objectRotation) * (180f / Math.PI);
+                        Console.WriteLine($"Expected resource type to be RT_Image, but it was {resource.Type}");
+                        continue;
+                    }
 
-                        if (scaleX < 0)
+                    var resourceFile = Path.Combine(_textureDir, $"{resource.Name.Split('.')[0]}.png");
+
+                    if (!File.Exists(resourceFile))
+                    {
+                        Console.WriteLine($"Cannot find resource file: {resourceFile}");
+                        continue;
+                    }
+
+                    img.Mutate(m =>
+                    {
+                        var image = Image.Load(resourceFile);
+                        image.Mutate(c =>
                         {
-                            c.Flip(FlipMode.Horizontal);
-                            scaleX = -scaleX;
-                        }
+                            var scaleX = frontendObject.Size.X;
+                            var scaleY = frontendObject.Size.Y;
+                            var objectRotation = ComputeObjectRotation(frontendObject);
+                            var rotateDeg = ExtractZRotation(objectRotation) * (180f / Math.PI);
 
-                        if (scaleY < 0)
-                        {
-                            c.Flip(FlipMode.Vertical);
-                            scaleY = -scaleY;
-                        }
+                            if (scaleX < 0)
+                            {
+                                c.Flip(FlipMode.Horizontal);
+                                scaleX = -scaleX;
+                            }
 
-                        c.Resize((int) scaleX, (int) scaleY);
-                        c.Rotate((float) rotateDeg);
+                            if (scaleY < 0)
+                            {
+                                c.Flip(FlipMode.Vertical);
+                                scaleY = -scaleY;
+                            }
 
-                        Console.WriteLine(
-                            "Object 0x{0:X}: OriginalPos={1}, Size={4}, NewPos=({2}, {3}), Color={5}, Rotation={6} [{7} deg]",
-                            frontendObject.Guid, frontendObject.Position, x, y, frontendObject.Size,
-                            frontendObject.Color, objectRotation, rotateDeg);
-                        Console.WriteLine(renderOrderItem.ObjectMatrix);
-                        // Handle rotation
-                        // c.Resize((int) frontendObject.Size.X, (int) frontendObject.Size.Y);
-                        // c.Fill(Color.FromRgb(
-                        //     (byte) (frontendObject.Color.Red & 0xff),
-                        //     (byte) (frontendObject.Color.Green & 0xff),
-                        //     (byte) (frontendObject.Color.Blue & 0xff)));
+                            c.Resize((int) scaleX, (int) scaleY);
+
+                            if (rotateDeg != 0)
+                            {
+                                Console.WriteLine("Rotating object by {0} degrees: {1}", rotateDeg,
+                                    _package.ResourceRequests[frontendObject.ResourceIndex].Name);
+                                c.Rotate((float) rotateDeg);
+                            }
+
+                            var redScale = frontendObject.Color.Red / 255f;
+                            var greenScale = frontendObject.Color.Green / 255f;
+                            var blueScale = frontendObject.Color.Blue / 255f;
+                            var alphaScale = frontendObject.Color.Alpha / 255f;
+
+                            c.ProcessPixelRowsAsVector4(span =>
+                            {
+                                // foreach (var vector4 in span)
+                                for (var i = 0; i < span.Length; i++)
+                                {
+                                    span[i].X *= redScale;
+                                    span[i].Y *= greenScale;
+                                    span[i].Z *= blueScale;
+                                    span[i].W *= alphaScale;
+                                }
+                            });
+
+                            Console.WriteLine("Applied channel filter");
+                        });
+                        m.DrawImage(
+                            image, new Point((int) x, (int) y), frontendObject.Color.Alpha / 255f);
                     });
-                    m.DrawImage(
-                        image, new Point((int) x, (int) y), frontendObject.Color.Alpha / 255f);
-                });
-            }
+                }
+                else if (frontendObject is FrontendString frontendString && !string.IsNullOrEmpty(frontendString.Value))
+                {
+                    Console.WriteLine("\tDrawing text in format {1}: {0}", frontendString.Value,
+                        frontendString.Formatting);
 
-            // img.Mutate(m =>
-            // {
-            //     m.DrawText("Bruh", new Font(SystemFonts.Find("Segoe UI"), 12), Color.Aqua,
-            //         new PointF(54.524994f, 113.525f));
-            // });
+                    img.Mutate(m =>
+                    {
+                        var font = new Font(SystemFonts.Find("Segoe UI"), 12);
+                        var rect = TextMeasurer.Measure(frontendString.Value, new RendererOptions(font));
+
+                        float CalculateXOffset(uint justification, float lineWidth)
+                        {
+                            if ((justification & 1) == 1) return lineWidth * -0.5f;
+
+                            if ((justification & 2) == 2) return -lineWidth;
+
+                            return 0;
+                        }
+
+                        float CalculateYOffset(uint justification, float textHeight)
+                        {
+                            if ((justification & 4) == 4) return textHeight * -0.5f;
+
+                            if ((justification & 8) == 8) return -textHeight;
+
+                            return 0;
+                        }
+
+                        var xOffset = CalculateXOffset((uint) frontendString.Formatting,
+                            rect.Width);
+                        var yOffset = CalculateYOffset((uint) frontendString.Formatting,
+                            rect.Height);
+
+                        m.DrawText(frontendString.Value, font,
+                            Color.FromRgba((byte) (frontendObject.Color.Red & 0xff),
+                                (byte) (frontendObject.Color.Green & 0xff), (byte) (frontendObject.Color.Blue & 0xff),
+                                (byte) (frontendObject.Color.Alpha & 0xff)),
+                            new PointF(x + xOffset, y + yOffset));
+                    });
+                }
+            }
 
             using var fs = File.OpenWrite(imagePath);
             img.SaveAsPng(fs);
+        }
 
-            var obj = _package.FindObjectByGuid(0x10EFAD);
-            var obj2 = _package.FindObjectByGuid(0x10EFAC);
-            var ro = new RenderOrderItem(ComputeObjectMatrix(obj), obj);
-            Console.WriteLine("{0}/{1}/{2}", ro.GetX(), ro.GetY(), ro.GetZ());
+        private static bool IsInvisible(FrontendObject frontendObject)
+        {
+            if (frontendObject.Parent is { } parent)
+                return (frontendObject.Flags & FE_ObjectFlags.FF_Invisible) != 0 || IsInvisible(parent);
 
-            // Console.WriteLine(Quaternion.Multiply(
-            //     new Quaternion(obj.Rotation.X, obj.Rotation.Y, obj.Rotation.Z, obj.Rotation.W), 
-            //     new Quaternion(obj2.Rotation.X, obj2.Rotation.Y, obj2.Rotation.Z, obj2.Rotation.W)));
-            // Console.WriteLine(Quaternion.Multiply(
-            //     new Quaternion(obj2.Rotation.X, obj2.Rotation.Y, obj2.Rotation.Z, obj2.Rotation.W), 
-            //     new Quaternion(obj.Rotation.X, obj.Rotation.Y, obj.Rotation.Z, obj.Rotation.W)));
-            // Console.WriteLine(
-            //     Matrix4x4.Multiply(
-            //         Matrix4x4.CreateFromQuaternion(new Quaternion(0, 0, 0.7071068f, 0.7071067f)),
-            //         Matrix4x4.CreateFromQuaternion(new Quaternion(0, 0, 0, 1))));
-            // Console.WriteLine(
-            //     Matrix4x4.Multiply(
-            //         Matrix4x4.CreateFromQuaternion(new Quaternion(0, 0, 0, 1)),
-            //         Matrix4x4.CreateFromQuaternion(new Quaternion(0, 0, 0.7071068f, 0.7071067f))));
+            return (frontendObject.Flags & FE_ObjectFlags.FF_Invisible) != 0;
         }
 
         private static Matrix4x4 ComputeObjectMatrix(FrontendObject frontendObject)
@@ -185,34 +232,8 @@ namespace FEngCli
             return q;
         }
 
-        private static string MatrixToString(Matrix4x4 matrix)
-        {
-            return
-                $"[({matrix.M11}, {matrix.M12}, {matrix.M13}, {matrix.M14}), ({matrix.M21}, {matrix.M22}, {matrix.M23}, {matrix.M24}), ({matrix.M31}, {matrix.M32}, {matrix.M33}, {matrix.M34}), ({matrix.M41}, {matrix.M42}, {matrix.M43}, {matrix.M44})]";
-        }
-
         private static double ExtractZRotation(Quaternion q)
         {
-            /*
-                 // roll (x-axis rotation)
-                double sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
-                double cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
-                angles.roll = std::atan2(sinr_cosp, cosr_cosp);
-
-                // pitch (y-axis rotation)
-                double sinp = 2 * (q.w * q.y - q.z * q.x);
-                if (std::abs(sinp) >= 1)
-                    angles.pitch = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
-                else
-                    angles.pitch = std::asin(sinp);
-
-                // yaw (z-axis rotation)
-                double siny_cosp = 2 * (q.w * q.z + q.x * q.y);
-                double cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
-                angles.yaw = std::atan2(siny_cosp, cosy_cosp);
-
-                return angles;
-             */
             return Math.Atan2(2 * (q.W * q.Z + q.X * q.Y), 1 - 2 * (q.Y * q.Y + q.Z * q.Z));
         }
 
@@ -229,12 +250,30 @@ namespace FEngCli
 
             public float GetX()
             {
-                return ObjectMatrix.M41 - FrontendObject.Size.X * 0.5f + 320f;
+                var x = ObjectMatrix.M41 + 320f;
+
+                switch (FrontendObject.Type)
+                {
+                    case FEObjType.FE_Image:
+                        x -= FrontendObject.Size.X * 0.5f;
+                        break;
+                }
+
+                return x;
             }
 
             public float GetY()
             {
-                return ObjectMatrix.M42 - FrontendObject.Size.Y * 0.5f + 240f;
+                var y = ObjectMatrix.M42 + 240f;
+
+                switch (FrontendObject.Type)
+                {
+                    case FEObjType.FE_Image:
+                        y -= FrontendObject.Size.Y * 0.5f;
+                        break;
+                }
+
+                return y;
             }
 
             public float GetZ()

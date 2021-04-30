@@ -24,7 +24,7 @@ namespace FEngCli
             }
 
             var package = LoadPackageFromChunk(options.InputFile);
-            // PackageDumper.DumpPackage(package);
+            PackageDumper.DumpPackage(package);
             var renderer = new PackageRenderer(package, options.TextureDir);
             var imagePath = $"{package.Name}.png";
             renderer.RenderToPng(imagePath);
