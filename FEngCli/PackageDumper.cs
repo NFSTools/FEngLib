@@ -19,7 +19,7 @@ namespace FEngCli
             }
 
             foreach (var frontendObject in package.Objects.OrderBy(o => o.Parent?.Guid).ThenBy(o => o.Guid))
-                DumpObject(frontendObject);
+                DumpObject(frontendObject, package);
 
             foreach (var messageDefinition in package.MessageDefinitions)
             {
@@ -51,8 +51,10 @@ namespace FEngCli
             Console.WriteLine("ID     : 0x{0:X8}", resourceRequest.ID);
         }
 
-        public static void DumpObject(FrontendObject frontendObject)
+        public static void DumpObject(FrontendObject frontendObject, FrontendPackage package)
         {
+            // if ((frontendObject.Type != FEObjType.FE_Image || frontendObject.ResourceIndex != 4) && frontendObject.Type != FEObjType.FE_Group) return;
+
             Console.WriteLine("--------- OBJECT ---------");
             if (!string.IsNullOrEmpty(frontendObject.Name))
                 Console.WriteLine("Name     : {0} ({1})", frontendObject.Name, frontendObject.Name.ToUpper());
@@ -67,7 +69,8 @@ namespace FEngCli
             Console.WriteLine("Rotation : {0}", frontendObject.Rotation);
             Console.WriteLine("Color    : {0}", frontendObject.Color);
             Console.WriteLine("Type     : {0}", frontendObject.Type);
-            Console.WriteLine("Resource : {0}", frontendObject.ResourceIndex);
+            Console.WriteLine("Resource : {0} ({1})", frontendObject.ResourceIndex,
+                package.ResourceRequests[frontendObject.ResourceIndex].Name);
 
             if (frontendObject.Scripts.Count > 0)
             {

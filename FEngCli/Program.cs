@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using CommandLine;
 using FEngLib;
@@ -23,11 +24,11 @@ namespace FEngCli
             }
 
             var package = LoadPackageFromChunk(options.InputFile);
-            PackageDumper.DumpPackage(package);
-            var renderer = new PackageRenderer(package);
+            // PackageDumper.DumpPackage(package);
+            var renderer = new PackageRenderer(package, options.TextureDir);
             var imagePath = $"{package.Name}.png";
             renderer.RenderToPng(imagePath);
-            // Process.Start(new ProcessStartInfo(imagePath) {UseShellExecute = true});
+            Process.Start(new ProcessStartInfo(imagePath) {UseShellExecute = true});
             return 0;
         }
 
@@ -61,6 +62,9 @@ namespace FEngCli
         {
             [Option('i', "input", Required = true)]
             public string InputFile { get; set; }
+
+            [Option('t', "textures", Required = true)]
+            public string TextureDir { get; set; }
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using CoreLibraries.IO;
 using FEngLib.Data;
 
 namespace FEngLib.Chunks
@@ -9,22 +9,20 @@ namespace FEngLib.Chunks
     {
         public List<FEResourceRequest> ResourceRequests { get; set; }
 
-        public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock, FrontendChunkReader chunkReader, BinaryReader reader)
+        public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock,
+            FrontendChunkReader chunkReader, BinaryReader reader)
         {
-            if ((chunkBlock.Size - 4) % 0x18 != 0)
-            {
-                throw new ChunkReadingException("Malformed RsRq chunk");
-            }
+            if ((chunkBlock.Size - 4) % 0x18 != 0) throw new ChunkReadingException("Malformed RsRq chunk");
 
-            int numRequests = reader.ReadInt32();
+            var numRequests = reader.ReadInt32();
             ResourceRequests = new List<FEResourceRequest>(numRequests);
 
-            for (int i = 0; i < numRequests; i++)
+            for (var i = 0; i < numRequests; i++)
             {
-                FEResourceRequest resourceRequest = new FEResourceRequest();
+                var resourceRequest = new FEResourceRequest();
                 resourceRequest.ID = reader.ReadUInt32();
                 resourceRequest.NameOffset = reader.ReadUInt32();
-                resourceRequest.Type = reader.ReadEnum<FEResourceType>();
+                resourceRequest.Type = (FEResourceType) reader.ReadUInt32();
                 resourceRequest.Flags = reader.ReadUInt32();
                 resourceRequest.Handle = reader.ReadUInt32();
                 resourceRequest.UserParam = reader.ReadUInt32();
@@ -35,7 +33,7 @@ namespace FEngLib.Chunks
 
         public override FrontendChunkType GetChunkType()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

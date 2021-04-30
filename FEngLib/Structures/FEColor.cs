@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using CoreLibraries.IO;
 
 namespace FEngLib.Structures
 {
@@ -9,7 +8,7 @@ namespace FEngLib.Structures
         public int Green { get; set; }
         public int Red { get; set; }
         public int Alpha { get; set; }
-        
+
         public void Read(BinaryReader br)
         {
             Blue = br.ReadInt32();

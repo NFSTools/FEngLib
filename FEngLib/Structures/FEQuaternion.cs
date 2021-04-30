@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using CoreLibraries.IO;
 
 namespace FEngLib.Structures
 {
