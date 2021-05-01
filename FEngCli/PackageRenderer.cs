@@ -41,18 +41,26 @@ namespace FEngCli
         /// <exception cref="ArgumentNullException">if <paramref name="imagePath" /> is <c>null</c></exception>
         public void RenderToPng([NotNull] string imagePath)
         {
+            const int width = /*1280*/ 640;
+            const int height = /*960*/ 480;
+
             if (imagePath == null) throw new ArgumentNullException(nameof(imagePath));
-            using var img = new Image<Rgba32>(640, 480, /*Rgba32.ParseHex("#000000ff")*/ Color.Transparent);
+            using var img = new Image<Rgba32>(width, height, /*Rgba32.ParseHex("#000000ff")*/ Color.Black);
 
             var renderOrderItems = new List<RenderOrderItem>();
+            var goodGuids = new List<uint>
+            {
+                0xE6D9B
+            };
 
             foreach (var frontendObject in _package.Objects)
             {
                 if (frontendObject.Type != FEObjType.FE_Image && frontendObject.Type != FEObjType.FE_String) continue;
-                if (frontendObject.Color.Alpha == 0 || IsInvisible(frontendObject)) continue;
+                if ( /*frontendObject.Color.Alpha == 0 || */IsInvisible(frontendObject)) continue;
+                // if (!goodGuids.Contains(frontendObject.Guid)) continue;
 
                 var computedMatrix = ComputeObjectMatrix(frontendObject);
-                renderOrderItems.Add(new RenderOrderItem(computedMatrix, frontendObject));
+                renderOrderItems.Add(new RenderOrderItem(computedMatrix, frontendObject, width / 2, height / 2));
             }
 
             foreach (var renderOrderItem in renderOrderItems.OrderByDescending(o => o.GetZ()))
@@ -68,13 +76,13 @@ namespace FEngCli
                     frontendObject.Guid, x, y, sizeX, sizeY, frontendObject.Color, frontendObject.Type,
                     _package.ResourceRequests[frontendObject.ResourceIndex].Name);
 
-                if (x < 0 || x > 640 || y < 0 || y > 480)
+                if (x < 0 || x > width || y < 0 || y > height)
                 {
                     Console.WriteLine("Object out of bounds. Skipping.");
                     continue;
                 }
 
-                // Console.WriteLine(renderOrderItem.ObjectMatrix);
+                Console.WriteLine("Computed matrix: {0}", renderOrderItem.ObjectMatrix);
 
                 if (frontendObject.Type == FEObjType.FE_Image)
                 {
@@ -231,8 +239,13 @@ namespace FEngCli
 
         private class RenderOrderItem
         {
-            public RenderOrderItem(Matrix4x4 objectMatrix, FrontendObject frontendObject)
+            private readonly int _halfHeight;
+            private readonly int _halfWidth;
+
+            public RenderOrderItem(Matrix4x4 objectMatrix, FrontendObject frontendObject, int halfWidth, int halfHeight)
             {
+                _halfWidth = halfWidth;
+                _halfHeight = halfHeight;
                 ObjectMatrix = objectMatrix;
                 FrontendObject = frontendObject;
             }
@@ -242,12 +255,12 @@ namespace FEngCli
 
             public float GetX()
             {
-                var x = ObjectMatrix.M41 + 320f;
+                var x = ObjectMatrix.M41 + _halfWidth;
 
                 switch (FrontendObject.Type)
                 {
                     case FEObjType.FE_Image:
-                        x -= GetSizeX() * 0.5f;
+                        x -= FrontendObject.Size.X * 0.5f;
                         break;
                 }
 
@@ -256,12 +269,12 @@ namespace FEngCli
 
             public float GetY()
             {
-                var y = ObjectMatrix.M42 + 240f;
+                var y = ObjectMatrix.M42 + _halfHeight;
 
                 switch (FrontendObject.Type)
                 {
                     case FEObjType.FE_Image:
-                        y -= GetSizeY() * 0.5f;
+                        y -= FrontendObject.Size.Y * 0.5f;
                         break;
                 }
 
