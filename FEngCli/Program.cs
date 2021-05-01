@@ -26,9 +26,9 @@ namespace FEngCli
             var package = LoadPackageFromChunk(options.InputFile);
             PackageDumper.DumpPackage(package);
             var renderer = new PackageRenderer(package, options.TextureDir);
-            var imagePath = $"{package.Name}.png";
-            renderer.RenderToPng(imagePath);
-            Process.Start(new ProcessStartInfo(imagePath) {UseShellExecute = true});
+            var outputFile = options.OutputFile ?? $"{package.Name}.png";
+            renderer.RenderToPng(outputFile);
+            Process.Start(new ProcessStartInfo(outputFile) {UseShellExecute = true});
             return 0;
         }
 
@@ -62,6 +62,8 @@ namespace FEngCli
         {
             [Option('i', "input", Required = true)]
             public string InputFile { get; set; }
+
+            [Option('o', "output")] public string OutputFile { get; set; }
 
             [Option('t', "textures", Required = true)]
             public string TextureDir { get; set; }
