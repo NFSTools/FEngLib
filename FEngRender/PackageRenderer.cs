@@ -6,14 +6,13 @@ using System.Numerics;
 using FEngLib;
 using FEngLib.Data;
 using FEngLib.Objects;
-using JetBrains.Annotations;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
-namespace FEngCli
+namespace FEngRender
 {
     /// <summary>
     ///     Renders objects from a <see cref="FrontendPackage" /> to an image.
@@ -35,16 +34,14 @@ namespace FEngCli
         }
 
         /// <summary>
-        ///     Renders the package to a PNG image file.
+        ///     Renders the package to an <see cref="Image" /> object.
         /// </summary>
-        /// <param name="imagePath">The destination path of the image.</param>
-        /// <exception cref="ArgumentNullException">if <paramref name="imagePath" /> is <c>null</c></exception>
-        public void RenderToPng([NotNull] string imagePath)
+        /// <returns>The rendered image.</returns>
+        public Image<Rgba32> RenderToPng()
         {
             const int width = /*1280*/ 640;
             const int height = /*960*/ 480;
-
-            if (imagePath == null) throw new ArgumentNullException(nameof(imagePath));
+            
             using var img = new Image<Rgba32>(width, height, /*Rgba32.ParseHex("#000000ff")*/ Color.Black);
 
             var renderOrderItems = new List<RenderOrderItem>();
@@ -195,9 +192,8 @@ namespace FEngCli
                     });
                 }
             }
-
-            using var fs = File.OpenWrite(imagePath);
-            img.SaveAsPng(fs);
+            
+            return img;
         }
 
         private static bool IsInvisible(FrontendObject frontendObject)

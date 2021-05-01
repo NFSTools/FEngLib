@@ -10,11 +10,12 @@
     <ItemGroup>
       <PackageReference Include="CommandLineParser" Version="2.8.0" />
       <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" />
-        <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0008"/>
+        <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0008" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\FEngLib\FEngLib.csproj" />
+      <ProjectReference Include="..\FEngRender\FEngRender.csproj" />
     </ItemGroup>
 
 </Project>
