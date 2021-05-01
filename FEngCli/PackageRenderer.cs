@@ -45,14 +45,6 @@ namespace FEngCli
             using var img = new Image<Rgba32>(640, 480, /*Rgba32.ParseHex("#000000ff")*/ Color.Transparent);
 
             var renderOrderItems = new List<RenderOrderItem>();
-            var goodGuids = new HashSet<uint>
-            {
-                0x10EFB0, // scroll bar GRAY
-                0x10EFAF, // scroll bar WHITE
-
-                0x10EFB4, // light gray background
-                0xF271C // dark gray background
-            };
 
             foreach (var frontendObject in _package.Objects)
             {
@@ -68,11 +60,13 @@ namespace FEngCli
                 var frontendObject = renderOrderItem.FrontendObject;
                 var x = renderOrderItem.GetX();
                 var y = renderOrderItem.GetY();
+                var sizeX = renderOrderItem.GetSizeX();
+                var sizeY = renderOrderItem.GetSizeY();
 
                 Console.WriteLine(
-                    "Object 0x{0:X}: OriginalPos={1}, Size={4}, NewPos=({2}, {3}), Color={5}, Type={6}, Rotation={7}",
-                    frontendObject.Guid, frontendObject.Position, x, y, frontendObject.Size,
-                    frontendObject.Color, frontendObject.Type, frontendObject.Rotation);
+                    "Object 0x{0:X}: position=({1}, {2}), size=({3}, {4}), color={5}, type={6}, resource={7}",
+                    frontendObject.Guid, x, y, sizeX, sizeY, frontendObject.Color, frontendObject.Type,
+                    _package.ResourceRequests[frontendObject.ResourceIndex].Name);
 
                 if (x < 0 || x > 640 || y < 0 || y > 480)
                 {
@@ -80,7 +74,7 @@ namespace FEngCli
                     continue;
                 }
 
-                Console.WriteLine(renderOrderItem.ObjectMatrix);
+                // Console.WriteLine(renderOrderItem.ObjectMatrix);
 
                 if (frontendObject.Type == FEObjType.FE_Image)
                 {
@@ -105,29 +99,27 @@ namespace FEngCli
                         var image = Image.Load(resourceFile);
                         image.Mutate(c =>
                         {
-                            var scaleX = frontendObject.Size.X;
-                            var scaleY = frontendObject.Size.Y;
                             var objectRotation = ComputeObjectRotation(frontendObject);
                             var rotateDeg = ExtractZRotation(objectRotation) * (180f / Math.PI);
 
-                            if (scaleX < 0)
+                            if (sizeX < 0)
                             {
                                 c.Flip(FlipMode.Horizontal);
-                                scaleX = -scaleX;
+                                sizeX = -sizeX;
                             }
 
-                            if (scaleY < 0)
+                            if (sizeY < 0)
                             {
                                 c.Flip(FlipMode.Vertical);
-                                scaleY = -scaleY;
+                                sizeY = -sizeY;
                             }
 
-                            c.Resize((int) scaleX, (int) scaleY);
+                            c.Resize((int) sizeX, (int) sizeY);
 
                             if (rotateDeg != 0)
                             {
-                                Console.WriteLine("Rotating object by {0} degrees: {1}", rotateDeg,
-                                    _package.ResourceRequests[frontendObject.ResourceIndex].Name);
+                                Console.WriteLine("Computed rotation: {1} - rotating object by {0} degrees.", rotateDeg,
+                                    objectRotation);
                                 c.Rotate((float) rotateDeg);
                             }
 
@@ -255,7 +247,7 @@ namespace FEngCli
                 switch (FrontendObject.Type)
                 {
                     case FEObjType.FE_Image:
-                        x -= FrontendObject.Size.X * 0.5f;
+                        x -= GetSizeX() * 0.5f;
                         break;
                 }
 
@@ -269,7 +261,7 @@ namespace FEngCli
                 switch (FrontendObject.Type)
                 {
                     case FEObjType.FE_Image:
-                        y -= FrontendObject.Size.Y * 0.5f;
+                        y -= GetSizeY() * 0.5f;
                         break;
                 }
 
@@ -279,6 +271,21 @@ namespace FEngCli
             public float GetZ()
             {
                 return ObjectMatrix.M43;
+            }
+
+            public float GetSizeX()
+            {
+                return ObjectMatrix.M11;
+            }
+
+            public float GetSizeY()
+            {
+                return ObjectMatrix.M22;
+            }
+
+            public float GetSizeZ()
+            {
+                return ObjectMatrix.M33;
             }
         }
     }
