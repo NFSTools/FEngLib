@@ -30,7 +30,7 @@ namespace FEngCli
             
             var renderer = new PackageRenderer(package, options.TextureDir);
             var outputFile = options.OutputFile ?? $"{package.Name}.png";
-            var img = renderer.RenderToPng();
+            var img = renderer.Render();
             using var fs = File.OpenWrite(outputFile);
             img.SaveAsPng(fs);
             

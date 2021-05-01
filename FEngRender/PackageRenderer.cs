@@ -37,7 +37,7 @@ namespace FEngRender
         ///     Renders the package to an <see cref="Image" /> object.
         /// </summary>
         /// <returns>The rendered image.</returns>
-        public Image<Rgba32> RenderToPng()
+        public Image<Rgba32> Render()
         {
             const int width = /*1280*/ 640;
             const int height = /*960*/ 480;
