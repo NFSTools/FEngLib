@@ -96,7 +96,8 @@ namespace FEngViewer
             var rootNode = treeView1.Nodes.Add(package.Name);
             ApplyObjectsToTreeNodes(feObjectNodes, rootNode.Nodes);
 
-            treeView1.ExpandAll();
+            rootNode.Expand();
+            // treeView1.ExpandAll();
             treeView1.EndUpdate();
 
             treeView1.SelectedNode = rootNode;
