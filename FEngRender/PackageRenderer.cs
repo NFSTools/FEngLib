@@ -118,12 +118,14 @@ namespace FEngRender
                             {
                                 c.Flip(FlipMode.Horizontal);
                                 sizeX = -sizeX;
+                                x -= sizeX;
                             }
 
                             if (sizeY < 0)
                             {
                                 c.Flip(FlipMode.Vertical);
                                 sizeY = -sizeY;
+                                y -= sizeY;
                             }
 
                             c.Resize((int) sizeX, (int) sizeY);
