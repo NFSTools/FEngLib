@@ -19,6 +19,8 @@ namespace FEngRender
     /// </summary>
     public class PackageRenderer
     {
+        public uint SelectedObjectGuid { get; set; }
+
         private readonly FrontendPackage _package;
         private readonly string _textureDir;
 
@@ -223,7 +225,24 @@ namespace FEngRender
                 }
             }
 
+            DrawBoundingBox(img, renderOrderItems);
+
             return img;
+        }
+
+        private void DrawBoundingBox(Image<Rgba32> image, List<RenderOrderItem> items)
+        {
+            var selectedObjectRenderItem = items.Find(item => item.FrontendObject.Guid == SelectedObjectGuid);
+
+            if (selectedObjectRenderItem == null)
+                return;
+            
+            image.Mutate(ctx =>
+            {
+                var boundingBox = new RectangleF(selectedObjectRenderItem.GetX(), selectedObjectRenderItem.GetY(),
+                    selectedObjectRenderItem.GetSizeX(), selectedObjectRenderItem.GetSizeY());
+                ctx.Draw(Color.Red, 1.0f, boundingBox);
+            });
         }
 
         private static bool IsInvisible(FrontendObject frontendObject)

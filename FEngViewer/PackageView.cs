@@ -15,6 +15,7 @@ namespace FEngViewer
 {
     public partial class PackageView : Form
     {
+        private PackageRenderer _renderer;
         public PackageView()
         {
             InitializeComponent();
@@ -40,8 +41,13 @@ namespace FEngViewer
             labelPkgName.Text = package.Name;
             var nodes = GeneratePackageHierarchy(package);
             PopulateTreeView(nodes);
-            var renderer = new PackageRenderer(package, options.TextureDir);
-            var image = renderer.Render();
+            _renderer = new PackageRenderer(package, options.TextureDir);
+            Render();
+        }
+
+        private void Render()
+        {
+            var image = _renderer.Render();
             var stream = new MemoryStream();
             image.SaveAsBmp(stream);
             viewOutput.Image = Image.FromStream(stream);
@@ -120,7 +126,10 @@ namespace FEngViewer
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            objectDetailsView1.UpdateObjectDetails((FEObjectViewNode) e.Node.Tag);
+            var viewNode = (FEObjectViewNode) e.Node.Tag;
+            objectDetailsView1.UpdateObjectDetails(viewNode);
+            _renderer.SelectedObjectGuid = viewNode.Obj.Guid;
+            Render();
         }
 
         private void viewOutput_MouseMove(object sender, MouseEventArgs e)
