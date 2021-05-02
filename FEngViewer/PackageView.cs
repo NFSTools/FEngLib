@@ -9,6 +9,7 @@ using FEngLib.Data;
 using FEngRender;
 using JetBrains.Annotations;
 using SixLabors.ImageSharp;
+using Image = System.Drawing.Image;
 
 namespace FEngViewer
 {
@@ -35,7 +36,7 @@ namespace FEngViewer
 
             var package = LoadPackageFromChunk(options.InputFile);
             // window title
-            this.Text = package.Name;
+            Text = package.Name;
             labelPkgName.Text = package.Name;
             var nodes = GeneratePackageHierarchy(package);
             PopulateTreeView(nodes);
@@ -43,7 +44,7 @@ namespace FEngViewer
             var image = renderer.Render();
             var stream = new MemoryStream();
             image.SaveAsBmp(stream);
-            viewOutput.Image = System.Drawing.Image.FromStream(stream);
+            viewOutput.Image = Image.FromStream(stream);
         }
 
         private List<FEObjectViewNode> GeneratePackageHierarchy(FrontendPackage package)
@@ -56,10 +57,7 @@ namespace FEngViewer
             var groupLookup = new Dictionary<uint, FEObjectViewNode>();
             var groups = flatNodes.FindAll(node => node.Obj.Type == FEObjType.FE_Group);
             // LUT for GUID -> group
-            foreach (var node in groups)
-            {
-                groupLookup.Add(node.Obj.Guid, node);
-            }
+            foreach (var node in groups) groupLookup.Add(node.Obj.Guid, node);
 
             // directly add all objects that don't belong to any group
             var rootObjects = flatNodes.FindAll(node => node.Obj.Parent == null);
@@ -67,10 +65,7 @@ namespace FEngViewer
             flatNodes.RemoveAll(node => node.Obj.Parent == null);
 
             // only objects that belong to another object are left
-            foreach (var node in flatNodes)
-            {
-                groupLookup[node.Obj.Parent.Guid].Children.Add(node);
-            }
+            foreach (var node in flatNodes) groupLookup[node.Obj.Parent.Guid].Children.Add(node);
 
             return nestedNodes;
         }
@@ -94,10 +89,7 @@ namespace FEngViewer
                 var feObj = feObjectNode.Obj;
                 var objTreeNode = treeNodes.Add($"{feObj.Type} {feObj.Guid:X}");
                 objTreeNode.Tag = feObjectNode;
-                if (feObjectNode.Children.Count > 0)
-                {
-                    ApplyObjectsToTreeNodes(feObjectNode.Children, objTreeNode.Nodes);
-                }
+                if (feObjectNode.Children.Count > 0) ApplyObjectsToTreeNodes(feObjectNode.Children, objTreeNode.Nodes);
             }
         }
 
@@ -126,6 +118,16 @@ namespace FEngViewer
             return new FrontendPackageLoader().Load(mr);
         }
 
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            objectDetailsView1.UpdateObjectDetails((FEObjectViewNode) e.Node.Tag);
+        }
+
+        private void viewOutput_MouseMove(object sender, MouseEventArgs e)
+        {
+            labelCoordDisplay.Text = $"FE: ({e.X - 320,4:D}, {e.Y - 240,4:D}) | Real: ({e.X,4:D}, {e.Y,4:D})";
+        }
+
         [UsedImplicitly]
         private class Options
         {
@@ -134,16 +136,6 @@ namespace FEngViewer
 
             [Option('t', "textures", Required = true)]
             public string TextureDir { get; set; }
-        }
-
-        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-            objectDetailsView1.UpdateObjectDetails((FEObjectViewNode) e.Node.Tag);
-        }
-
-        private void viewOutput_MouseMove(object sender, MouseEventArgs e)
-        {
-            labelCoordDisplay.Text = $"FE X: {(e.X - 320),4:D}  Y: {(e.Y - 240),4:D}";
         }
     }
 }
