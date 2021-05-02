@@ -99,6 +99,7 @@ namespace FEngLib
                         break;
                     case FrontendChunkType.FrontendObjectContainer:
                         var frontendObject = new FrontendObject();
+                        frontendObject.Package = Package;
                         var objectContainerChunk = new FrontendObjectContainerChunk(frontendObject);
                         frontendObject = objectContainerChunk.Read(Package, new ObjectReaderState(block, this), Reader);
                         Package.Objects.Add(frontendObject);
