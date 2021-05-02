@@ -149,6 +149,12 @@ namespace FEngViewer
             labelObjGUID.Text = $"{obj.Guid:X}";
             labelObjFlags.Text = $"{obj.Flags:X}";
             labelObjResID.Text = obj.ResourceIndex.ToString();
+
+            labelObjDataColor.Text = obj.Color.ToString();
+            labelObjDataPivot.Text = obj.Pivot.ToString();
+            labelObjDataPosition.Text = obj.Position.ToString();
+            labelObjDataRotation.Text = obj.Rotation.ToString();
+            labelObjDataSize.Text = obj.Size.ToString();
         }
     }
 }

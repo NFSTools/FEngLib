@@ -31,8 +31,20 @@ namespace FEngViewer
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.labelPkgName = new System.Windows.Forms.Label();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.labelObjDataSize = new System.Windows.Forms.Label();
+            this.labelObjDataRotation = new System.Windows.Forms.Label();
+            this.labelObjDataPosition = new System.Windows.Forms.Label();
+            this.labelObjDataPivot = new System.Windows.Forms.Label();
+            this.labelObjDataColor = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
             this.labelObjResID = new System.Windows.Forms.Label();
             this.labelObjFlags = new System.Windows.Forms.Label();
             this.labelObjGUID = new System.Windows.Forms.Label();
@@ -46,7 +58,6 @@ namespace FEngViewer
             this.label1 = new System.Windows.Forms.Label();
             this.viewOutput = new System.Windows.Forms.PictureBox();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.labelPkgName = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -56,6 +67,7 @@ namespace FEngViewer
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.viewOutput)).BeginInit();
             this.SuspendLayout();
             // 
@@ -74,7 +86,7 @@ namespace FEngViewer
             // 
             this.splitContainer1.Panel2.Controls.Add(this.groupBox1);
             this.splitContainer1.Panel2.Controls.Add(this.viewOutput);
-            this.splitContainer1.Size = new System.Drawing.Size(1008, 781);
+            this.splitContainer1.Size = new System.Drawing.Size(1008, 985);
             this.splitContainer1.SplitterDistance = 340;
             this.splitContainer1.TabIndex = 0;
             // 
@@ -93,16 +105,25 @@ namespace FEngViewer
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.treeView1);
-            this.splitContainer2.Size = new System.Drawing.Size(340, 781);
+            this.splitContainer2.Size = new System.Drawing.Size(340, 985);
             this.splitContainer2.SplitterDistance = 100;
             this.splitContainer2.TabIndex = 1;
+            // 
+            // labelPkgName
+            // 
+            this.labelPkgName.AutoSize = true;
+            this.labelPkgName.Location = new System.Drawing.Point(22, 20);
+            this.labelPkgName.Name = "labelPkgName";
+            this.labelPkgName.Size = new System.Drawing.Size(121, 20);
+            this.labelPkgName.TabIndex = 0;
+            this.labelPkgName.Text = "WWWWWWWW";
             // 
             // treeView1
             // 
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView1.Location = new System.Drawing.Point(0, 0);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(340, 677);
+            this.treeView1.Size = new System.Drawing.Size(340, 881);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
@@ -110,6 +131,7 @@ namespace FEngViewer
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.groupBox2);
             this.groupBox1.Controls.Add(this.labelObjResID);
             this.groupBox1.Controls.Add(this.labelObjFlags);
             this.groupBox1.Controls.Add(this.labelObjGUID);
@@ -121,12 +143,141 @@ namespace FEngViewer
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Location = new System.Drawing.Point(3, 491);
+            this.groupBox1.Location = new System.Drawing.Point(3, 586);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(658, 287);
+            this.groupBox1.Size = new System.Drawing.Size(658, 396);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Object details";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.labelObjDataSize);
+            this.groupBox2.Controls.Add(this.labelObjDataRotation);
+            this.groupBox2.Controls.Add(this.labelObjDataPosition);
+            this.groupBox2.Controls.Add(this.labelObjDataPivot);
+            this.groupBox2.Controls.Add(this.labelObjDataColor);
+            this.groupBox2.Controls.Add(this.label11);
+            this.groupBox2.Controls.Add(this.label10);
+            this.groupBox2.Controls.Add(this.label9);
+            this.groupBox2.Controls.Add(this.label8);
+            this.groupBox2.Controls.Add(this.label7);
+            this.groupBox2.Location = new System.Drawing.Point(6, 143);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(343, 247);
+            this.groupBox2.TabIndex = 12;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Data";
+            // 
+            // labelObjDataSize
+            // 
+            this.labelObjDataSize.AutoSize = true;
+            this.labelObjDataSize.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.labelObjDataSize.Location = new System.Drawing.Point(100, 135);
+            this.labelObjDataSize.Name = "labelObjDataSize";
+            this.labelObjDataSize.Size = new System.Drawing.Size(164, 28);
+            this.labelObjDataSize.TabIndex = 9;
+            this.labelObjDataSize.Text = "WWWWWWWW";
+            this.labelObjDataSize.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // labelObjDataRotation
+            // 
+            this.labelObjDataRotation.AutoSize = true;
+            this.labelObjDataRotation.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.labelObjDataRotation.Location = new System.Drawing.Point(100, 107);
+            this.labelObjDataRotation.Name = "labelObjDataRotation";
+            this.labelObjDataRotation.Size = new System.Drawing.Size(164, 28);
+            this.labelObjDataRotation.TabIndex = 8;
+            this.labelObjDataRotation.Text = "WWWWWWWW";
+            this.labelObjDataRotation.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // labelObjDataPosition
+            // 
+            this.labelObjDataPosition.AutoSize = true;
+            this.labelObjDataPosition.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.labelObjDataPosition.Location = new System.Drawing.Point(100, 79);
+            this.labelObjDataPosition.Name = "labelObjDataPosition";
+            this.labelObjDataPosition.Size = new System.Drawing.Size(164, 28);
+            this.labelObjDataPosition.TabIndex = 7;
+            this.labelObjDataPosition.Text = "WWWWWWWW";
+            this.labelObjDataPosition.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // labelObjDataPivot
+            // 
+            this.labelObjDataPivot.AutoSize = true;
+            this.labelObjDataPivot.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.labelObjDataPivot.Location = new System.Drawing.Point(100, 51);
+            this.labelObjDataPivot.Name = "labelObjDataPivot";
+            this.labelObjDataPivot.Size = new System.Drawing.Size(164, 28);
+            this.labelObjDataPivot.TabIndex = 6;
+            this.labelObjDataPivot.Text = "WWWWWWWW";
+            this.labelObjDataPivot.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // labelObjDataColor
+            // 
+            this.labelObjDataColor.AutoSize = true;
+            this.labelObjDataColor.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.labelObjDataColor.Location = new System.Drawing.Point(100, 23);
+            this.labelObjDataColor.Name = "labelObjDataColor";
+            this.labelObjDataColor.Size = new System.Drawing.Size(164, 28);
+            this.labelObjDataColor.TabIndex = 5;
+            this.labelObjDataColor.Text = "WWWWWWWW";
+            this.labelObjDataColor.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label11.Location = new System.Drawing.Point(43, 135);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(51, 28);
+            this.label11.TabIndex = 4;
+            this.label11.Text = "Size:";
+            this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label10.Location = new System.Drawing.Point(3, 107);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(91, 28);
+            this.label10.TabIndex = 3;
+            this.label10.Text = "Rotation:";
+            this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label9.Location = new System.Drawing.Point(8, 79);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(86, 28);
+            this.label9.TabIndex = 2;
+            this.label9.Text = "Position:";
+            this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label8.Location = new System.Drawing.Point(33, 51);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(61, 28);
+            this.label8.TabIndex = 1;
+            this.label8.Text = "Pivot:";
+            this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label7.Location = new System.Drawing.Point(30, 23);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(64, 28);
+            this.label7.TabIndex = 0;
+            this.label7.Text = "Color:";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // labelObjResID
             // 
@@ -261,20 +412,11 @@ namespace FEngViewer
             this.viewOutput.TabIndex = 0;
             this.viewOutput.TabStop = false;
             // 
-            // labelPkgName
-            // 
-            this.labelPkgName.AutoSize = true;
-            this.labelPkgName.Location = new System.Drawing.Point(22, 20);
-            this.labelPkgName.Name = "labelPkgName";
-            this.labelPkgName.Size = new System.Drawing.Size(95, 15);
-            this.labelPkgName.TabIndex = 0;
-            this.labelPkgName.Text = "WWWWWWWW";
-            // 
             // PackageView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1008, 781);
+            this.ClientSize = new System.Drawing.Size(1008, 985);
             this.Controls.Add(this.splitContainer1);
             this.Name = "PackageView";
             this.Text = "Form1";
@@ -290,6 +432,8 @@ namespace FEngViewer
             this.splitContainer2.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.viewOutput)).EndInit();
             this.ResumeLayout(false);
 
@@ -315,5 +459,16 @@ namespace FEngViewer
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label labelPkgName;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label labelObjDataPivot;
+        private System.Windows.Forms.Label labelObjDataColor;
+        private System.Windows.Forms.Label labelObjDataSize;
+        private System.Windows.Forms.Label labelObjDataRotation;
+        private System.Windows.Forms.Label labelObjDataPosition;
     }
 }
