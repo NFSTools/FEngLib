@@ -80,6 +80,12 @@ namespace FEngRender
                     continue;
                 }
 
+                if (sizeX == 0 || sizeY == 0)
+                {
+                    Console.WriteLine("Zero pixels on at least one axis. Skipping.");
+                    continue;
+                }
+
                 Console.WriteLine("Computed matrix: {0}", renderOrderItem.ObjectMatrix);
 
                 if (frontendObject.Type == FEObjType.FE_Image)
@@ -117,11 +123,9 @@ namespace FEngRender
                                 sizeY = -sizeY;
                             }
 
-                            var objectRotation = ComputeObjectRotation(frontendObject);
-                            var atb = new AffineTransformBuilder();
-                            atb.AppendScale(new SizeF(sizeX / image.Width, sizeY / image.Height));
+                            c.Resize((int) sizeX, (int) sizeY);
 
-                            c.Transform(atb);
+                            // TODO: How do we handle rotation?
 
                             // var eulerAngles = QuaternionToEuler(objectRotation);
                             // var xRotateDeg = eulerAngles.Roll * (180f / Math.PI);
@@ -143,7 +147,6 @@ namespace FEngRender
                             //     sizeY = -sizeY;
                             // }
                             //
-                            // c.Resize((int) sizeX, (int) sizeY);
                             //
                             // c.Rotate((float) xRotateDeg);
                             // c.Rotate((float) zRotateDeg);
