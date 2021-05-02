@@ -31,14 +31,14 @@ namespace FEngViewer
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.viewOutput = new System.Windows.Forms.PictureBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.viewOutput)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -55,7 +55,7 @@ namespace FEngViewer
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.groupBox1);
-            this.splitContainer1.Panel2.Controls.Add(this.pictureBox1);
+            this.splitContainer1.Panel2.Controls.Add(this.viewOutput);
             this.splitContainer1.Size = new System.Drawing.Size(1002, 845);
             this.splitContainer1.SplitterDistance = 334;
             this.splitContainer1.TabIndex = 0;
@@ -71,16 +71,16 @@ namespace FEngViewer
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.viewOutput.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox1.BackColor = System.Drawing.Color.Black;
-            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox1.MaximumSize = new System.Drawing.Size(640, 480);
-            this.pictureBox1.MinimumSize = new System.Drawing.Size(640, 480);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(640, 480);
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
+            this.viewOutput.BackColor = System.Drawing.Color.Black;
+            this.viewOutput.Location = new System.Drawing.Point(0, 0);
+            this.viewOutput.MaximumSize = new System.Drawing.Size(640, 480);
+            this.viewOutput.MinimumSize = new System.Drawing.Size(640, 480);
+            this.viewOutput.Name = "viewOutput";
+            this.viewOutput.Size = new System.Drawing.Size(640, 480);
+            this.viewOutput.TabIndex = 0;
+            this.viewOutput.TabStop = false;
             // 
             // groupBox1
             // 
@@ -106,7 +106,7 @@ namespace FEngViewer
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.viewOutput)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -115,7 +115,7 @@ namespace FEngViewer
 
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.TreeView treeView1;
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox viewOutput;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.ColorDialog colorDialog1;
     }

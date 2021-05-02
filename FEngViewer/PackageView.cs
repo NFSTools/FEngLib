@@ -25,7 +25,7 @@ namespace FEngViewer
 
             var opts = Parser.Default.ParseArguments<Options>(args);
             opts.WithNotParsed(errors => Application.Exit());
-            Options options = ((Parsed<Options>) opts).Value;
+            var options = ((Parsed<Options>) opts).Value;
 
             if (!File.Exists(options.InputFile))
             {
@@ -40,7 +40,7 @@ namespace FEngViewer
             var image = renderer.Render();
             var stream = new MemoryStream();
             image.SaveAsBmp(stream);
-            pictureBox1.Image = System.Drawing.Image.FromStream(stream);
+            viewOutput.Image = System.Drawing.Image.FromStream(stream);
         }
 
         private List<FEObjectViewNode> GeneratePackageHierarchy(FrontendPackage package)
@@ -48,21 +48,21 @@ namespace FEngViewer
             var sorted = package.Objects.OrderBy(o => o.Parent?.Guid).ThenBy(o => o.Guid).ToList();
             var flatNodes = sorted.ConvertAll(obj => new FEObjectViewNode(obj));
 
-            var groupLookup = new Dictionary<uint, FEObjectViewNode>();
             var nestedNodes = new List<FEObjectViewNode>();
 
+            var groupLookup = new Dictionary<uint, FEObjectViewNode>();
             var groups = flatNodes.FindAll(node => node.Obj.Type == FEObjType.FE_Group);
             // LUT for GUID -> group
             foreach (var node in groups)
             {
                 groupLookup.Add(node.Obj.Guid, node);
             }
-            
+
             // directly add all objects that don't belong to any group
             var rootObjects = flatNodes.FindAll(node => node.Obj.Parent == null);
             nestedNodes.AddRange(rootObjects);
             flatNodes.RemoveAll(node => node.Obj.Parent == null);
-            
+
             // only objects that belong to another object are left
             foreach (var node in flatNodes)
             {
@@ -84,14 +84,15 @@ namespace FEngViewer
             treeView1.ExpandAll();
             treeView1.EndUpdate();
         }
-        
-        private static void ApplyObjectsToTreeNodes(IEnumerable<FEObjectViewNode> objectNodes, TreeNodeCollection treeNodes)
+
+        private static void ApplyObjectsToTreeNodes(IEnumerable<FEObjectViewNode> objectNodes,
+            TreeNodeCollection treeNodes)
         {
             foreach (var feObjectNode in objectNodes)
             {
                 var feObj = feObjectNode.Obj;
                 var objTreeNode = treeNodes.Add($"{feObj.Type} {feObj.Guid:X}");
-                
+
                 if (feObjectNode.Children.Count > 0)
                 {
                     ApplyObjectsToTreeNodes(feObjectNode.Children, objTreeNode.Nodes);
@@ -136,7 +137,6 @@ namespace FEngViewer
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-
         }
     }
 }
