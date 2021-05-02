@@ -92,7 +92,7 @@ namespace FEngViewer
             {
                 var feObj = feObjectNode.Obj;
                 var objTreeNode = treeNodes.Add($"{feObj.Type} {feObj.Guid:X}");
-
+                objTreeNode.Tag = feObjectNode;
                 if (feObjectNode.Children.Count > 0)
                 {
                     ApplyObjectsToTreeNodes(feObjectNode.Children, objTreeNode.Nodes);
@@ -137,6 +137,19 @@ namespace FEngViewer
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
+            if (e.Node.Tag == null) // package node, TODO remove it and show pkg info statically instead
+                return;
+            UpdateObjectDetails((FEObjectViewNode) e.Node.Tag);
+        }
+
+        private void UpdateObjectDetails(FEObjectViewNode nodeTag)
+        {
+            var obj = nodeTag.Obj;
+            labelObjType.Text = obj.Type.ToString();
+            labelObjHash.Text = $"{obj.NameHash:X}";
+            labelObjGUID.Text = $"{obj.Guid:X}";
+            labelObjFlags.Text = $"{obj.Flags:X}";
+            labelObjResID.Text = obj.ResourceIndex.ToString();
         }
     }
 }
