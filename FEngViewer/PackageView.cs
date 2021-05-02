@@ -34,8 +34,11 @@ namespace FEngViewer
             }
 
             var package = LoadPackageFromChunk(options.InputFile);
+            // window title
+            this.Text = package.Name;
+            labelPkgName.Text = package.Name;
             var nodes = GeneratePackageHierarchy(package);
-            PopulateTreeView(package, nodes);
+            PopulateTreeView(nodes);
             var renderer = new PackageRenderer(package, options.TextureDir);
             var image = renderer.Render();
             var stream = new MemoryStream();
@@ -72,14 +75,12 @@ namespace FEngViewer
             return nestedNodes;
         }
 
-        private void PopulateTreeView(FrontendPackage package, IEnumerable<FEObjectViewNode> feObjectNodes)
+        private void PopulateTreeView(IEnumerable<FEObjectViewNode> feObjectNodes)
         {
             // map group guid to children guids
             treeView1.BeginUpdate();
 
-            var pkgNode = treeView1.Nodes.Add(package.Name);
-
-            ApplyObjectsToTreeNodes(feObjectNodes, pkgNode.Nodes);
+            ApplyObjectsToTreeNodes(feObjectNodes, treeView1.Nodes);
 
             treeView1.ExpandAll();
             treeView1.EndUpdate();
@@ -137,8 +138,6 @@ namespace FEngViewer
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            if (e.Node.Tag == null) // package node, TODO remove it and show pkg info statically instead
-                return;
             UpdateObjectDetails((FEObjectViewNode) e.Node.Tag);
         }
 

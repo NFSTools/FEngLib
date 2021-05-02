@@ -46,11 +46,13 @@ namespace FEngViewer
             this.label1 = new System.Windows.Forms.Label();
             this.viewOutput = new System.Windows.Forms.PictureBox();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.labelPkgName = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
+            this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -83,6 +85,10 @@ namespace FEngViewer
             this.splitContainer2.Location = new System.Drawing.Point(0, 0);
             this.splitContainer2.Name = "splitContainer2";
             this.splitContainer2.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer2.Panel1
+            // 
+            this.splitContainer2.Panel1.Controls.Add(this.labelPkgName);
             // 
             // splitContainer2.Panel2
             // 
@@ -255,6 +261,15 @@ namespace FEngViewer
             this.viewOutput.TabIndex = 0;
             this.viewOutput.TabStop = false;
             // 
+            // labelPkgName
+            // 
+            this.labelPkgName.AutoSize = true;
+            this.labelPkgName.Location = new System.Drawing.Point(22, 20);
+            this.labelPkgName.Name = "labelPkgName";
+            this.labelPkgName.Size = new System.Drawing.Size(95, 15);
+            this.labelPkgName.TabIndex = 0;
+            this.labelPkgName.Text = "WWWWWWWW";
+            // 
             // PackageView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
@@ -268,6 +283,8 @@ namespace FEngViewer
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.splitContainer2.Panel1.ResumeLayout(false);
+            this.splitContainer2.Panel1.PerformLayout();
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
@@ -297,5 +314,6 @@ namespace FEngViewer
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labelPkgName;
     }
 }
