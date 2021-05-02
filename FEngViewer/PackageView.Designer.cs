@@ -36,6 +36,7 @@ namespace FEngViewer
             this.objectDetailsView1 = new FEngViewer.ObjectDetailsView();
             this.viewOutput = new System.Windows.Forms.PictureBox();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.labelCoordDisplay = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -60,10 +61,11 @@ namespace FEngViewer
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.labelCoordDisplay);
             this.splitContainer1.Panel2.Controls.Add(this.objectDetailsView1);
             this.splitContainer1.Panel2.Controls.Add(this.viewOutput);
-            this.splitContainer1.Size = new System.Drawing.Size(1282, 1233);
-            this.splitContainer1.SplitterDistance = 614;
+            this.splitContainer1.Size = new System.Drawing.Size(937, 1017);
+            this.splitContainer1.SplitterDistance = 269;
             this.splitContainer1.TabIndex = 0;
             // 
             // splitContainer2
@@ -81,7 +83,7 @@ namespace FEngViewer
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.treeView1);
-            this.splitContainer2.Size = new System.Drawing.Size(614, 1233);
+            this.splitContainer2.Size = new System.Drawing.Size(269, 1017);
             this.splitContainer2.SplitterDistance = 100;
             this.splitContainer2.TabIndex = 1;
             // 
@@ -99,7 +101,7 @@ namespace FEngViewer
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView1.Location = new System.Drawing.Point(0, 0);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(614, 1129);
+            this.treeView1.Size = new System.Drawing.Size(269, 913);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
@@ -107,7 +109,7 @@ namespace FEngViewer
             // 
             this.objectDetailsView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.objectDetailsView1.Location = new System.Drawing.Point(3, 734);
+            this.objectDetailsView1.Location = new System.Drawing.Point(3, 518);
             this.objectDetailsView1.Name = "objectDetailsView1";
             this.objectDetailsView1.Size = new System.Drawing.Size(637, 495);
             this.objectDetailsView1.TabIndex = 1;
@@ -124,18 +126,29 @@ namespace FEngViewer
             this.viewOutput.Size = new System.Drawing.Size(640, 480);
             this.viewOutput.TabIndex = 0;
             this.viewOutput.TabStop = false;
+            this.viewOutput.MouseMove += new System.Windows.Forms.MouseEventHandler(this.viewOutput_MouseMove);
+            // 
+            // labelCoordDisplay
+            // 
+            this.labelCoordDisplay.AutoSize = true;
+            this.labelCoordDisplay.Location = new System.Drawing.Point(4, 487);
+            this.labelCoordDisplay.Name = "labelCoordDisplay";
+            this.labelCoordDisplay.Size = new System.Drawing.Size(92, 20);
+            this.labelCoordDisplay.TabIndex = 2;
+            this.labelCoordDisplay.Text = "X:    0   Y:    0";
             // 
             // PackageView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1282, 1233);
+            this.ClientSize = new System.Drawing.Size(937, 1017);
             this.Controls.Add(this.splitContainer1);
             this.Name = "PackageView";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.PackageView_Load);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
+            this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
@@ -157,5 +170,6 @@ namespace FEngViewer
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.Label labelPkgName;
         private ObjectDetailsView objectDetailsView1;
+        private System.Windows.Forms.Label labelCoordDisplay;
     }
 }

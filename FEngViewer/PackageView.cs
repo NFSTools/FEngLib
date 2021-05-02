@@ -140,5 +140,10 @@ namespace FEngViewer
         {
             objectDetailsView1.UpdateObjectDetails((FEObjectViewNode) e.Node.Tag);
         }
+
+        private void viewOutput_MouseMove(object sender, MouseEventArgs e)
+        {
+            labelCoordDisplay.Text = $"FE X: {(e.X - 320),4:D}  Y: {(e.Y - 240),4:D}";
+        }
     }
 }
