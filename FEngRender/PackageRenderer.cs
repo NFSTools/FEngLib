@@ -101,7 +101,7 @@ namespace FEngRender
                         continue;
                     }
 
-                    var resourceFile = Path.Combine(_textureDir, $"{resource.Name.Split('.')[0]}.png");
+                    var resourceFile = Path.Combine(_textureDir, $"{CleanResourcePath(resource.Name)}.png");
 
                     if (!File.Exists(resourceFile))
                     {
@@ -229,6 +229,11 @@ namespace FEngRender
                     selectedObjectRenderItem.GetSizeX(), selectedObjectRenderItem.GetSizeY());
                 ctx.Draw(Color.Red, 1.0f, boundingBox);
             });
+        }
+
+        private static string CleanResourcePath(string path)
+        {
+            return path.Split('\\')[^1].Split('.')[0];
         }
 
         private static bool IsInvisible(FrontendObject frontendObject)
