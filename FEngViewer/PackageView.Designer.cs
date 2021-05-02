@@ -33,10 +33,10 @@ namespace FEngViewer
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.labelPkgName = new System.Windows.Forms.Label();
             this.treeView1 = new System.Windows.Forms.TreeView();
+            this.labelCoordDisplay = new System.Windows.Forms.Label();
             this.objectDetailsView1 = new FEngViewer.ObjectDetailsView();
             this.viewOutput = new System.Windows.Forms.PictureBox();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.labelCoordDisplay = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -92,7 +92,7 @@ namespace FEngViewer
             this.labelPkgName.AutoSize = true;
             this.labelPkgName.Location = new System.Drawing.Point(22, 20);
             this.labelPkgName.Name = "labelPkgName";
-            this.labelPkgName.Size = new System.Drawing.Size(121, 20);
+            this.labelPkgName.Size = new System.Drawing.Size(95, 15);
             this.labelPkgName.TabIndex = 0;
             this.labelPkgName.Text = "WWWWWWWW";
             // 
@@ -105,11 +105,21 @@ namespace FEngViewer
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
+            // labelCoordDisplay
+            // 
+            this.labelCoordDisplay.AutoSize = true;
+            this.labelCoordDisplay.Location = new System.Drawing.Point(4, 487);
+            this.labelCoordDisplay.Name = "labelCoordDisplay";
+            this.labelCoordDisplay.Size = new System.Drawing.Size(72, 15);
+            this.labelCoordDisplay.TabIndex = 2;
+            this.labelCoordDisplay.Text = "X:    0   Y:    0";
+            // 
             // objectDetailsView1
             // 
             this.objectDetailsView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.objectDetailsView1.Location = new System.Drawing.Point(3, 518);
+            this.objectDetailsView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.objectDetailsView1.Name = "objectDetailsView1";
             this.objectDetailsView1.Size = new System.Drawing.Size(637, 495);
             this.objectDetailsView1.TabIndex = 1;
@@ -128,18 +138,8 @@ namespace FEngViewer
             this.viewOutput.TabStop = false;
             this.viewOutput.MouseMove += new System.Windows.Forms.MouseEventHandler(this.viewOutput_MouseMove);
             // 
-            // labelCoordDisplay
-            // 
-            this.labelCoordDisplay.AutoSize = true;
-            this.labelCoordDisplay.Location = new System.Drawing.Point(4, 487);
-            this.labelCoordDisplay.Name = "labelCoordDisplay";
-            this.labelCoordDisplay.Size = new System.Drawing.Size(92, 20);
-            this.labelCoordDisplay.TabIndex = 2;
-            this.labelCoordDisplay.Text = "X:    0   Y:    0";
-            // 
             // PackageView
             // 
-            // this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             this.ClientSize = new System.Drawing.Size(937, 1017);
             this.Controls.Add(this.splitContainer1);

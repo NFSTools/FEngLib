@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -7,6 +8,7 @@ using CommandLine;
 using FEngLib;
 using FEngLib.Data;
 using FEngRender;
+using FEngViewer.Properties;
 using JetBrains.Annotations;
 using SixLabors.ImageSharp;
 using Image = System.Drawing.Image;
@@ -15,11 +17,18 @@ namespace FEngViewer
 {
     public partial class PackageView : Form
     {
+        private readonly ImageList _imageList;
         private PackageRenderer _renderer;
 
         public PackageView()
         {
             InitializeComponent();
+            _imageList = new ImageList();
+            _imageList.Images.Add("TreeItem_Package", Resources.TreeItem_Package);
+            _imageList.Images.Add("TreeItem_String", Resources.TreeItem_String);
+            _imageList.Images.Add("TreeItem_Group", Resources.TreeItem_Group);
+            _imageList.Images.Add("TreeItem_Image", Resources.TreeItem_Image);
+            treeView1.ImageList = _imageList;
         }
 
         private void PackageView_Load(object sender, EventArgs e)
@@ -97,9 +106,27 @@ namespace FEngViewer
             foreach (var feObjectNode in objectNodes)
             {
                 var feObj = feObjectNode.Obj;
-                var objTreeNode = treeNodes.Add($"{feObj.Type} {feObj.Guid:X}");
+                var nodeImageKey = feObj.Type switch
+                {
+                    FEObjType.FE_String => "TreeItem_String",
+                    FEObjType.FE_Image => "TreeItem_Image",
+                    FEObjType.FE_Group => "TreeItem_Group",
+                    _ => null
+                };
+
+                var nodeText = $"{feObj.Name ?? feObj.Guid.ToString("X")}";
+
+                if (nodeImageKey == null)
+                {
+                    Debug.WriteLine("Encountered an object type that we don't have an icon for: " + feObj.Type);
+                    nodeText = feObj.Type + " " + nodeText;
+                }
+
+                var objTreeNode = treeNodes.Add(nodeText);
                 objTreeNode.Tag = feObjectNode;
                 if (feObjectNode.Children.Count > 0) ApplyObjectsToTreeNodes(feObjectNode.Children, objTreeNode.Nodes);
+
+                if (nodeImageKey != null) objTreeNode.ImageKey = objTreeNode.SelectedImageKey = nodeImageKey;
             }
         }
 
