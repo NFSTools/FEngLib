@@ -46,19 +46,12 @@ namespace FEngRender
             const int height = /*960*/ 480;
 
             var img = new Image<Rgba32>(width, height, /*Rgba32.ParseHex("#000000ff")*/ Color.Black);
-
             var renderOrderItems = new List<RenderOrderItem>();
-            var goodGuids = new List<uint>
-            {
-                0xE6D9B
-            };
 
             foreach (var frontendObject in _package.Objects)
             {
                 if (frontendObject.Type != FEObjType.FE_Image && frontendObject.Type != FEObjType.FE_String) continue;
-                if ( /*frontendObject.Color.Alpha == 0 || */IsInvisible(frontendObject)) continue;
-                // if (!goodGuids.Contains(frontendObject.Guid)) continue;
-                // if (frontendObject.ResourceIndex != 7) continue;
+                if (IsInvisible(frontendObject)) continue;
 
                 var computedMatrix = ComputeObjectMatrix(frontendObject);
                 renderOrderItems.Add(new RenderOrderItem(computedMatrix, frontendObject, width / 2, height / 2));
