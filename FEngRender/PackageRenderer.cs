@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -19,8 +20,6 @@ namespace FEngRender
     /// </summary>
     public class PackageRenderer
     {
-        public uint SelectedObjectGuid { get; set; }
-
         private readonly FrontendPackage _package;
         private readonly string _textureDir;
 
@@ -34,6 +33,8 @@ namespace FEngRender
             _package = package;
             _textureDir = textureDir;
         }
+
+        public uint SelectedObjectGuid { get; set; }
 
         /// <summary>
         ///     Renders the package to an <see cref="Image" /> object.
@@ -71,24 +72,24 @@ namespace FEngRender
                 var sizeX = renderOrderItem.GetSizeX();
                 var sizeY = renderOrderItem.GetSizeY();
 
-                Console.WriteLine(
+                Debug.WriteLine(
                     "Object 0x{0:X}: position=({1}, {2}), size=({3}, {4}), color={5}, type={6}, resource={7}",
                     frontendObject.Guid, x, y, sizeX, sizeY, frontendObject.Color, frontendObject.Type,
                     _package.ResourceRequests[frontendObject.ResourceIndex].Name);
 
                 if (x < 0 || x > width || y < 0 || y > height)
                 {
-                    Console.WriteLine("Object out of bounds. Skipping.");
+                    Debug.WriteLine("Object out of bounds. Skipping.");
                     continue;
                 }
 
                 if (sizeX == 0 || sizeY == 0)
                 {
-                    Console.WriteLine("Zero pixels on at least one axis. Skipping.");
+                    Debug.WriteLine("Zero pixels on at least one axis. Skipping.");
                     continue;
                 }
 
-                Console.WriteLine("Computed matrix: {0}", renderOrderItem.ObjectMatrix);
+                Debug.WriteLine("Computed matrix: {0}", renderOrderItem.ObjectMatrix);
 
                 if (frontendObject.Type == FEObjType.FE_Image)
                 {
@@ -96,7 +97,7 @@ namespace FEngRender
 
                     if (resource.Type != FEResourceType.RT_Image)
                     {
-                        Console.WriteLine($"Expected resource type to be RT_Image, but it was {resource.Type}");
+                        Debug.WriteLine($"Expected resource type to be RT_Image, but it was {resource.Type}");
                         continue;
                     }
 
@@ -104,7 +105,7 @@ namespace FEngRender
 
                     if (!File.Exists(resourceFile))
                     {
-                        Console.WriteLine($"Cannot find resource file: {resourceFile}");
+                        Debug.WriteLine($"Cannot find resource file: {resourceFile}");
                         continue;
                     }
 
@@ -127,38 +128,21 @@ namespace FEngRender
 
                             c.Resize((int) sizeX, (int) sizeY);
 
-                            // TODO: How do we handle rotation?
+                            var rotationQuaternion = ComputeObjectRotation(frontendObject);
+                            var eulerAngles = QuaternionToEuler(rotationQuaternion);
+                            Debug.WriteLine("Rotation (Quaternion) : {0}", rotationQuaternion);
+                            Debug.WriteLine("Rotation (Euler)      : {0}, {1}, {2}", eulerAngles.Roll,
+                                eulerAngles.Pitch, eulerAngles.Yaw);
 
-                            // var eulerAngles = QuaternionToEuler(objectRotation);
-                            // var xRotateDeg = eulerAngles.Roll * (180f / Math.PI);
-                            // var yRotateDeg = eulerAngles.Pitch * (180f / Math.PI);
-                            // var zRotateDeg = eulerAngles.Yaw * (180f / Math.PI);
+                            var rotateX = eulerAngles.Roll * (180 / Math.PI);
+                            var rotateY = eulerAngles.Pitch * (180 / Math.PI);
+                            var rotateZ = eulerAngles.Yaw * (180 / Math.PI);
 
-                            // Console.WriteLine("Rotation quaternion to degrees: {0} {1} {2}", xRotateDeg, yRotateDeg, zRotateDeg);
-                            // var rotateDeg = ExtractZRotation(objectRotation) * (180f / Math.PI);
+                            // TODO: ELIMINATE THESE UGLY HACKS
+                            if (Math.Abs(Math.Abs(rotateX) - 180) < 0.1) c.Flip(FlipMode.Vertical);
+                            if (Math.Abs(Math.Abs(rotateY) - 180) < 0.1) c.Flip(FlipMode.Horizontal);
 
-                            // if (sizeX < 0)
-                            // {
-                            //     c.Flip(FlipMode.Horizontal);
-                            //     sizeX = -sizeX;
-                            // }
-                            //
-                            // if (sizeY < 0)
-                            // {
-                            //     c.Flip(FlipMode.Vertical);
-                            //     sizeY = -sizeY;
-                            // }
-                            //
-                            //
-                            // c.Rotate((float) xRotateDeg);
-                            // c.Rotate((float) zRotateDeg);
-
-                            // if (zRotateDeg != 0)
-                            // {
-                            //     Console.WriteLine("Computed rotation: {1} - rotating object by {0} degrees.", zRotateDeg,
-                            //         objectRotation);
-                            //     c.Rotate((float) zRotateDeg);
-                            // }
+                            c.Rotate((float) rotateZ);
 
                             var redScale = frontendObject.Color.Red / 255f;
                             var greenScale = frontendObject.Color.Green / 255f;
@@ -177,7 +161,7 @@ namespace FEngRender
                                 }
                             });
 
-                            Console.WriteLine("Applied channel filter");
+                            Debug.WriteLine("Applied channel filter");
                         });
                         m.DrawImage(
                             image, new Point((int) x, (int) y), frontendObject.Color.Alpha / 255f);
@@ -185,7 +169,7 @@ namespace FEngRender
                 }
                 else if (frontendObject is FrontendString frontendString && !string.IsNullOrEmpty(frontendString.Value))
                 {
-                    Console.WriteLine("\tDrawing text in format {1}: {0}", frontendString.Value,
+                    Debug.WriteLine("\tDrawing text in format {1}: {0}", frontendString.Value,
                         frontendString.Formatting);
 
                     img.Mutate(m =>
@@ -236,7 +220,7 @@ namespace FEngRender
 
             if (selectedObjectRenderItem == null)
                 return;
-            
+
             image.Mutate(ctx =>
             {
                 var boundingBox = new RectangleF(selectedObjectRenderItem.GetX(), selectedObjectRenderItem.GetY(),
@@ -317,7 +301,9 @@ namespace FEngRender
 
         private struct EulerAngles
         {
-            public double Roll, Pitch, Yaw;
+            public readonly double Roll;
+            public readonly double Pitch;
+            public readonly double Yaw;
 
             public EulerAngles(double roll, double pitch, double yaw)
             {
