@@ -42,7 +42,7 @@ namespace FEngRender
             const int width = /*1280*/ 640;
             const int height = /*960*/ 480;
             
-            using var img = new Image<Rgba32>(width, height, /*Rgba32.ParseHex("#000000ff")*/ Color.Black);
+            var img = new Image<Rgba32>(width, height, /*Rgba32.ParseHex("#000000ff")*/ Color.Black);
 
             var renderOrderItems = new List<RenderOrderItem>();
             var goodGuids = new List<uint>
