@@ -41,7 +41,7 @@ namespace FEngRender
         {
             const int width = /*1280*/ 640;
             const int height = /*960*/ 480;
-            
+
             var img = new Image<Rgba32>(width, height, /*Rgba32.ParseHex("#000000ff")*/ Color.Black);
 
             var renderOrderItems = new List<RenderOrderItem>();
@@ -55,6 +55,7 @@ namespace FEngRender
                 if (frontendObject.Type != FEObjType.FE_Image && frontendObject.Type != FEObjType.FE_String) continue;
                 if ( /*frontendObject.Color.Alpha == 0 || */IsInvisible(frontendObject)) continue;
                 // if (!goodGuids.Contains(frontendObject.Guid)) continue;
+                // if (frontendObject.ResourceIndex != 7) continue;
 
                 var computedMatrix = ComputeObjectMatrix(frontendObject);
                 renderOrderItems.Add(new RenderOrderItem(computedMatrix, frontendObject, width / 2, height / 2));
@@ -104,9 +105,6 @@ namespace FEngRender
                         var image = Image.Load(resourceFile);
                         image.Mutate(c =>
                         {
-                            var objectRotation = ComputeObjectRotation(frontendObject);
-                            var rotateDeg = ExtractZRotation(objectRotation) * (180f / Math.PI);
-
                             if (sizeX < 0)
                             {
                                 c.Flip(FlipMode.Horizontal);
@@ -119,14 +117,43 @@ namespace FEngRender
                                 sizeY = -sizeY;
                             }
 
-                            c.Resize((int) sizeX, (int) sizeY);
+                            var objectRotation = ComputeObjectRotation(frontendObject);
+                            var atb = new AffineTransformBuilder();
+                            atb.AppendScale(new SizeF(sizeX / image.Width, sizeY / image.Height));
 
-                            if (rotateDeg != 0)
-                            {
-                                Console.WriteLine("Computed rotation: {1} - rotating object by {0} degrees.", rotateDeg,
-                                    objectRotation);
-                                c.Rotate((float) rotateDeg);
-                            }
+                            c.Transform(atb);
+
+                            // var eulerAngles = QuaternionToEuler(objectRotation);
+                            // var xRotateDeg = eulerAngles.Roll * (180f / Math.PI);
+                            // var yRotateDeg = eulerAngles.Pitch * (180f / Math.PI);
+                            // var zRotateDeg = eulerAngles.Yaw * (180f / Math.PI);
+
+                            // Console.WriteLine("Rotation quaternion to degrees: {0} {1} {2}", xRotateDeg, yRotateDeg, zRotateDeg);
+                            // var rotateDeg = ExtractZRotation(objectRotation) * (180f / Math.PI);
+
+                            // if (sizeX < 0)
+                            // {
+                            //     c.Flip(FlipMode.Horizontal);
+                            //     sizeX = -sizeX;
+                            // }
+                            //
+                            // if (sizeY < 0)
+                            // {
+                            //     c.Flip(FlipMode.Vertical);
+                            //     sizeY = -sizeY;
+                            // }
+                            //
+                            // c.Resize((int) sizeX, (int) sizeY);
+                            //
+                            // c.Rotate((float) xRotateDeg);
+                            // c.Rotate((float) zRotateDeg);
+
+                            // if (zRotateDeg != 0)
+                            // {
+                            //     Console.WriteLine("Computed rotation: {1} - rotating object by {0} degrees.", zRotateDeg,
+                            //         objectRotation);
+                            //     c.Rotate((float) zRotateDeg);
+                            // }
 
                             var redScale = frontendObject.Color.Red / 255f;
                             var greenScale = frontendObject.Color.Green / 255f;
@@ -192,7 +219,7 @@ namespace FEngRender
                     });
                 }
             }
-            
+
             return img;
         }
 
@@ -228,9 +255,54 @@ namespace FEngRender
             return q;
         }
 
-        private static double ExtractZRotation(Quaternion q)
+        private static EulerAngles QuaternionToEuler(Quaternion q)
         {
-            return Math.Atan2(2 * (q.W * q.Z + q.X * q.Y), 1 - 2 * (q.Y * q.Y + q.Z * q.Z));
+/*
+    EulerAngles angles;
+
+    // roll (x-axis rotation)
+    double sinr_cosp = 2 * (q.w * q.x + q.y * q.z);
+    double cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y);
+    angles.roll = std::atan2(sinr_cosp, cosr_cosp);
+
+    // pitch (y-axis rotation)
+    double sinp = 2 * (q.w * q.y - q.z * q.x);
+    if (std::abs(sinp) >= 1)
+        angles.pitch = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
+    else
+        angles.pitch = std::asin(sinp);
+
+    // yaw (z-axis rotation)
+    double siny_cosp = 2 * (q.w * q.z + q.x * q.y);
+    double cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
+    angles.yaw = std::atan2(siny_cosp, cosy_cosp);
+
+    return angles;
+ */
+            var sinr_cosp = 2 * (q.W * q.X + q.Y * q.Z);
+            var cosr_cosp = 1 - 2 * (q.X * q.X + q.Y * q.Y);
+            var roll = Math.Atan2(sinr_cosp, cosr_cosp);
+
+            var sinp = 2 * (q.W * q.Y - q.Z * q.X);
+            var pitch = Math.Abs(sinp) >= 1 ? Math.CopySign(Math.PI / 2, sinp) : Math.Asin(sinp);
+
+            var siny_cosp = 2 * (q.W * q.Z + q.X * q.Y);
+            var cosy_cosp = 1 - 2 * (q.Y * q.Y + q.Z * q.Z);
+            var yaw = Math.Atan2(siny_cosp, cosy_cosp);
+
+            return new EulerAngles(roll, pitch, yaw);
+        }
+
+        private struct EulerAngles
+        {
+            public double Roll, Pitch, Yaw;
+
+            public EulerAngles(double roll, double pitch, double yaw)
+            {
+                Roll = roll;
+                Pitch = pitch;
+                Yaw = yaw;
+            }
         }
 
         private class RenderOrderItem
@@ -256,7 +328,7 @@ namespace FEngRender
                 switch (FrontendObject.Type)
                 {
                     case FEObjType.FE_Image:
-                        x -= FrontendObject.Size.X * 0.5f;
+                        x -= GetSizeX() * 0.5f;
                         break;
                 }
 
@@ -270,7 +342,7 @@ namespace FEngRender
                 switch (FrontendObject.Type)
                 {
                     case FEObjType.FE_Image:
-                        y -= FrontendObject.Size.Y * 0.5f;
+                        y -= GetSizeY() * 0.5f;
                         break;
                 }
 
