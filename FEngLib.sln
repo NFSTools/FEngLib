@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FEngTestBench", "FEngTestBe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FEngRender", "FEngRender\FEngRender.csproj", "{CBCF4BDA-B2F5-490C-9ECF-69E0EDC0D3CC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FEngViewer", "FEngViewer\FEngViewer.csproj", "{41331FD7-E2D2-4CA7-86D8-774F03DB6409}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,14 @@ Global
 		{CBCF4BDA-B2F5-490C-9ECF-69E0EDC0D3CC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CBCF4BDA-B2F5-490C-9ECF-69E0EDC0D3CC}.Release|x86.ActiveCfg = Release|Any CPU
 		{CBCF4BDA-B2F5-490C-9ECF-69E0EDC0D3CC}.Release|x86.Build.0 = Release|Any CPU
+		{41331FD7-E2D2-4CA7-86D8-774F03DB6409}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41331FD7-E2D2-4CA7-86D8-774F03DB6409}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41331FD7-E2D2-4CA7-86D8-774F03DB6409}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{41331FD7-E2D2-4CA7-86D8-774F03DB6409}.Debug|x86.Build.0 = Debug|Any CPU
+		{41331FD7-E2D2-4CA7-86D8-774F03DB6409}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41331FD7-E2D2-4CA7-86D8-774F03DB6409}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41331FD7-E2D2-4CA7-86D8-774F03DB6409}.Release|x86.ActiveCfg = Release|Any CPU
+		{41331FD7-E2D2-4CA7-86D8-774F03DB6409}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
