@@ -8,7 +8,7 @@ namespace FEngViewer
         {
             InitializeComponent();
         }
-        
+
         public void UpdateObjectDetails(FEObjectViewNode nodeTag)
         {
             var obj = nodeTag.Obj;
@@ -16,7 +16,17 @@ namespace FEngViewer
             labelObjHash.Text = $"{obj.NameHash:X}";
             labelObjGUID.Text = $"{obj.Guid:X}";
             labelObjFlags.Text = $"{obj.Flags:X}";
-            labelObjResID.Text = obj.ResourceIndex.ToString();
+
+            if (obj.ResourceIndex > -1)
+            {
+                // labelObjResID.Text = obj.ResourceIndex.ToString();
+                var resourceRequest = obj.Package.ResourceRequests[obj.ResourceIndex];
+                labelObjResID.Text = $"{obj.ResourceIndex} - {resourceRequest.Name} ({resourceRequest.Type})";
+            }
+            else
+            {
+                labelObjResID.Text = "<n/a>";
+            }
 
             labelObjDataColor.Text = obj.Color.ToString();
             labelObjDataPivot.Text = obj.Pivot.ToString();

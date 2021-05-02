@@ -16,6 +16,7 @@ namespace FEngViewer
     public partial class PackageView : Form
     {
         private PackageRenderer _renderer;
+
         public PackageView()
         {
             InitializeComponent();
@@ -40,7 +41,7 @@ namespace FEngViewer
             Text = package.Name;
             labelPkgName.Text = package.Name;
             var nodes = GeneratePackageHierarchy(package);
-            PopulateTreeView(nodes);
+            PopulateTreeView(package, nodes);
             _renderer = new PackageRenderer(package, options.TextureDir);
             Render();
         }
@@ -76,15 +77,18 @@ namespace FEngViewer
             return nestedNodes;
         }
 
-        private void PopulateTreeView(IEnumerable<FEObjectViewNode> feObjectNodes)
+        private void PopulateTreeView(FrontendPackage package, IEnumerable<FEObjectViewNode> feObjectNodes)
         {
             // map group guid to children guids
             treeView1.BeginUpdate();
 
-            ApplyObjectsToTreeNodes(feObjectNodes, treeView1.Nodes);
+            var rootNode = treeView1.Nodes.Add(package.Name);
+            ApplyObjectsToTreeNodes(feObjectNodes, rootNode.Nodes);
 
             treeView1.ExpandAll();
             treeView1.EndUpdate();
+
+            treeView1.SelectedNode = rootNode;
         }
 
         private static void ApplyObjectsToTreeNodes(IEnumerable<FEObjectViewNode> objectNodes,
@@ -126,10 +130,17 @@ namespace FEngViewer
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            var viewNode = (FEObjectViewNode) e.Node.Tag;
-            objectDetailsView1.UpdateObjectDetails(viewNode);
-            _renderer.SelectedObjectGuid = viewNode.Obj.Guid;
-            Render();
+            if (e.Node.Tag is FEObjectViewNode viewNode)
+            {
+                objectDetailsView1.Visible = true;
+                objectDetailsView1.UpdateObjectDetails(viewNode);
+                _renderer.SelectedObjectGuid = viewNode.Obj.Guid;
+                Render();
+            }
+            else
+            {
+                objectDetailsView1.Visible = false;
+            }
         }
 
         private void viewOutput_MouseMove(object sender, MouseEventArgs e)
