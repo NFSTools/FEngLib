@@ -138,23 +138,7 @@ namespace FEngViewer
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            UpdateObjectDetails((FEObjectViewNode) e.Node.Tag);
-        }
-
-        private void UpdateObjectDetails(FEObjectViewNode nodeTag)
-        {
-            var obj = nodeTag.Obj;
-            labelObjType.Text = obj.Type.ToString();
-            labelObjHash.Text = $"{obj.NameHash:X}";
-            labelObjGUID.Text = $"{obj.Guid:X}";
-            labelObjFlags.Text = $"{obj.Flags:X}";
-            labelObjResID.Text = obj.ResourceIndex.ToString();
-
-            labelObjDataColor.Text = obj.Color.ToString();
-            labelObjDataPivot.Text = obj.Pivot.ToString();
-            labelObjDataPosition.Text = obj.Position.ToString();
-            labelObjDataRotation.Text = obj.Rotation.ToString();
-            labelObjDataSize.Text = obj.Size.ToString();
+            objectDetailsView1.UpdateObjectDetails((FEObjectViewNode) e.Node.Tag);
         }
     }
 }

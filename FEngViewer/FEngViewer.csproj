@@ -16,4 +16,10 @@
     <ProjectReference Include="..\FEngRender\FEngRender.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="ObjectDetailsView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>
