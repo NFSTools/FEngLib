@@ -33,9 +33,9 @@ namespace FEngViewer
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.labelPkgName = new System.Windows.Forms.Label();
             this.treeView1 = new System.Windows.Forms.TreeView();
+            this.objectDetailsView1 = new FEngViewer.ObjectDetailsView();
             this.viewOutput = new System.Windows.Forms.PictureBox();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.objectDetailsView1 = new FEngViewer.ObjectDetailsView();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -62,8 +62,8 @@ namespace FEngViewer
             // 
             this.splitContainer1.Panel2.Controls.Add(this.objectDetailsView1);
             this.splitContainer1.Panel2.Controls.Add(this.viewOutput);
-            this.splitContainer1.Size = new System.Drawing.Size(1024, 985);
-            this.splitContainer1.SplitterDistance = 356;
+            this.splitContainer1.Size = new System.Drawing.Size(1282, 1233);
+            this.splitContainer1.SplitterDistance = 614;
             this.splitContainer1.TabIndex = 0;
             // 
             // splitContainer2
@@ -81,7 +81,7 @@ namespace FEngViewer
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.treeView1);
-            this.splitContainer2.Size = new System.Drawing.Size(356, 985);
+            this.splitContainer2.Size = new System.Drawing.Size(614, 1233);
             this.splitContainer2.SplitterDistance = 100;
             this.splitContainer2.TabIndex = 1;
             // 
@@ -99,9 +99,18 @@ namespace FEngViewer
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView1.Location = new System.Drawing.Point(0, 0);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(356, 881);
+            this.treeView1.Size = new System.Drawing.Size(614, 1129);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
+            // 
+            // objectDetailsView1
+            // 
+            this.objectDetailsView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.objectDetailsView1.Location = new System.Drawing.Point(3, 734);
+            this.objectDetailsView1.Name = "objectDetailsView1";
+            this.objectDetailsView1.Size = new System.Drawing.Size(637, 495);
+            this.objectDetailsView1.TabIndex = 1;
             // 
             // viewOutput
             // 
@@ -116,20 +125,11 @@ namespace FEngViewer
             this.viewOutput.TabIndex = 0;
             this.viewOutput.TabStop = false;
             // 
-            // objectDetailsView1
-            // 
-            this.objectDetailsView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.objectDetailsView1.Location = new System.Drawing.Point(3, 486);
-            this.objectDetailsView1.Name = "objectDetailsView1";
-            this.objectDetailsView1.Size = new System.Drawing.Size(637, 495);
-            this.objectDetailsView1.TabIndex = 1;
-            // 
             // PackageView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1024, 985);
+            this.ClientSize = new System.Drawing.Size(1282, 1233);
             this.Controls.Add(this.splitContainer1);
             this.Name = "PackageView";
             this.Text = "Form1";
