@@ -15,7 +15,7 @@ namespace FEngViewer
             labelObjType.Text = obj.Type.ToString();
             labelObjHash.Text = $"{obj.NameHash:X}";
             labelObjGUID.Text = $"{obj.Guid:X}";
-            labelObjFlags.Text = $"{obj.Flags:X}";
+            labelObjFlags.Text = $"{obj.Flags}";
 
             if (obj.ResourceIndex > -1)
             {
