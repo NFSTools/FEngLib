@@ -71,6 +71,9 @@ namespace FEngLib.Chunks
                     frontendObject.Name = objectNameTag.Name;
                     frontendObject.NameHash = objectNameTag.NameHash;
                     break;
+                case MultiImageTextureTag _:
+                case MultiImageTextureFlagsTag _:
+                    break;
                 default:
                     throw new InvalidDataException($"Unknown tag: {tag}");
             }
