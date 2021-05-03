@@ -3,8 +3,8 @@ using System.Diagnostics;
 using System.IO;
 using CommandLine;
 using FEngLib;
-using JetBrains.Annotations;
 using FEngRender;
+using JetBrains.Annotations;
 using SixLabors.ImageSharp;
 
 namespace FEngCli
@@ -27,14 +27,14 @@ namespace FEngCli
 
             var package = LoadPackageFromChunk(options.InputFile);
             PackageDumper.DumpPackage(package);
-            
+
             var renderer = new PackageRenderer(package, options.TextureDir);
             var outputFile = options.OutputFile ?? $"{package.Name}.png";
             var img = renderer.Render();
             using var fs = File.OpenWrite(outputFile);
             img.SaveAsPng(fs);
-            
-            Process.Start(new ProcessStartInfo(outputFile) {UseShellExecute = true});
+
+            if (!options.NoOpen) Process.Start(new ProcessStartInfo(outputFile) {UseShellExecute = true});
             return 0;
         }
 
@@ -73,6 +73,8 @@ namespace FEngCli
 
             [Option('t', "textures", Required = true)]
             public string TextureDir { get; set; }
+
+            [Option('q', "no-open")] public bool NoOpen { get; set; }
         }
     }
 }
