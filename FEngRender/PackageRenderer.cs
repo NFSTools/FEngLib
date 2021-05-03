@@ -150,9 +150,15 @@ namespace FEngRender
                             });
 
                             Debug.WriteLine("Applied channel filter");
-                            m.DrawImage(
-                                image, new Point((int)x, (int)y), frontendObject.Color.Alpha / 255f);
                         });
+
+                        m.DrawImage(
+                            image, new Point((int)x, (int)y), frontendObject.Color.Alpha / 255f);
+                        if (frontendObject.Guid == SelectedObjectGuid)
+                        {
+                            m.Draw(Color.Red, 1,
+                                new RectangleF(new PointF(x, y), new SizeF(image.Width, image.Height)));
+                        }
                     });
                 }
                 else if (frontendObject is FrontendString frontendString && !string.IsNullOrEmpty(frontendString.Value))
@@ -197,7 +203,7 @@ namespace FEngRender
                 }
             }
 
-            DrawBoundingBox(renderSurface, renderOrderItems);
+            //DrawBoundingBox(renderSurface, renderOrderItems);
 
             return renderSurface;
         }
