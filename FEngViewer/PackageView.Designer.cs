@@ -29,6 +29,7 @@ namespace FEngViewer
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.labelCoordDisplay = new System.Windows.Forms.Label();
@@ -37,12 +38,17 @@ namespace FEngViewer
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.OpenFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.objectContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toggleObjectVisibilityItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.changeObjectPositionItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.changeObjectColorItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.viewOutput)).BeginInit();
             this.menuStrip1.SuspendLayout();
+            this.objectContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -73,6 +79,7 @@ namespace FEngViewer
             this.treeView1.Size = new System.Drawing.Size(269, 990);
             this.treeView1.TabIndex = 1;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
+            this.treeView1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.treeView1_MouseDown);
             // 
             // labelCoordDisplay
             // 
@@ -124,6 +131,34 @@ namespace FEngViewer
             this.OpenFileMenuItem.Text = "Open";
             this.OpenFileMenuItem.Click += new System.EventHandler(this.OpenFileMenuItem_Click);
             // 
+            // objectContextMenu
+            // 
+            this.objectContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toggleObjectVisibilityItem,
+            this.changeObjectPositionItem,
+            this.changeObjectColorItem});
+            this.objectContextMenu.Name = "objectContextMenu";
+            this.objectContextMenu.Size = new System.Drawing.Size(162, 70);
+            // 
+            // toggleObjectVisibilityItem
+            // 
+            this.toggleObjectVisibilityItem.Name = "toggleObjectVisibilityItem";
+            this.toggleObjectVisibilityItem.Size = new System.Drawing.Size(161, 22);
+            this.toggleObjectVisibilityItem.Text = "Toggle visibility";
+            this.toggleObjectVisibilityItem.Click += new System.EventHandler(this.toggleObjectVisibilityItem_Click);
+            // 
+            // changeObjectPositionItem
+            // 
+            this.changeObjectPositionItem.Name = "changeObjectPositionItem";
+            this.changeObjectPositionItem.Size = new System.Drawing.Size(161, 22);
+            this.changeObjectPositionItem.Text = "Change position";
+            // 
+            // changeObjectColorItem
+            // 
+            this.changeObjectColorItem.Name = "changeObjectColorItem";
+            this.changeObjectColorItem.Size = new System.Drawing.Size(161, 22);
+            this.changeObjectColorItem.Text = "Change color";
+            // 
             // PackageView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -141,6 +176,7 @@ namespace FEngViewer
             ((System.ComponentModel.ISupportInitialize)(this.viewOutput)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.objectContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -156,5 +192,9 @@ namespace FEngViewer
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem OpenFileMenuItem;
         private System.Windows.Forms.TreeView treeView1;
+        private System.Windows.Forms.ContextMenuStrip objectContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem toggleObjectVisibilityItem;
+        private System.Windows.Forms.ToolStripMenuItem changeObjectPositionItem;
+        private System.Windows.Forms.ToolStripMenuItem changeObjectColorItem;
     }
 }

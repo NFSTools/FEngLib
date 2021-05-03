@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -10,8 +11,7 @@ using FEngLib.Data;
 using FEngRender;
 using FEngViewer.Properties;
 using JetBrains.Annotations;
-using SixLabors.ImageSharp;
-using Image = System.Drawing.Image;
+using static SixLabors.ImageSharp.ImageExtensions;
 
 namespace FEngViewer
 {
@@ -253,6 +253,36 @@ namespace FEngViewer
             PopulateTreeView(package, nodes);
             _renderer = new PackageRenderer(package, Path.Combine(Path.GetDirectoryName(path) ?? "", "textures"));
             Render();
+        }
+
+        private void treeView1_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Right) return;
+
+            TreeNode hit_node = treeView1.GetNodeAt(e.X, e.Y);
+            treeView1.SelectedNode = hit_node;
+
+            if (hit_node?.Tag is FEObjectViewNode)
+            {
+                objectContextMenu.Show(treeView1, new Point(e.X, e.Y));
+            }
+        }
+
+        private void toggleObjectVisibilityItem_Click(object sender, EventArgs e)
+        {
+            if (treeView1.SelectedNode?.Tag is FEObjectViewNode viewNode)
+            {
+                if ((viewNode.Obj.Flags & FE_ObjectFlags.FF_Invisible) != 0)
+                {
+                    viewNode.Obj.Flags &= ~FE_ObjectFlags.FF_Invisible;
+                }
+                else
+                {
+                    viewNode.Obj.Flags |= FE_ObjectFlags.FF_Invisible;
+                }
+
+                Render();
+            }
         }
     }
 }
