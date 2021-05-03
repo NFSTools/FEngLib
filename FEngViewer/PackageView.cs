@@ -244,6 +244,8 @@ namespace FEngViewer
 
         private void LoadFile(string path)
         {
+            if (string.IsNullOrWhiteSpace(path))
+                return;
             var package = LoadPackageFromChunk(path);
             // window title
             Text = package.Name;
