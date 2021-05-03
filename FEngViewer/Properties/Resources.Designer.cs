@@ -63,6 +63,16 @@ namespace FEngViewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap TreeItem_ColoredImage {
+            get {
+                object obj = ResourceManager.GetObject("TreeItem_ColoredImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap TreeItem_Group {
             get {
                 object obj = ResourceManager.GetObject("TreeItem_Group", resourceCulture);
@@ -76,6 +86,26 @@ namespace FEngViewer.Properties {
         internal static System.Drawing.Bitmap TreeItem_Image {
             get {
                 object obj = ResourceManager.GetObject("TreeItem_Image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap TreeItem_Movie {
+            get {
+                object obj = ResourceManager.GetObject("TreeItem_Movie", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap TreeItem_MultiImage {
+            get {
+                object obj = ResourceManager.GetObject("TreeItem_MultiImage", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

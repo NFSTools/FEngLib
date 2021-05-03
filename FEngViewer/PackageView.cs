@@ -30,6 +30,9 @@ namespace FEngViewer
             imageList.Images.Add("TreeItem_Image", Resources.TreeItem_Image);
             imageList.Images.Add("TreeItem_Script", Resources.TreeItem_Script);
             imageList.Images.Add("TreeItem_ScriptTrack", Resources.TreeItem_ScriptTrack);
+            imageList.Images.Add("TreeItem_Movie", Resources.TreeItem_Movie);
+            imageList.Images.Add("TreeItem_ColoredImage", Resources.TreeItem_ColoredImage);
+            imageList.Images.Add("TreeItem_MultiImage", Resources.TreeItem_MultiImage);
             treeView1.ImageList = imageList;
         }
 
@@ -108,6 +111,9 @@ namespace FEngViewer
                 FEObjType.FE_String => "TreeItem_String",
                 FEObjType.FE_Image => "TreeItem_Image",
                 FEObjType.FE_Group => "TreeItem_Group",
+                FEObjType.FE_Movie => "TreeItem_Movie",
+                FEObjType.FE_ColoredImage => "TreeItem_ColoredImage",
+                FEObjType.FE_MultiImage => "TreeItem_MultiImage",
                 _ => null
             };
 
