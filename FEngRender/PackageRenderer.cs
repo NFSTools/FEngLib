@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -45,7 +46,7 @@ namespace FEngRender
             const int width = /*1280*/ 640;
             const int height = /*960*/ 480;
 
-            var img = new Image<Rgba32>(width, height, /*Rgba32.ParseHex("#000000ff")*/ Color.Black);
+            var renderSurface = new Image<Rgba32>(width, height, /*Rgba32.ParseHex("#000000ff")*/ Color.Black);
             var renderOrderItems = new List<RenderOrderItem>();
 
             foreach (var frontendObject in _package.Objects)
@@ -86,25 +87,12 @@ namespace FEngRender
 
                 if (frontendObject.Type == FEObjType.FE_Image)
                 {
-                    var resource = _package.ResourceRequests[frontendObject.ResourceIndex];
-
-                    if (resource.Type != FEResourceType.RT_Image)
-                    {
-                        Debug.WriteLine($"Expected resource type to be RT_Image, but it was {resource.Type}");
+                    var image = GetImageResourceByIndex(frontendObject.ResourceIndex);
+                    if (image == null)
                         continue;
-                    }
 
-                    var resourceFile = Path.Combine(_textureDir, $"{CleanResourcePath(resource.Name)}.png");
-
-                    if (!File.Exists(resourceFile))
+                    renderSurface.Mutate(m =>
                     {
-                        Debug.WriteLine($"Cannot find resource file: {resourceFile}");
-                        continue;
-                    }
-
-                    img.Mutate(m =>
-                    {
-                        var image = Image.Load(resourceFile);
                         image.Mutate(c =>
                         {
                             if (sizeX < 0)
@@ -167,7 +155,7 @@ namespace FEngRender
                     Debug.WriteLine("\tDrawing text in format {1}: {0}", frontendString.Value,
                         frontendString.Formatting);
 
-                    img.Mutate(m =>
+                    renderSurface.Mutate(m =>
                     {
                         var font = new Font(SystemFonts.Find("Segoe UI"), 12);
                         var rect = TextMeasurer.Measure(frontendString.Value, new RendererOptions(font));
@@ -204,11 +192,32 @@ namespace FEngRender
                 }
             }
 
-            DrawBoundingBox(img, renderOrderItems);
+            DrawBoundingBox(renderSurface, renderOrderItems);
 
-            return img;
+            return renderSurface;
         }
 
+        private Image? GetImageResourceByIndex(int index)
+        {
+            var resource = _package.ResourceRequests[index];
+
+            if (resource.Type != FEResourceType.RT_Image)
+            {
+                Debug.WriteLine($"Expected resource type to be RT_Image, but it was {resource.Type}");
+                return null;
+            }
+
+            var resourceFile = Path.Combine(_textureDir, $"{CleanResourcePath(resource.Name)}.png");
+
+            if (!File.Exists(resourceFile))
+            {
+                Debug.WriteLine($"Cannot find resource file: {resourceFile}");
+                return null;
+            }
+            
+            return Image.Load(resourceFile);
+        }
+        
         private void DrawBoundingBox(Image<Rgba32> image, List<RenderOrderItem> items)
         {
             var selectedObjectRenderItem = items.Find(item => item.FrontendObject.Guid == SelectedObjectGuid);
