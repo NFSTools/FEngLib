@@ -109,6 +109,11 @@ namespace FEngRender
                                 y -= sizeY;
                             }
 
+                            if ((int)sizeX == 0 || (int)sizeY == 0)
+                            {
+                                return;
+                            }
+
                             c.Resize((int) sizeX, (int) sizeY);
 
                             var rotationQuaternion = ComputeObjectRotation(frontendObject);
@@ -145,9 +150,9 @@ namespace FEngRender
                             });
 
                             Debug.WriteLine("Applied channel filter");
+                            m.DrawImage(
+                                image, new Point((int)x, (int)y), frontendObject.Color.Alpha / 255f);
                         });
-                        m.DrawImage(
-                            image, new Point((int) x, (int) y), frontendObject.Color.Alpha / 255f);
                     });
                 }
                 else if (frontendObject is FrontendString frontendString && !string.IsNullOrEmpty(frontendString.Value))
