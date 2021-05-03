@@ -153,6 +153,11 @@ namespace FEngCli
                     Console.WriteLine("\tTextures      : {0}",
                         string.Join(", ", frontendMultiImage.Texture.Select(h => h.ToString("X8"))));
                     break;
+                case FrontendColoredImage frontendMultiImage:
+                    Console.WriteLine("\tImage flags   : {0}", frontendMultiImage.ImageFlags);
+                    Console.WriteLine("\tColors        : {0}",
+                        string.Join(", ", frontendMultiImage.VertexColors.Select(h => h.ToString())));
+                    break;
                 case FrontendImage frontendImage:
                     Console.WriteLine("\tImage flags   : {0}", frontendImage.ImageFlags);
                     break;
