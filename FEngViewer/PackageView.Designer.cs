@@ -30,79 +30,48 @@ namespace FEngViewer
         private void InitializeComponent()
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.labelPkgName = new System.Windows.Forms.Label();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.labelCoordDisplay = new System.Windows.Forms.Label();
             this.objectDetailsView1 = new FEngViewer.ObjectDetailsView();
             this.viewOutput = new System.Windows.Forms.PictureBox();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.OpenFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
-            this.splitContainer2.Panel1.SuspendLayout();
-            this.splitContainer2.Panel2.SuspendLayout();
-            this.splitContainer2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.viewOutput)).BeginInit();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
             // 
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer1.Location = new System.Drawing.Point(0, 27);
             this.splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.splitContainer2);
+            this.splitContainer1.Panel1.Controls.Add(this.treeView1);
             // 
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.labelCoordDisplay);
             this.splitContainer1.Panel2.Controls.Add(this.objectDetailsView1);
             this.splitContainer1.Panel2.Controls.Add(this.viewOutput);
-            this.splitContainer1.Size = new System.Drawing.Size(937, 1017);
+            this.splitContainer1.Size = new System.Drawing.Size(937, 990);
             this.splitContainer1.SplitterDistance = 269;
             this.splitContainer1.TabIndex = 0;
-            // 
-            // splitContainer2
-            // 
-            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer2.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this.splitContainer2.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer2.Name = "splitContainer2";
-            this.splitContainer2.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitContainer2.Panel1
-            // 
-            this.splitContainer2.Panel1.Controls.Add(this.labelPkgName);
-            // 
-            // splitContainer2.Panel2
-            // 
-            this.splitContainer2.Panel2.Controls.Add(this.treeView1);
-            this.splitContainer2.Size = new System.Drawing.Size(269, 1017);
-            this.splitContainer2.SplitterDistance = 100;
-            this.splitContainer2.TabIndex = 1;
-            // 
-            // labelPkgName
-            // 
-            this.labelPkgName.AutoSize = true;
-            this.labelPkgName.Location = new System.Drawing.Point(22, 20);
-            this.labelPkgName.Name = "labelPkgName";
-            this.labelPkgName.Size = new System.Drawing.Size(95, 15);
-            this.labelPkgName.TabIndex = 0;
-            this.labelPkgName.Text = "WWWWWWWW";
             // 
             // treeView1
             // 
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView1.Location = new System.Drawing.Point(0, 0);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(269, 913);
-            this.treeView1.TabIndex = 0;
+            this.treeView1.Size = new System.Drawing.Size(269, 990);
+            this.treeView1.TabIndex = 1;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
             // labelCoordDisplay
@@ -118,10 +87,10 @@ namespace FEngViewer
             // 
             this.objectDetailsView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.objectDetailsView1.Location = new System.Drawing.Point(3, 518);
+            this.objectDetailsView1.Location = new System.Drawing.Point(3, 529);
             this.objectDetailsView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.objectDetailsView1.Name = "objectDetailsView1";
-            this.objectDetailsView1.Size = new System.Drawing.Size(637, 495);
+            this.objectDetailsView1.Size = new System.Drawing.Size(661, 457);
             this.objectDetailsView1.TabIndex = 1;
             // 
             // viewOutput
@@ -138,38 +107,54 @@ namespace FEngViewer
             this.viewOutput.TabStop = false;
             this.viewOutput.MouseMove += new System.Windows.Forms.MouseEventHandler(this.viewOutput_MouseMove);
             // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.OpenFileMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(937, 24);
+            this.menuStrip1.TabIndex = 4;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // OpenFileMenuItem
+            // 
+            this.OpenFileMenuItem.Name = "OpenFileMenuItem";
+            this.OpenFileMenuItem.Size = new System.Drawing.Size(48, 20);
+            this.OpenFileMenuItem.Text = "Open";
+            this.OpenFileMenuItem.Click += new System.EventHandler(this.OpenFileMenuItem_Click);
+            // 
             // PackageView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             this.ClientSize = new System.Drawing.Size(937, 1017);
+            this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.splitContainer1);
             this.Name = "PackageView";
-            this.Text = "Form1";
+            this.Text = "FEngViewer";
             this.Load += new System.EventHandler(this.PackageView_Load);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            this.splitContainer2.Panel1.ResumeLayout(false);
-            this.splitContainer2.Panel1.PerformLayout();
-            this.splitContainer2.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
-            this.splitContainer2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.viewOutput)).EndInit();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.TreeView treeView1;
         private System.Windows.Forms.PictureBox viewOutput;
         private System.Windows.Forms.ColorDialog colorDialog1;
-        private System.Windows.Forms.SplitContainer splitContainer2;
-        private System.Windows.Forms.Label labelPkgName;
         private ObjectDetailsView objectDetailsView1;
         private System.Windows.Forms.Label labelCoordDisplay;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem OpenFileMenuItem;
+        private System.Windows.Forms.TreeView treeView1;
     }
 }

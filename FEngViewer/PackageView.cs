@@ -17,20 +17,20 @@ namespace FEngViewer
 {
     public partial class PackageView : Form
     {
-        private readonly ImageList _imageList;
         private PackageRenderer _renderer;
 
         public PackageView()
         {
             InitializeComponent();
-            _imageList = new ImageList();
-            _imageList.Images.Add("TreeItem_Package", Resources.TreeItem_Package);
-            _imageList.Images.Add("TreeItem_String", Resources.TreeItem_String);
-            _imageList.Images.Add("TreeItem_Group", Resources.TreeItem_Group);
-            _imageList.Images.Add("TreeItem_Image", Resources.TreeItem_Image);
-            _imageList.Images.Add("TreeItem_Script", Resources.TreeItem_Script);
-            _imageList.Images.Add("TreeItem_ScriptTrack", Resources.TreeItem_ScriptTrack);
-            treeView1.ImageList = _imageList;
+
+            var imageList = new ImageList();
+            imageList.Images.Add("TreeItem_Package", Resources.TreeItem_Package);
+            imageList.Images.Add("TreeItem_String", Resources.TreeItem_String);
+            imageList.Images.Add("TreeItem_Group", Resources.TreeItem_Group);
+            imageList.Images.Add("TreeItem_Image", Resources.TreeItem_Image);
+            imageList.Images.Add("TreeItem_Script", Resources.TreeItem_Script);
+            imageList.Images.Add("TreeItem_ScriptTrack", Resources.TreeItem_ScriptTrack);
+            treeView1.ImageList = imageList;
         }
 
         private void PackageView_Load(object sender, EventArgs e)
@@ -38,23 +38,9 @@ namespace FEngViewer
             var args = Environment.GetCommandLineArgs();
 
             var opts = Parser.Default.ParseArguments<Options>(args);
-            opts.WithNotParsed(errors => Application.Exit());
-            var options = ((Parsed<Options>) opts).Value;
-
-            if (!File.Exists(options.InputFile))
-            {
-                Console.Error.WriteLine("File not found: {0}", options.InputFile);
-                Application.Exit();
-            }
-
-            var package = LoadPackageFromChunk(options.InputFile);
-            // window title
-            Text = package.Name;
-            labelPkgName.Text = package.Name;
-            var nodes = GeneratePackageHierarchy(package);
-            PopulateTreeView(package, nodes);
-            _renderer = new PackageRenderer(package, options.TextureDir);
-            Render();
+            
+            opts.WithParsed(parsed => LoadFile(parsed.InputFile))
+                .WithNotParsed(err => Application.Exit());
         }
 
         private void Render()
@@ -92,6 +78,7 @@ namespace FEngViewer
         {
             // map group guid to children guids
             treeView1.BeginUpdate();
+            treeView1.Nodes.Clear();
 
             var rootNode = treeView1.Nodes.Add(package.Name);
             ApplyObjectsToTreeNodes(feObjectNodes, rootNode.Nodes);
@@ -124,7 +111,7 @@ namespace FEngViewer
                 _ => null
             };
 
-            var nodeText = $"{feObj.Name ?? feObj.Guid.ToString("X")}";
+            var nodeText = $"{feObj.Name ?? feObj.NameHash.ToString("X")}";
 
             if (nodeImageKey == null)
             {
@@ -234,11 +221,30 @@ namespace FEngViewer
         [UsedImplicitly]
         private class Options
         {
-            [Option('i', "input", Required = true)]
+            [Option('i', "input")]
             public string InputFile { get; set; }
+        }
 
-            [Option('t', "textures", Required = true)]
-            public string TextureDir { get; set; }
+        private void OpenFileMenuItem_Click(object sender, EventArgs e)
+        {
+            var ofd = new OpenFileDialog();
+            ofd.Filter = "FNG Files (*.fng)|*.fng|All files (*.*)|*.*";
+            ofd.CheckFileExists = true;
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                LoadFile(ofd.FileName);
+            }
+        }
+
+        private void LoadFile(string path)
+        {
+            var package = LoadPackageFromChunk(path);
+            // window title
+            Text = package.Name;
+            var nodes = GeneratePackageHierarchy(package);
+            PopulateTreeView(package, nodes);
+            _renderer = new PackageRenderer(package, Path.Combine(Path.GetDirectoryName(path) ?? "", "textures"));
+            Render();
         }
     }
 }
