@@ -125,7 +125,10 @@ namespace FEngRender
                 posX += xOffset;
                 posY += yOffset;
 
-                m.DrawText(str.Value, TextRendering.DefaultFont,
+                m.DrawText(new TextGraphicsOptions(new GraphicsOptions(), new TextOptions
+                    {
+                        WrapTextWidth = str.MaxWidth
+                    }),  str.Value, TextRendering.DefaultFont,
                     Color.FromRgba((byte)(str.Color.Red & 0xff),
                         (byte)(str.Color.Green & 0xff), (byte)(str.Color.Blue & 0xff),
                         (byte)(str.Color.Alpha & 0xff)),
