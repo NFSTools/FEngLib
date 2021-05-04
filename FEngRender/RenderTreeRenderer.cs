@@ -116,7 +116,7 @@ namespace FEngRender
             float posY = imgMatrix.M42 + Height / 2f;
             surface.Mutate(m =>
             {
-                var rect = TextRendering.MeasureText(str.Value);
+                var rect = TextRendering.MeasureText(str.Value, str.MaxWidth);
                 var xOffset = TextRendering.CalculateXOffset((uint)str.Formatting,
                     rect.Width);
                 var yOffset = TextRendering.CalculateYOffset((uint)str.Formatting,

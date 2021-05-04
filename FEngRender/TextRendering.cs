@@ -9,8 +9,8 @@ namespace FEngRender
     {
         public static readonly Font DefaultFont = SystemFonts.CreateFont("Segoe UI", 12);
 
-        public static FontRectangle MeasureText(string text) =>
-            TextMeasurer.Measure(text, new RendererOptions(DefaultFont));
+        public static FontRectangle MeasureText(string text, float maxWidth = -1) =>
+            TextMeasurer.Measure(text, new RendererOptions(DefaultFont) { WrappingWidth = maxWidth });
 
         public static float CalculateXOffset(uint justification, float lineWidth)
         {
