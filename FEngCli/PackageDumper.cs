@@ -69,9 +69,8 @@ namespace FEngCli
             Console.WriteLine("Rotation : {0}", frontendObject.Rotation);
             Console.WriteLine("Color    : {0}", frontendObject.Color);
             Console.WriteLine("Type     : {0}", frontendObject.Type);
-            if (frontendObject.ResourceIndex > -1)
-                Console.WriteLine("Resource : {0} ({1})", frontendObject.ResourceIndex,
-                    package.ResourceRequests[frontendObject.ResourceIndex].Name);
+            if (frontendObject.ResourceRequest != null)
+                Console.WriteLine("Resource : {0}", frontendObject.ResourceRequest.Name);
 
             if (frontendObject.Scripts.Count > 0)
             {

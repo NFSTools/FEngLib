@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 using CommandLine;
 using FEngLib;
@@ -17,7 +16,8 @@ namespace FEngViewer
 {
     public partial class PackageView : Form
     {
-        private PackageRenderer _renderer;
+        private RenderTreeRenderer _renderer;
+        private RenderTree _currentRenderTree;
 
         public PackageView()
         {
@@ -48,36 +48,14 @@ namespace FEngViewer
 
         private void Render()
         {
-            var image = _renderer.Render();
+            var image = _renderer.Render(_currentRenderTree);
             var stream = new MemoryStream();
             image.SaveAsBmp(stream);
             viewOutput.Image = Image.FromStream(stream);
         }
 
-        private List<FEObjectViewNode> GeneratePackageHierarchy(FrontendPackage package)
-        {
-            var sorted = package.Objects.OrderBy(o => o.Parent?.Guid).ThenBy(o => o.Guid).ToList();
-            var flatNodes = sorted.ConvertAll(obj => new FEObjectViewNode(obj));
 
-            var nestedNodes = new List<FEObjectViewNode>();
-
-            var groupLookup = new Dictionary<uint, FEObjectViewNode>();
-            var groups = flatNodes.FindAll(node => node.Obj.Type == FEObjType.FE_Group);
-            // LUT for GUID -> group
-            foreach (var node in groups) groupLookup.Add(node.Obj.Guid, node);
-
-            // directly add all objects that don't belong to any group
-            var rootObjects = flatNodes.FindAll(node => node.Obj.Parent == null);
-            nestedNodes.AddRange(rootObjects);
-            flatNodes.RemoveAll(node => node.Obj.Parent == null);
-
-            // only objects that belong to another object are left
-            foreach (var node in flatNodes) groupLookup[node.Obj.Parent.Guid].Children.Add(node);
-
-            return nestedNodes;
-        }
-
-        private void PopulateTreeView(FrontendPackage package, IEnumerable<FEObjectViewNode> feObjectNodes)
+        private void PopulateTreeView(FrontendPackage package, IEnumerable<RenderTreeNode> feObjectNodes)
         {
             // map group guid to children guids
             treeView1.BeginUpdate();
@@ -93,19 +71,20 @@ namespace FEngViewer
             treeView1.SelectedNode = rootNode;
         }
 
-        private static void ApplyObjectsToTreeNodes(IEnumerable<FEObjectViewNode> objectNodes,
+        private static void ApplyObjectsToTreeNodes(IEnumerable<RenderTreeNode> objectNodes,
             TreeNodeCollection treeNodes)
         {
             foreach (var feObjectNode in objectNodes)
             {
                 var objTreeNode = CreateObjectTreeNode(treeNodes, feObjectNode);
-                if (feObjectNode.Children.Count > 0) ApplyObjectsToTreeNodes(feObjectNode.Children, objTreeNode.Nodes);
+                if (feObjectNode is RenderTreeGroup grp)
+                    ApplyObjectsToTreeNodes(grp, objTreeNode.Nodes);
             }
         }
 
-        private static TreeNode CreateObjectTreeNode(TreeNodeCollection collection, FEObjectViewNode viewNode)
+        private static TreeNode CreateObjectTreeNode(TreeNodeCollection collection, RenderTreeNode viewNode)
         {
-            var feObj = viewNode.Obj;
+            var feObj = viewNode.FrontendObject;
             var nodeImageKey = feObj.Type switch
             {
                 FEObjType.FE_String => "TreeItem_String",
@@ -145,19 +124,6 @@ namespace FEngViewer
             {
                 var trackName = track.Offset switch
                 {
-                    /*
-                     *                             {0, "FETrack_Color"},
-                            {4, "FETrack_Pivot"},
-                            {7, "FETrack_Position"},
-                            {10, "FETrack_Rotation"},
-                            {14, "FETrack_Size"},
-                            {17, "FETrack_UpperLeft"},
-                            {19, "FETrack_UpperRight"},
-                            {21, "FETrack_FrameNumber OR FETrack_Color1"},
-                            {25, "FETrack_Color2"},
-                            {29, "FETrack_Color3"},
-                            {33, "FETrack_Color4"}
-                     */
                     0 => "Color",
                     4 => "Pivot",
                     7 => "Position",
@@ -206,11 +172,12 @@ namespace FEngViewer
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            if (e.Node.Tag is FEObjectViewNode viewNode)
+            if (e.Node.Tag is RenderTreeNode viewNode)
             {
                 objectDetailsView1.Visible = true;
                 objectDetailsView1.UpdateObjectDetails(viewNode);
-                _renderer.SelectedObjectGuid = viewNode.Obj.Guid;
+                _renderer.SelectedNode = viewNode;
+                //_renderer.SelectedObjectGuid = viewNode.FrontendObject.Guid;
                 Render();
             }
             else
@@ -248,11 +215,14 @@ namespace FEngViewer
                 return;
             var package = LoadPackageFromChunk(path);
             // window title
-            Text = package.Name;
-            var nodes = GeneratePackageHierarchy(package);
-            PopulateTreeView(package, nodes);
-            _renderer = new PackageRenderer(package, Path.Combine(Path.GetDirectoryName(path) ?? "", "textures"));
+            _currentRenderTree = RenderTree.Create(package);
+            PopulateTreeView(package, _currentRenderTree);
+            //_renderer = new PackageRenderer(package, Path.Combine(Path.GetDirectoryName(path) ?? "", "textures"));
+            _renderer = new RenderTreeRenderer();
+            _renderer.LoadTextures(Path.Combine(Path.GetDirectoryName(path) ?? "", "textures"));
             Render();
+
+            Text = package.Name;
         }
 
         private void treeView1_MouseDown(object sender, MouseEventArgs e)
@@ -262,7 +232,7 @@ namespace FEngViewer
             TreeNode hit_node = treeView1.GetNodeAt(e.X, e.Y);
             treeView1.SelectedNode = hit_node;
 
-            if (hit_node?.Tag is FEObjectViewNode)
+            if (hit_node?.Tag is RenderTreeNode)
             {
                 objectContextMenu.Show(treeView1, new Point(e.X, e.Y));
             }
@@ -270,15 +240,16 @@ namespace FEngViewer
 
         private void toggleObjectVisibilityItem_Click(object sender, EventArgs e)
         {
-            if (treeView1.SelectedNode?.Tag is FEObjectViewNode viewNode)
+            if (treeView1.SelectedNode?.Tag is RenderTreeNode viewNode)
             {
-                if ((viewNode.Obj.Flags & FE_ObjectFlags.FF_Invisible) != 0)
+                var frontendObject = viewNode.FrontendObject;
+                if ((frontendObject.Flags & FE_ObjectFlags.FF_Invisible) != 0)
                 {
-                    viewNode.Obj.Flags &= ~FE_ObjectFlags.FF_Invisible;
+                    frontendObject.Flags &= ~FE_ObjectFlags.FF_Invisible;
                 }
                 else
                 {
-                    viewNode.Obj.Flags |= FE_ObjectFlags.FF_Invisible;
+                    frontendObject.Flags |= FE_ObjectFlags.FF_Invisible;
                 }
 
                 Render();

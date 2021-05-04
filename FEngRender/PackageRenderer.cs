@@ -43,6 +43,8 @@ namespace FEngRender
         /// <returns>The rendered image.</returns>
         public Image<Rgba32> Render()
         {
+            var rt = RenderTree.Create(_package);
+
             const int width = /*1280*/ 640;
             const int height = /*960*/ 480;
 
@@ -66,28 +68,29 @@ namespace FEngRender
                 var sizeX = renderOrderItem.GetSizeX();
                 var sizeY = renderOrderItem.GetSizeY();
 
-                Debug.WriteLine(
-                    "Object 0x{0:X}: position=({1}, {2}), size=({3}, {4}), color={5}, type={6}, resource={7}",
-                    frontendObject.Guid, x, y, sizeX, sizeY, frontendObject.Color, frontendObject.Type,
-                    _package.ResourceRequests[frontendObject.ResourceIndex].Name);
+                Debug.WriteLine("Render: {0} ({1}) - matrix: {2}", frontendObject.Name, frontendObject.Type, renderOrderItem.ObjectMatrix);
+                //Debug.WriteLine(
+                //    "Object {0}: position=({1}, {2}), size=({3}, {4}), color={5}, type={6}, resource={7}",
+                //    frontendObject.Name ?? $"0x{frontendObject.Guid:X}", x, y, sizeX, sizeY, frontendObject.Color, frontendObject.Type,
+                //    frontendObject.ResourceRequest.Name);
 
                 if (x < 0 || x > width || y < 0 || y > height)
                 {
-                    Debug.WriteLine("Object out of bounds. Skipping.");
+                    //Debug.WriteLine("Object out of bounds. Skipping.");
                     continue;
                 }
 
                 if (sizeX == 0 || sizeY == 0)
                 {
-                    Debug.WriteLine("Zero pixels on at least one axis. Skipping.");
+                    //Debug.WriteLine("Zero pixels on at least one axis. Skipping.");
                     continue;
                 }
 
-                Debug.WriteLine("Computed matrix: {0}", renderOrderItem.ObjectMatrix);
+                //Debug.WriteLine("Computed matrix: {0}", renderOrderItem.ObjectMatrix);
 
                 if (frontendObject.Type == FEObjType.FE_Image)
                 {
-                    var image = GetImageResourceByIndex(frontendObject.ResourceIndex);
+                    var image = GetImageResource(frontendObject.ResourceRequest);
                     if (image == null)
                         continue;
 
@@ -118,13 +121,15 @@ namespace FEngRender
 
                             var rotationQuaternion = ComputeObjectRotation(frontendObject);
                             var eulerAngles = QuaternionToEuler(rotationQuaternion);
-                            Debug.WriteLine("Rotation (Quaternion) : {0}", rotationQuaternion);
-                            Debug.WriteLine("Rotation (Euler)      : {0}, {1}, {2}", eulerAngles.Roll,
-                                eulerAngles.Pitch, eulerAngles.Yaw);
+                            //Debug.WriteLine("Rotation (Quaternion) : {0}", rotationQuaternion);
+                            //Debug.WriteLine("Rotation (Euler)      : {0}, {1}, {2}", eulerAngles.Roll,
+                            //    eulerAngles.Pitch, eulerAngles.Yaw);
 
                             var rotateX = eulerAngles.Roll * (180 / Math.PI);
                             var rotateY = eulerAngles.Pitch * (180 / Math.PI);
                             var rotateZ = eulerAngles.Yaw * (180 / Math.PI);
+
+                            Debug.WriteLine("\tRotation (Degrees): {0}, {1}, {2}", rotateX, rotateY, rotateZ);
 
                             // TODO: ELIMINATE THESE UGLY HACKS
                             if (Math.Abs(Math.Abs(rotateX) - 180) < 0.1) c.Flip(FlipMode.Vertical);
@@ -149,7 +154,7 @@ namespace FEngRender
                                 }
                             });
 
-                            Debug.WriteLine("Applied channel filter");
+                            //Debug.WriteLine("Applied channel filter");
                         });
 
                         m.DrawImage(
@@ -163,8 +168,8 @@ namespace FEngRender
                 }
                 else if (frontendObject is FrontendString frontendString && !string.IsNullOrEmpty(frontendString.Value))
                 {
-                    Debug.WriteLine("\tDrawing text in format {1}: {0}", frontendString.Value,
-                        frontendString.Formatting);
+                    //Debug.WriteLine("\tDrawing text in format {1}: {0}", frontendString.Value,
+                    //    frontendString.Formatting);
 
                     renderSurface.Mutate(m =>
                     {
@@ -208,13 +213,11 @@ namespace FEngRender
             return renderSurface;
         }
 
-        private Image? GetImageResourceByIndex(int index)
+        private Image? GetImageResource(FEResourceRequest resource)
         {
-            var resource = _package.ResourceRequests[index];
-
             if (resource.Type != FEResourceType.RT_Image)
             {
-                Debug.WriteLine($"Expected resource type to be RT_Image, but it was {resource.Type}");
+                //Debug.WriteLine($"Expected resource type to be RT_Image, but it was {resource.Type}");
                 return null;
             }
 
@@ -222,7 +225,7 @@ namespace FEngRender
 
             if (!File.Exists(resourceFile))
             {
-                Debug.WriteLine($"Cannot find resource file: {resourceFile}");
+                //Debug.WriteLine($"Cannot find resource file: {resourceFile}");
                 return null;
             }
             

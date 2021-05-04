@@ -197,7 +197,12 @@ namespace FEngLib.Chunks
         {
             frontendObject.Flags = objectReferenceTag.Flags;
             frontendObject.Guid = objectReferenceTag.Guid;
-            frontendObject.ResourceIndex = objectReferenceTag.ResourceIndex;
+
+            if (objectReferenceTag.ResourceIndex > -1)
+            {
+                frontendObject.ResourceRequest =
+                    frontendObject.Package.ResourceRequests[objectReferenceTag.ResourceIndex];
+            }
         }
 
         public override FrontendChunkType GetChunkType()

@@ -1,4 +1,5 @@
 ﻿using System.Windows.Forms;
+using FEngRender;
 
 namespace FEngViewer
 {
@@ -9,19 +10,18 @@ namespace FEngViewer
             InitializeComponent();
         }
 
-        public void UpdateObjectDetails(FEObjectViewNode nodeTag)
+        public void UpdateObjectDetails(RenderTreeNode nodeTag)
         {
-            var obj = nodeTag.Obj;
+            var obj = nodeTag.FrontendObject;
             labelObjType.Text = obj.Type.ToString();
             labelObjHash.Text = $"{obj.NameHash:X}";
             labelObjGUID.Text = $"{obj.Guid:X}";
             labelObjFlags.Text = $"{obj.Flags}";
 
-            if (obj.ResourceIndex > -1)
+            if (obj.ResourceRequest is {} resourceRequest)
             {
                 // labelObjResID.Text = obj.ResourceIndex.ToString();
-                var resourceRequest = obj.Package.ResourceRequests[obj.ResourceIndex];
-                labelObjResID.Text = $"{obj.ResourceIndex} - {resourceRequest.Name} ({resourceRequest.Type})";
+                labelObjResID.Text = $"{resourceRequest.Name} ({resourceRequest.Type})";
             }
             else
             {

@@ -339,3 +339,4 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 /FEngViewer/Properties/launchSettings.json
+/FEngCli/Properties/launchSettings.json

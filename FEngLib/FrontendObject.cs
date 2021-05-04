@@ -24,7 +24,7 @@ namespace FEngLib
         public FEObjType Type { get; set; }
         public FE_ObjectFlags Flags { get; set; }
 
-        public int ResourceIndex { get; set; }
+        public FEResourceRequest ResourceRequest { get; set; }
         public string Name { get; set; }
         public uint NameHash { get; set; }
         public uint Guid { get; set; }
