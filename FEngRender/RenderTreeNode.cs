@@ -16,6 +16,11 @@ namespace FEngRender
         public FEColor ObjectColor { get; private set; }
 
         /// <summary>
+        /// The <see cref="FEngLib.FrontendObject"/> instance owned by the node.
+        /// </summary>
+        public FrontendObject FrontendObject { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RenderTreeNode"/> class.
         /// </summary>
         /// <param name="frontendObject">
@@ -56,10 +61,5 @@ namespace FEngRender
         {
             return ObjectMatrix.M43;
         }
-
-        /// <summary>
-        /// The <see cref="FEngLib.FrontendObject"/> instance owned by the node.
-        /// </summary>
-        public FrontendObject FrontendObject { get; }
     }
 }
