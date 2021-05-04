@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using FEngLib;
 using FEngLib.Data;
 using FEngLib.Objects;
-using FEngLib.Tags;
-using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
@@ -52,25 +48,26 @@ namespace FEngRender
             ComputeObjectMatrices(tree, Matrix4x4.Identity);
             RenderTree(img, tree);
 
-            // make sure we have a box to draw
-            if (_boundingBox.width != 0)
+            if (_boundingBox.width > 0)
             {
-                img.Mutate(m => m.Draw(Color.Red, 1,
-                    new RectangleF(new PointF(_boundingBox.x, _boundingBox.y), new SizeF(_boundingBox.width, _boundingBox.height))));
+                img.Mutate(m => m.Draw(
+                    Color.Red, 
+                    1, 
+                    new RectangleF(_boundingBox.x, _boundingBox.y, _boundingBox.width, _boundingBox.height)));
             }
 
             return img;
         }
 
         private void ComputeObjectMatrices(IEnumerable<RenderTreeNode> nodes,
-            Matrix4x4 viewMatrix)
+            Matrix4x4 viewMatrix, RenderTreeNode parent = null)
         {
             var nodeList = nodes.ToList();
 
-            nodeList.ForEach(r => r.ComputeObjectMatrix(viewMatrix));
+            nodeList.ForEach(r => r.ApplyContext(viewMatrix, parent));
             foreach (var renderTreeGroup in nodeList.OfType<RenderTreeGroup>())
             {
-                ComputeObjectMatrices(renderTreeGroup, renderTreeGroup.ObjectMatrix);
+                ComputeObjectMatrices(renderTreeGroup, renderTreeGroup.ObjectMatrix, renderTreeGroup);
             }
         }
 
@@ -102,18 +99,19 @@ namespace FEngRender
             switch (node.FrontendObject)
             {
                 case FrontendImage image:
-                    RenderImage(surface, node.ObjectMatrix, image);
+                    RenderImage(surface, node, image);
                     break;
                 case FrontendString str:
-                    RenderString(surface, node.ObjectMatrix, str);
+                    RenderString(surface, node, str);
                     break;
             }
         }
 
-        private void RenderString(Image<Rgba32> surface, Matrix4x4 imgMatrix, FrontendString str)
+        private void RenderString(Image<Rgba32> surface, RenderTreeNode node, FrontendString str)
         {
-            float posX = imgMatrix.M41 + Width / 2f;
-            float posY = imgMatrix.M42 + Height / 2f;
+            var strMatrix = node.ObjectMatrix;
+            float posX = strMatrix.M41 + Width / 2f;
+            float posY = strMatrix.M42 + Height / 2f;
             surface.Mutate(m =>
             {
                 var rect = TextRendering.MeasureText(str.Value, str.MaxWidth);
@@ -129,9 +127,9 @@ namespace FEngRender
                     {
                         WrapTextWidth = str.MaxWidth
                     }),  str.Value, TextRendering.DefaultFont,
-                    Color.FromRgba((byte)(str.Color.Red & 0xff),
-                        (byte)(str.Color.Green & 0xff), (byte)(str.Color.Blue & 0xff),
-                        (byte)(str.Color.Alpha & 0xff)),
+                    Color.FromRgba((byte)(node.ObjectColor.Red & 0xff),
+                        (byte)(node.ObjectColor.Green & 0xff), (byte)(node.ObjectColor.Blue & 0xff),
+                        (byte)(node.ObjectColor.Alpha & 0xff)),
                     new PointF(posX, posY));
                 if (SelectedNode?.FrontendObject?.Guid == str.Guid)
                 {
@@ -140,8 +138,9 @@ namespace FEngRender
             });
         }
 
-        private void RenderImage(Image<Rgba32> surface, Matrix4x4 imgMatrix, FrontendImage image)
+        private void RenderImage(Image<Rgba32> surface, RenderTreeNode node, FrontendImage image)
         {
+            var imgMatrix = node.ObjectMatrix;
             float sizeX = imgMatrix.M11;
             float sizeY = imgMatrix.M22;
             float posX = imgMatrix.M41 + Width / 2f - sizeX * 0.5f;
@@ -179,9 +178,10 @@ namespace FEngRender
                         return;
                     }
 
+                    //c.SetGraphicsOptions(new GraphicsOptions {Antialias = false});
                     c.Resize((int)sizeX, (int)sizeY);
-                    var rotationQuaternion = ComputeObjectRotation(image);
-                    var eulerAngles = QuaternionToEuler(rotationQuaternion);
+                    var rotationQuaternion = node.ObjectRotation;
+                    var eulerAngles = MathHelpers.QuaternionToEuler(rotationQuaternion);
                     var rotateX = eulerAngles.Roll * (180 / Math.PI);
                     var rotateY = eulerAngles.Pitch * (180 / Math.PI);
                     var rotateZ = eulerAngles.Yaw * (180 / Math.PI);
@@ -192,22 +192,18 @@ namespace FEngRender
 
                     c.Rotate((float)rotateZ);
 
-                    var redScale = image.Color.Red / 255f;
-                    var greenScale = image.Color.Green / 255f;
-                    var blueScale = image.Color.Blue / 255f;
-                    var alphaScale = image.Color.Alpha / 255f;
-                    var scaleVector = new Vector4(redScale, greenScale, blueScale, alphaScale);
-
+                    var colorScaleVector = ColorHelpers.GetLevels(node.ObjectColor);
+                    
                     c.ProcessPixelRowsAsVector4(span =>
                     {
                         for (var i = 0; i < span.Length; i++)
                         {
-                            span[i] *= scaleVector;
+                            span[i] *= colorScaleVector;
                         }
                     });
                 });
                 m.DrawImage(
-                    clone, new Point((int)posX, (int)posY), image.Color.Alpha / 255f);
+                    clone, new Point((int)posX, (int)posY), node.ObjectColor.Alpha / 255f);
 
                 /*
                  *                             m.Draw(Color.Red, 1,
@@ -245,36 +241,5 @@ namespace FEngRender
 
             return q;
         }
-
-        private static EulerAngles QuaternionToEuler(Quaternion q)
-        {
-            var sinr_cosp = 2 * (q.W * q.X + q.Y * q.Z);
-            var cosr_cosp = 1 - 2 * (q.X * q.X + q.Y * q.Y);
-            var roll = Math.Atan2(sinr_cosp, cosr_cosp);
-
-            var sinp = 2 * (q.W * q.Y - q.Z * q.X);
-            var pitch = Math.Abs(sinp) >= 1 ? Math.CopySign(Math.PI / 2, sinp) : Math.Asin(sinp);
-
-            var siny_cosp = 2 * (q.W * q.Z + q.X * q.Y);
-            var cosy_cosp = 1 - 2 * (q.Y * q.Y + q.Z * q.Z);
-            var yaw = Math.Atan2(siny_cosp, cosy_cosp);
-
-            return new EulerAngles(roll, pitch, yaw);
-        }
-
-        private struct EulerAngles
-        {
-            public readonly double Roll;
-            public readonly double Pitch;
-            public readonly double Yaw;
-
-            public EulerAngles(double roll, double pitch, double yaw)
-            {
-                Roll = roll;
-                Pitch = pitch;
-                Yaw = yaw;
-            }
-        }
-
     }
 }

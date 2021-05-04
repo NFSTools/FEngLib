@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using FEngLib;
+using FEngLib.Structures;
 
 namespace FEngRender
 {
@@ -9,6 +10,10 @@ namespace FEngRender
     public class RenderTreeNode
     {
         public Matrix4x4 ObjectMatrix { get; private set; }
+
+        public Quaternion ObjectRotation { get; private set; }
+
+        public FEColor ObjectColor { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderTreeNode"/> class.
@@ -22,17 +27,25 @@ namespace FEngRender
         }
 
         /// <summary>
-        /// Computes the object's matrix, given a view matrix.
+        /// Computes transformations based on context.
         /// </summary>
         /// <param name="viewMatrix"></param>
-        public void ComputeObjectMatrix(Matrix4x4 viewMatrix)
+        /// <param name="parentNode"></param>
+        public void ApplyContext(Matrix4x4 viewMatrix, RenderTreeNode parentNode)
         {
-            ObjectMatrix = Matrix4x4.Multiply(new Matrix4x4(
-                FrontendObject.Size.X, 0, 0, 0,
-                0, FrontendObject.Size.Y, 0, 0,
-                0, 0, FrontendObject.Size.Z, 0,
-                FrontendObject.Position.X, FrontendObject.Position.Y, FrontendObject.Position.Z, 1
-            ), viewMatrix);
+            var scaleMatrix = Matrix4x4.CreateScale(FrontendObject.Size.X, FrontendObject.Size.Y, FrontendObject.Size.Z);
+            var transMatrix = Matrix4x4.CreateTranslation(FrontendObject.Position.X, FrontendObject.Position.Y,
+                FrontendObject.Position.Z);
+
+            ObjectMatrix = scaleMatrix * transMatrix * viewMatrix;
+            ObjectRotation = FrontendObject.Rotation.ToQuaternion();
+            ObjectColor = FrontendObject.Color;
+
+            if (parentNode != null)
+            {
+                ObjectRotation *= parentNode.ObjectRotation;
+                ObjectColor = ColorHelpers.BlendColors(ObjectColor, parentNode.ObjectColor);
+            }
         }
 
         /// <summary>
