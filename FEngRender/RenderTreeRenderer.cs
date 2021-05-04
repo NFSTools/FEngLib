@@ -51,8 +51,8 @@ namespace FEngRender
             if (_boundingBox.width > 0)
             {
                 img.Mutate(m => m.Draw(
-                    Color.Red, 
-                    1, 
+                    Color.Red,
+                    1,
                     new RectangleF(_boundingBox.x, _boundingBox.y, _boundingBox.width, _boundingBox.height)));
             }
 
@@ -75,6 +75,12 @@ namespace FEngRender
         {
             foreach (var node in nodes)
             {
+                if ((node.FrontendObject.Flags & FE_ObjectFlags.FF_Invisible) != 0 ||
+                    (node.FrontendObject.Flags & FE_ObjectFlags.FF_HideInEdit) != 0)
+                {
+                    continue;
+                }
+
                 yield return node;
 
                 if (!(node is RenderTreeGroup grp)) continue;
@@ -124,9 +130,9 @@ namespace FEngRender
                 posY += yOffset;
 
                 m.DrawText(new TextGraphicsOptions(new GraphicsOptions(), new TextOptions
-                    {
-                        WrapTextWidth = str.MaxWidth
-                    }),  str.Value, TextRendering.DefaultFont,
+                {
+                    WrapTextWidth = str.MaxWidth
+                }), str.Value, TextRendering.DefaultFont,
                     Color.FromRgba((byte)(node.ObjectColor.Red & 0xff),
                         (byte)(node.ObjectColor.Green & 0xff), (byte)(node.ObjectColor.Blue & 0xff),
                         (byte)(node.ObjectColor.Alpha & 0xff)),
@@ -193,7 +199,7 @@ namespace FEngRender
                     c.Rotate((float)rotateZ);
 
                     var colorScaleVector = ColorHelpers.GetLevels(node.ObjectColor);
-                    
+
                     c.ProcessPixelRowsAsVector4(span =>
                     {
                         for (var i = 0; i < span.Length; i++)
