@@ -8,6 +8,7 @@ using CommandLine;
 using FEngLib;
 using FEngLib.Data;
 using FEngRender;
+using FEngRender.Data;
 using FEngViewer.Properties;
 using JetBrains.Annotations;
 using static SixLabors.ImageSharp.ImageExtensions;

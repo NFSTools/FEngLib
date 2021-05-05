@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using FEngLib.Structures;
 
-namespace FEngRender
+namespace FEngRender.Utils
 {
     /// <summary>
     /// Helper functions for working with <see cref="FEColor"/> objects

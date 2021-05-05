@@ -5,7 +5,7 @@ using FEngLib;
 using FEngLib.Data;
 using FEngLib.Objects;
 
-namespace FEngRender
+namespace FEngRender.Data
 {
     /// <summary>
     /// Represents a list of <see cref="RenderTreeNode"/> objects.

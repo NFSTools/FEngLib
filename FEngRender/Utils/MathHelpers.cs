@@ -2,7 +2,7 @@
 using System.Numerics;
 using FEngLib.Structures;
 
-namespace FEngRender
+namespace FEngRender.Utils
 {
     /// <summary>
     /// Useful mathematical functions

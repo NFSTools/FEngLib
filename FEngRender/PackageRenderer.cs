@@ -8,6 +8,7 @@ using System.Numerics;
 using FEngLib;
 using FEngLib.Data;
 using FEngLib.Objects;
+using FEngRender.Data;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;

@@ -6,10 +6,15 @@ using System.Numerics;
 using FEngLib;
 using FEngLib.Data;
 using FEngLib.Objects;
+using FEngRender.Data;
+using FEngRender.Utils;
+using SixLabors.Fonts;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using Path = System.IO.Path;
 
 namespace FEngRender
 {
@@ -45,7 +50,7 @@ namespace FEngRender
             var img = new Image<Rgba32>(Width, Height, Color.Black);
 
             _boundingBox = (0, 0, 0, 0);
-            ComputeObjectMatrices(tree, Matrix4x4.Identity);
+            ApplyContext(tree, Matrix4x4.Identity);
             RenderTree(img, tree);
 
             if (_boundingBox.width > 0)
@@ -59,7 +64,7 @@ namespace FEngRender
             return img;
         }
 
-        private void ComputeObjectMatrices(IEnumerable<RenderTreeNode> nodes,
+        private void ApplyContext(IEnumerable<RenderTreeNode> nodes,
             Matrix4x4 viewMatrix, RenderTreeNode parent = null)
         {
             var nodeList = nodes.ToList();
@@ -67,7 +72,7 @@ namespace FEngRender
             nodeList.ForEach(r => r.ApplyContext(viewMatrix, parent));
             foreach (var renderTreeGroup in nodeList.OfType<RenderTreeGroup>())
             {
-                ComputeObjectMatrices(renderTreeGroup, renderTreeGroup.ObjectMatrix, renderTreeGroup);
+                ApplyContext(renderTreeGroup, renderTreeGroup.ObjectMatrix, renderTreeGroup);
             }
         }
 
@@ -116,30 +121,30 @@ namespace FEngRender
         private void RenderString(Image<Rgba32> surface, RenderTreeNode node, FrontendString str)
         {
             var strMatrix = node.ObjectMatrix;
-            float posX = strMatrix.M41 + Width / 2f;
-            float posY = strMatrix.M42 + Height / 2f;
+            var posX = strMatrix.M41 + Width / 2f;
+            var posY = strMatrix.M42 + Height / 2f;
             surface.Mutate(m =>
             {
-                var rect = TextRendering.MeasureText(str.Value, str.MaxWidth);
-                var xOffset = TextRendering.CalculateXOffset((uint)str.Formatting,
-                    rect.Width);
-                var yOffset = TextRendering.CalculateYOffset((uint)str.Formatting,
-                    rect.Height);
+                var font = TextHelpers.GetFont(12);
+                var (_, _, width, height) = TextHelpers.MeasureText(str.Value, new RendererOptions(font)
+                {
+                    WrappingWidth = str.MaxWidth
+                });
+                var xOffset = TextHelpers.CalculateXOffset((uint)str.Formatting,
+                    width);
+                var yOffset = TextHelpers.CalculateYOffset((uint)str.Formatting,
+                    height);
 
                 posX += xOffset;
                 posY += yOffset;
 
-                m.DrawText(new TextGraphicsOptions(new GraphicsOptions(), new TextOptions
-                {
-                    WrapTextWidth = str.MaxWidth
-                }), str.Value, TextRendering.DefaultFont,
-                    Color.FromRgba((byte)(node.ObjectColor.Red & 0xff),
-                        (byte)(node.ObjectColor.Green & 0xff), (byte)(node.ObjectColor.Blue & 0xff),
-                        (byte)(node.ObjectColor.Alpha & 0xff)),
-                    new PointF(posX, posY));
+                m.DrawText(str.Value, font, Color.FromRgba((byte)(node.ObjectColor.Red & 0xff),
+                    (byte)(node.ObjectColor.Green & 0xff), (byte)(node.ObjectColor.Blue & 0xff),
+                    (byte)(node.ObjectColor.Alpha & 0xff)), new PointF(posX, posY));
+
                 if (SelectedNode?.FrontendObject?.Guid == str.Guid)
                 {
-                    _boundingBox = (rect.Width, rect.Height, posX, posY);
+                    _boundingBox = (width, height, posX, posY);
                 }
             });
         }

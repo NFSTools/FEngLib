@@ -1,8 +1,10 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using FEngLib;
 using FEngLib.Structures;
+using FEngRender.Utils;
 
-namespace FEngRender
+namespace FEngRender.Data
 {
     /// <summary>
     /// Base class for representing an item in a <see cref="RenderTree"/>.

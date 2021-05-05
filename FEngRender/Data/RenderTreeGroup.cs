@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using FEngLib.Objects;
 
-namespace FEngRender
+namespace FEngRender.Data
 {
     /// <summary>
     /// Represents a node in the render tree that can have children.
