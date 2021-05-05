@@ -7,17 +7,14 @@ using System.Windows.Forms;
 using CommandLine;
 using FEngLib;
 using FEngLib.Data;
-using FEngRender;
 using FEngRender.Data;
 using FEngViewer.Properties;
 using JetBrains.Annotations;
-using static SixLabors.ImageSharp.ImageExtensions;
 
 namespace FEngViewer
 {
     public partial class PackageView : Form
     {
-        private RenderTreeRenderer _renderer;
         private RenderTree _currentRenderTree;
 
         public PackageView()
@@ -49,10 +46,7 @@ namespace FEngViewer
 
         private void Render()
         {
-            var image = _renderer.Render(_currentRenderTree);
-            var stream = new MemoryStream();
-            image.SaveAsBmp(stream);
-            viewOutput.Image = Image.FromStream(stream);
+            viewOutput.Render(_currentRenderTree);
         }
 
 
@@ -177,8 +171,7 @@ namespace FEngViewer
             {
                 objectDetailsView1.Visible = true;
                 objectDetailsView1.UpdateObjectDetails(viewNode);
-                _renderer.SelectedNode = viewNode;
-                //_renderer.SelectedObjectGuid = viewNode.FrontendObject.Guid;
+                viewOutput.SelectedNode = viewNode;
                 Render();
             }
             else
@@ -218,9 +211,7 @@ namespace FEngViewer
             // window title
             _currentRenderTree = RenderTree.Create(package);
             PopulateTreeView(package, _currentRenderTree);
-            //_renderer = new PackageRenderer(package, Path.Combine(Path.GetDirectoryName(path) ?? "", "textures"));
-            _renderer = new RenderTreeRenderer();
-            _renderer.LoadTextures(Path.Combine(Path.GetDirectoryName(path) ?? "", "textures"));
+            viewOutput.Init(Path.Combine(Path.GetDirectoryName(path) ?? "", "textures"));
             Render();
 
             Text = package.Name;

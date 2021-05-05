@@ -34,7 +34,7 @@ namespace FEngViewer
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.labelCoordDisplay = new System.Windows.Forms.Label();
             this.objectDetailsView1 = new FEngViewer.ObjectDetailsControl();
-            this.viewOutput = new System.Windows.Forms.PictureBox();
+            this.viewOutput = new ImageSharpRenderControl();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.OpenFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,7 +46,6 @@ namespace FEngViewer
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.viewOutput)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.objectContextMenu.SuspendLayout();
             this.SuspendLayout();
@@ -173,7 +172,6 @@ namespace FEngViewer
             this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.viewOutput)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.objectContextMenu.ResumeLayout(false);
@@ -185,7 +183,7 @@ namespace FEngViewer
         #endregion
 
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.PictureBox viewOutput;
+        private ImageSharpRenderControl viewOutput;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private ObjectDetailsControl objectDetailsView1;
         private System.Windows.Forms.Label labelCoordDisplay;
