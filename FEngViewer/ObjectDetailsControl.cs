@@ -4,9 +4,9 @@ using FEngRender.Data;
 
 namespace FEngViewer
 {
-    public partial class ObjectDetailsView : UserControl
+    public partial class ObjectDetailsControl : UserControl
     {
-        public ObjectDetailsView()
+        public ObjectDetailsControl()
         {
             InitializeComponent();
         }

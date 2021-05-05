@@ -2,7 +2,7 @@
 
 namespace FEngViewer
 {
-    partial class ObjectDetailsView
+    partial class ObjectDetailsControl
     {
         /// <summary> 
         /// Required designer variable.

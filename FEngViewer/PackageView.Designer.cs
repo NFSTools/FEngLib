@@ -33,7 +33,7 @@ namespace FEngViewer
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.labelCoordDisplay = new System.Windows.Forms.Label();
-            this.objectDetailsView1 = new FEngViewer.ObjectDetailsView();
+            this.objectDetailsView1 = new FEngViewer.ObjectDetailsControl();
             this.viewOutput = new System.Windows.Forms.PictureBox();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -187,7 +187,7 @@ namespace FEngViewer
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.PictureBox viewOutput;
         private System.Windows.Forms.ColorDialog colorDialog1;
-        private ObjectDetailsView objectDetailsView1;
+        private ObjectDetailsControl objectDetailsView1;
         private System.Windows.Forms.Label labelCoordDisplay;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem OpenFileMenuItem;
