@@ -8,6 +8,8 @@ using FEngLib.Data;
 using FEngLib.Objects;
 using FEngRender.Data;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
+using Quaternion = System.Numerics.Quaternion;
 
 
 namespace FEngRender.OpenGL
@@ -24,19 +26,33 @@ namespace FEngRender.OpenGL
         private (float width, float height, float x, float y) _boundingBox;
 
         private readonly Dictionary<string, Texture> _textures = new Dictionary<string, Texture>();
+        
+        private int _vertexBufferObject;
+        private int _vertexArrayObject;
         private Shader _shader;
 
-        public GLRenderTreeRenderer(string textureDirectory)
+        public GLRenderTreeRenderer()
         {
-            LoadTextures(textureDirectory);
-
             PrepareRender();
         }
 
         private void PrepareRender()
         {
-            _shader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
+            GL.ClearColor(Color4.Green);
+
+            /*_vertexArrayObject = GL.GenVertexArray();
+            GL.BindVertexArray(_vertexArrayObject);
+
+            _vertexBufferObject = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
+            // BufferData??? todo in quad
+            
+            _shader = new Shader();
             _shader.Use();
+            
+            VertexDeclaration.Declare();*/
+            
+            
         }
 
         public void LoadTextures(string directory)
@@ -55,7 +71,11 @@ namespace FEngRender.OpenGL
         /// <param name="tree">The <see cref="RenderTree"/> to render.</param>
         public void Render(RenderTree tree)
         {
-            GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.ClearColor(Color4.MidnightBlue);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            if (!CanRender(tree))
+                return;
             
             _boundingBox = (0, 0, 0, 0);
             ComputeObjectMatrices(tree, Matrix4x4.Identity);
@@ -69,6 +89,11 @@ namespace FEngRender.OpenGL
                     1, 
                     new RectangleF(_boundingBox.x, _boundingBox.y, _boundingBox.width, _boundingBox.height)));
             }*/
+        }
+
+        private bool CanRender(RenderTree tree)
+        {
+            return tree != null && _textures.Count > 0;
         }
 
         private void ComputeObjectMatrices(IEnumerable<RenderTreeNode> nodes,

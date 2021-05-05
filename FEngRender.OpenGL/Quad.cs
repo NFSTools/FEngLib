@@ -1,20 +1,11 @@
-﻿using System.Runtime.InteropServices;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
 namespace FEngRender.OpenGL
 {
     public class Quad
     {
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct Vertex
-        {
-            public Vector3 Position;
-            public Color4 Color;
-            public Vector2 TexCoords;
-        }
-
-        private Vertex[] _vertices = new Vertex[4];
+        private VertexDeclaration[] _vertices = new VertexDeclaration[4];
 
         private static readonly int[] Indices =
         {
@@ -76,7 +67,7 @@ namespace FEngRender.OpenGL
             // TODO probably pass some handles down in here after that
             tex.Use(TextureUnit.Texture0);
 
-            GL.DrawElements(PrimitiveType.TriangleFan, Indices.Length, DrawElementsType.UnsignedByte, 0);
+            GL.DrawElements(PrimitiveType.TriangleFan, Indices.Length, DrawElementsType.UnsignedInt, 0);
         }
         
         // we need Vector3 for the vertex format
