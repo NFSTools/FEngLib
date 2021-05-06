@@ -1,7 +1,8 @@
-﻿using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
+using SharpGL;
+using SharpGL.Enumerations;
 
-namespace FEngRender.OpenGL
+namespace FEngRender.GL
 {
     public class Quad
     {
@@ -11,6 +12,10 @@ namespace FEngRender.OpenGL
         {
             0, 1, 2, 3
         };
+
+        private readonly Matrix4 _transform;
+
+        private const bool DoZ = false;
 
         public Quad(
             float left, float up,
@@ -36,10 +41,19 @@ namespace FEngRender.OpenGL
             _vertices[3].Position.Y = down;
             _vertices[3].Position.Z = z;
 
+            _transform = transform;
             _vertices[0].Position = MultIgnoringCol4(transform, _vertices[0].Position);
             _vertices[1].Position = MultIgnoringCol4(transform, _vertices[1].Position);
             _vertices[2].Position = MultIgnoringCol4(transform, _vertices[2].Position);
             _vertices[3].Position = MultIgnoringCol4(transform, _vertices[3].Position);
+
+            if (!DoZ)
+            {
+                _vertices[0].Position.Z = 1.0f;
+                _vertices[1].Position.Z = 1.0f;
+                _vertices[2].Position.Z = 1.0f;
+                _vertices[3].Position.Z = 1.0f;
+            }
 
             _vertices[0].TexCoords.X = texTopLeft.X;
             _vertices[0].TexCoords.Y = texTopLeft.Y;
@@ -59,15 +73,34 @@ namespace FEngRender.OpenGL
             _vertices[3].Color = colors[3];
         }
 
-        public void Render(Texture tex)
-        {
-            // TODO maybe? apply those weird float scaling things? probably
-            // TODO apply texture adjustment
-            // TODO lots of init in renderer
-            // TODO probably pass some handles down in here after that
-            tex.Use(TextureUnit.Texture0);
+        public const float XScale = 1.0f / 320.0f;
+        private const float YScale = 1.0f / 240.0f;
 
-            GL.DrawElements(PrimitiveType.TriangleFan, Indices.Length, DrawElementsType.UnsignedInt, 0);
+        public void Render(OpenGL gl, Texture tex)
+        {
+            tex.GLTexture.Bind(gl);
+            gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
+            gl.Enable(OpenGL.GL_BLEND);
+            
+            gl.Begin(BeginMode.TriangleFan);
+
+            for (var j = 0; j < _vertices.Length; j++)
+            {
+                _vertices[j].Position.X = _vertices[j].Position.X * XScale - 1.0f;
+                _vertices[j].Position.Y = -(_vertices[j].Position.Y * YScale - 1.0f);
+
+                _vertices[j].TexCoords.X += 0.5f / tex.Width;
+                _vertices[j].TexCoords.Y += 0.5f / tex.Height;
+            }
+
+            foreach (var vertex in _vertices)
+            {
+                gl.Color(vertex.Color.R, vertex.Color.G, vertex.Color.B, vertex.Color.A);
+                gl.TexCoord(vertex.TexCoords.X, vertex.TexCoords.Y);
+                gl.Vertex(vertex.Position.X, vertex.Position.Y, vertex.Position.Z);
+            }
+
+            gl.End();
         }
         
         // we need Vector3 for the vertex format

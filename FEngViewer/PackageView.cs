@@ -258,7 +258,7 @@ namespace FEngViewer
 
         private float rotCube = 0;
 
-        private void openglControl1_OpenGLDraw(object sender, RenderEventArgs args)
+        /*private void openglControl1_OpenGLDraw(object sender, RenderEventArgs args)
         {
             OpenGL gl = this.openglControl1.OpenGL;
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
@@ -346,6 +346,6 @@ namespace FEngViewer
             //gl.End();
 
             gl.Flush();
-        }
+        }*/
     }
 }

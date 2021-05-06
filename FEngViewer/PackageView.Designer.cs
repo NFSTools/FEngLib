@@ -32,10 +32,9 @@ namespace FEngViewer
             this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
-            this.openglControl1 = new SharpGL.OpenGLControl();
             this.labelCoordDisplay = new System.Windows.Forms.Label();
             this.objectDetailsView1 = new FEngViewer.ObjectDetailsControl();
-            this.viewOutput = new FEngViewer.ImageSharpRenderControl();
+            this.viewOutput = new FEngViewer.GLRenderControl();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.OpenFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,7 +46,6 @@ namespace FEngViewer
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.openglControl1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.objectContextMenu.SuspendLayout();
             this.SuspendLayout();
@@ -65,7 +63,6 @@ namespace FEngViewer
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.openglControl1);
             this.splitContainer1.Panel2.Controls.Add(this.labelCoordDisplay);
             this.splitContainer1.Panel2.Controls.Add(this.objectDetailsView1);
             this.splitContainer1.Panel2.Controls.Add(this.viewOutput);
@@ -82,19 +79,6 @@ namespace FEngViewer
             this.treeView1.TabIndex = 1;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             this.treeView1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.treeView1_MouseDown);
-            // 
-            // openglControl1
-            // 
-            this.openglControl1.DrawFPS = true;
-            this.openglControl1.Location = new System.Drawing.Point(244, 239);
-            this.openglControl1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.openglControl1.Name = "openglControl1";
-            this.openglControl1.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1;
-            this.openglControl1.RenderContextType = SharpGL.RenderContextType.DIBSection;
-            this.openglControl1.RenderTrigger = SharpGL.RenderTrigger.TimerBased;
-            this.openglControl1.Size = new System.Drawing.Size(175, 173);
-            this.openglControl1.TabIndex = 3;
-            this.openglControl1.OpenGLDraw += new SharpGL.RenderEventHandler(this.openglControl1_OpenGLDraw);
             // 
             // labelCoordDisplay
             // 
@@ -189,7 +173,6 @@ namespace FEngViewer
             this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.openglControl1)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.objectContextMenu.ResumeLayout(false);
@@ -201,7 +184,7 @@ namespace FEngViewer
         #endregion
 
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private ImageSharpRenderControl viewOutput;
+        private GLRenderControl viewOutput;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private ObjectDetailsControl objectDetailsView1;
         private System.Windows.Forms.Label labelCoordDisplay;
@@ -212,6 +195,5 @@ namespace FEngViewer
         private System.Windows.Forms.ToolStripMenuItem toggleObjectVisibilityItem;
         private System.Windows.Forms.ToolStripMenuItem changeObjectPositionItem;
         private System.Windows.Forms.ToolStripMenuItem changeObjectColorItem;
-        private SharpGL.OpenGLControl openglControl1;
     }
 }

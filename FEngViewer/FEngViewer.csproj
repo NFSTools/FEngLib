@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FEngLib\FEngLib.csproj" />
-    <ProjectReference Include="..\FEngRender.OpenGL\FEngRender.OpenGL.csproj" />
+    <ProjectReference Include="..\FEngRender.GL\FEngRender.GL.csproj" />
     <ProjectReference Include="..\FEngRender\FEngRender.csproj" />
   </ItemGroup>
 

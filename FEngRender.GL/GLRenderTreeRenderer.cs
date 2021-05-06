@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -7,12 +6,15 @@ using FEngLib;
 using FEngLib.Data;
 using FEngLib.Objects;
 using FEngRender.Data;
-using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using SharpGL;
+using SharpGL.Enumerations;
+using SharpGL.VertexBuffers;
 using Quaternion = System.Numerics.Quaternion;
+using Vector2 = OpenTK.Mathematics.Vector2;
+using Texture = SharpGL.SceneGraph.Assets.Texture;
 
-
-namespace FEngRender.OpenGL
+namespace FEngRender.GL
 {
     /// <summary>
     /// Make sure to initialize an OpenGL context before using this.
@@ -27,32 +29,18 @@ namespace FEngRender.OpenGL
 
         private readonly Dictionary<string, Texture> _textures = new Dictionary<string, Texture>();
         
-        private int _vertexBufferObject;
-        private int _vertexArrayObject;
-        private Shader _shader;
+        private readonly OpenGL _gl;
 
-        public GLRenderTreeRenderer()
+        public GLRenderTreeRenderer(OpenGL gl)
         {
-            PrepareRender();
+            _gl = gl;
         }
 
-        private void PrepareRender()
+        public void PrepareRender()
         {
-            GL.ClearColor(Color4.Green);
+            _gl.ClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 
-            /*_vertexArrayObject = GL.GenVertexArray();
-            GL.BindVertexArray(_vertexArrayObject);
-
-            _vertexBufferObject = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
-            // BufferData??? todo in quad
-            
-            _shader = new Shader();
-            _shader.Use();
-            
-            VertexDeclaration.Declare();*/
-            
-            
+            _gl.Enable(OpenGL.GL_TEXTURE_2D);
         }
 
         public void LoadTextures(string directory)
@@ -61,25 +49,33 @@ namespace FEngRender.OpenGL
             foreach (var pngFile in Directory.GetFiles(directory, "*.png"))
             {
                 var filename = Path.GetFileNameWithoutExtension(pngFile) ?? "";
-                _textures.Add(filename.ToUpperInvariant(), Texture.LoadFromFile(pngFile));
+                _textures.Add(filename.ToUpperInvariant(), new Texture(_gl, pngFile));
             }
         }
 
         /// <summary>
         /// Renders nodes from a <see cref="RenderTree"/> to a surface.
         /// </summary>
+        /// <param name="gl">GL context</param>
         /// <param name="tree">The <see cref="RenderTree"/> to render.</param>
         public void Render(RenderTree tree)
         {
-            GL.ClearColor(Color4.MidnightBlue);
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            _gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
 
             if (!CanRender(tree))
                 return;
-            
+
             _boundingBox = (0, 0, 0, 0);
             ComputeObjectMatrices(tree, Matrix4x4.Identity);
+            _gl.LoadIdentity();
+            //gl.Viewport(0, 0, 640, 480);
+            _gl.Translate(0.0f, 0.0f, -3.5f);
+            _gl.DepthMask(0); // disable depth 
+            _textures.TryGetValue("LEFT", out var tex);
+
             RenderTree(tree);
+
+            _gl.Flush();
 
             // make sure we have a box to draw
             /*if (_boundingBox.width > 0)
@@ -139,17 +135,18 @@ namespace FEngRender.OpenGL
                     RenderImage(node, image);
                     break;
                 case FrontendString str:
-                    //RenderString(surface, node, str);
+                    RenderString(node, str);
                     break;
             }
         }
 
-        /*private void RenderString(Image<Rgba32> surface, RenderTreeNode node, FrontendString str)
+        private void RenderString(RenderTreeNode node, FrontendString str)
         {
             var strMatrix = node.ObjectMatrix;
             float posX = strMatrix.M41 + Width / 2f;
             float posY = strMatrix.M42 + Height / 2f;
-            surface.Mutate(m =>
+            // TODO
+            /*surface.Mutate(m =>
             {
                 var rect = TextRendering.MeasureText(str.Value, str.MaxWidth);
                 var xOffset = TextRendering.CalculateXOffset((uint)str.Formatting,
@@ -172,8 +169,8 @@ namespace FEngRender.OpenGL
                 {
                     _boundingBox = (rect.Width, rect.Height, posX, posY);
                 }
-            });
-        }*/
+            });*/
+        }
 
         private void RenderImage(RenderTreeNode node, FrontendImage image)
         {
@@ -186,73 +183,72 @@ namespace FEngRender.OpenGL
             // Bounds checking
             if (posX < 0 || posY < 0 || posX > Width || posY > Height)
                 return;
-            
+
 
             var texture = GetTexture(image.ResourceRequest);
 
             if (texture == null)
                 return;
 
-            /*surface.Mutate(m =>
+            var otkMat4 = new Matrix4(
+                node.ObjectMatrix.M11, node.ObjectMatrix.M12, node.ObjectMatrix.M13, node.ObjectMatrix.M14,
+                node.ObjectMatrix.M21, node.ObjectMatrix.M22, node.ObjectMatrix.M23, node.ObjectMatrix.M24,
+                node.ObjectMatrix.M31, node.ObjectMatrix.M32, node.ObjectMatrix.M33, node.ObjectMatrix.M34,
+                node.ObjectMatrix.M41, node.ObjectMatrix.M42, node.ObjectMatrix.M43, node.ObjectMatrix.M44);
+
+            var feTranslateMat = Matrix4.Identity;
+            feTranslateMat.M41 = 320.0f;
+            feTranslateMat.M42 = 240.0f;
+            feTranslateMat.M43 = 0.0f;
+
+            otkMat4 *= feTranslateMat;
+
+            // this is done by the game, basically a noop in most cases but sometimes relevant?
+            // i think it's to do with square-ness and powers of two. or something
+            uint CalculateDivisor(int value)
             {
-                var clone = texture.Clone(c =>
+                if (texture.Width == 0) return 0;
+
+                var v10 = (uint) (value - 1) >> 1;
+                uint divisor;
+                for (divisor = 2; v10 != 0; divisor *= 2)
                 {
-                    if (sizeX < 0)
-                    {
-                        c.Flip(FlipMode.Horizontal);
-                        sizeX = -sizeX;
-                        posX -= sizeX;
-                    }
-
-                    if (sizeY < 0)
-                    {
-                        c.Flip(FlipMode.Vertical);
-                        sizeY = -sizeY;
-                        posY -= sizeY;
-                    }
-
-                    if ((int)sizeX == 0 || (int)sizeY == 0)
-                    {
-                        return;
-                    }
-
-                    //c.SetGraphicsOptions(new GraphicsOptions {Antialias = false});
-                    c.Resize((int)sizeX, (int)sizeY);
-                    var rotationQuaternion = node.ObjectRotation;
-                    var eulerAngles = MathHelpers.QuaternionToEuler(rotationQuaternion);
-                    var rotateX = eulerAngles.Roll * (180 / Math.PI);
-                    var rotateY = eulerAngles.Pitch * (180 / Math.PI);
-                    var rotateZ = eulerAngles.Yaw * (180 / Math.PI);
-
-                    // TODO: ELIMINATE THESE UGLY HACKS
-                    if (Math.Abs(Math.Abs(rotateX) - 180) < 0.1) c.Flip(FlipMode.Vertical);
-                    if (Math.Abs(Math.Abs(rotateY) - 180) < 0.1) c.Flip(FlipMode.Horizontal);
-
-                    c.Rotate((float)rotateZ);
-
-                    var colorScaleVector = ColorHelpers.GetLevels(node.ObjectColor);
-                    
-                    c.ProcessPixelRowsAsVector4(span =>
-                    {
-                        for (var i = 0; i < span.Length; i++)
-                        {
-                            span[i] *= colorScaleVector;
-                        }
-                    });
-                });
-                m.DrawImage(
-                    clone, new Point((int)posX, (int)posY), node.ObjectColor.Alpha / 255f);
-
-                /*
-                 *                             m.Draw(Color.Red, 1,
-                                new RectangleF(new PointF(x, y), new SizeF(image.Width, image.Height)));
-                 */
-                /*if (SelectedNode?.FrontendObject?.Guid == image.Guid)
-                {
-                    _boundingBox = (clone.Width, clone.Height, posX, posY);
+                    v10 >>= 1;
                 }
-            });*/
 
+                return divisor;
+            }
+
+            var widthDivide = CalculateDivisor(texture.Width);
+            var heightDivide = CalculateDivisor(texture.Height);
+
+            var texUpLeft = new Vector2(
+                (texture.Width / widthDivide) * image.UpperLeft.X,
+                (texture.Height / heightDivide) * image.UpperLeft.Y
+            );
+
+            var texLowRight = new Vector2(
+                (texture.Width / widthDivide) * image.LowerRight.X,
+                (texture.Height / heightDivide) * image.LowerRight.Y
+            );
+
+            var color = new Color4(
+                node.ObjectColor.Red, node.ObjectColor.Green, node.ObjectColor.Blue, node.ObjectColor.Alpha 
+            );
+            
+            Color4[] colors =
+            {
+                color, color, color, color
+            };
+
+            var q = new Quad(-0.5f, -0.5f, 0.5f, 0.5f,
+                1.0f,
+                otkMat4,
+                texUpLeft,
+                texLowRight,
+                colors);
+
+            q.Render(_gl, texture);
         }
 
         private Texture GetTexture(FEResourceRequest resource)
@@ -270,6 +266,7 @@ namespace FEngRender.OpenGL
         {
             return path.Split('\\')[^1].Split('.')[0].ToUpperInvariant();
         }
+
         private static Quaternion ComputeObjectRotation(FrontendObject frontendObject)
         {
             var q = new Quaternion(frontendObject.Rotation.X, frontendObject.Rotation.Y, frontendObject.Rotation.Z,

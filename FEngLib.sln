@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FEngViewer", "FEngViewer\FE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTK.WinForms", "OpenTK.GLControl\OpenTK.WinForms\OpenTK.WinForms.csproj", "{6CC3D87E-8AB3-4D54-92FA-637D8229D6F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FEngRender.OpenGL", "FEngRender.OpenGL\FEngRender.OpenGL.csproj", "{7A41DB9F-2F8C-4F8F-8296-814FCD953318}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FEngRender.GL", "FEngRender.GL\FEngRender.GL.csproj", "{7A41DB9F-2F8C-4F8F-8296-814FCD953318}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

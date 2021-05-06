@@ -1,9 +1,9 @@
 ﻿using System.Drawing;
 using System.Runtime.InteropServices;
-using OpenTK.Graphics.OpenGL4;
+using SharpGL;
 using OpenTK.Mathematics;
 
-namespace FEngRender.OpenGL
+namespace FEngRender.GL
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct VertexDeclaration
@@ -14,15 +14,16 @@ namespace FEngRender.OpenGL
 
         /// <summary>
         /// Sets up OpenGL for this vertex declaration.
+        /// Currently unused (not needed with immediate mode).
         /// </summary>
-        public static void Declare()
+        public static void Declare(OpenGL gl)
         {
-            static void DeclAttrib(int index, int sz, string name)
+            void DeclAttrib(uint index, int sz, string name)
             {
-                GL.VertexAttribPointer(index, sz, VertexAttribPointerType.Float, false,
+                gl.VertexAttribPointer(index, sz, OpenGL.GL_FLOAT, false,
                     Marshal.SizeOf<VertexDeclaration>(),
                     Marshal.OffsetOf<VertexDeclaration>(name));
-                GL.EnableVertexAttribArray(index);
+                gl.EnableVertexAttribArray(index);
             }
 
             DeclAttrib(0, 3, "Position");
