@@ -38,7 +38,7 @@ namespace FEngRender.GL
 
         public void PrepareRender()
         {
-            _gl.ClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+            _gl.ClearColor(0.0f, 0f, 0.0f, 0f);
 
             _gl.Enable(OpenGL.GL_TEXTURE_2D);
         }
@@ -233,7 +233,8 @@ namespace FEngRender.GL
             );
 
             var color = new Color4(
-                node.ObjectColor.Red, node.ObjectColor.Green, node.ObjectColor.Blue, node.ObjectColor.Alpha 
+                node.ObjectColor.Red / 255f, node.ObjectColor.Green / 255f, node.ObjectColor.Blue / 255f,
+                node.ObjectColor.Alpha / 255f 
             );
             
             Color4[] colors =
