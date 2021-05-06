@@ -30,7 +30,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="GlmNet" Version="0.7.0" />
       <PackageReference Include="OpenTK.Mathematics" Version="4.4.0" />
       <PackageReference Include="SharpGL" Version="3.1.1" />
       <PackageReference Include="SharpGL.SceneGraph" Version="3.1.1" />
