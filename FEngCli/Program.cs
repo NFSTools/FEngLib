@@ -29,7 +29,7 @@ namespace FEngCli
             var package = LoadPackageFromChunk(options.InputFile);
             PackageDumper.DumpPackage(package);
 
-            var renderer = new RenderTreeRenderer();
+            var renderer = new ImageRenderTreeRenderer();
             renderer.LoadTextures(options.TextureDir);
             var outputFile = options.OutputFile ?? $"{package.Name}.png";
             var img = renderer.Render(RenderTree.Create(package));
