@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -6,6 +7,7 @@ using FEngLib;
 using FEngLib.Data;
 using FEngLib.Objects;
 using FEngRender.Data;
+using FEngRender.Utils;
 using OpenTK.Mathematics;
 using SharpGL;
 using SharpGL.Enumerations;
@@ -28,7 +30,7 @@ namespace FEngRender.GL
         private (float width, float height, float x, float y) _boundingBox;
 
         private readonly Dictionary<string, Texture> _textures = new Dictionary<string, Texture>();
-        
+
         private readonly OpenGL _gl;
 
         public GLRenderTreeRenderer(OpenGL gl)
@@ -68,23 +70,15 @@ namespace FEngRender.GL
             _boundingBox = (0, 0, 0, 0);
             ComputeObjectMatrices(tree, Matrix4x4.Identity);
             _gl.LoadIdentity();
-            //gl.Viewport(0, 0, 640, 480);
-            _gl.Translate(0.0f, 0.0f, -3.5f);
-            _gl.DepthMask(0); // disable depth 
-            _textures.TryGetValue("LEFT", out var tex);
+
+            // disable depth
+            _gl.DepthMask(0);
 
             RenderTree(tree);
 
+            _gl.MatrixMode(MatrixMode.Projection);
+            _gl.Ortho(0, 640, 480, 0, -1, 1);
             _gl.Flush();
-
-            // make sure we have a box to draw
-            /*if (_boundingBox.width > 0)
-            {
-                img.Mutate(m => m.Draw(
-                    Color.Red, 
-                    1, 
-                    new RectangleF(_boundingBox.x, _boundingBox.y, _boundingBox.width, _boundingBox.height)));
-            }*/
         }
 
         private bool CanRender(RenderTree tree)
@@ -181,8 +175,8 @@ namespace FEngRender.GL
             float posY = imgMatrix.M42 + Height / 2f - sizeY * 0.5f;
 
             // Bounds checking
-            if (posX < 0 || posY < 0 || posX > Width || posY > Height)
-                return;
+            //if (posX < 0 || posY < 0 || posX > Width || posY > Height)
+            //    return;
 
 
             var texture = GetTexture(image.ResourceRequest);
@@ -209,7 +203,7 @@ namespace FEngRender.GL
             {
                 if (texture.Width == 0) return 0;
 
-                var v10 = (uint) (value - 1) >> 1;
+                var v10 = (uint)(value - 1) >> 1;
                 uint divisor;
                 for (divisor = 2; v10 != 0; divisor *= 2)
                 {
@@ -234,9 +228,9 @@ namespace FEngRender.GL
 
             var color = new Color4(
                 node.ObjectColor.Red / 255f, node.ObjectColor.Green / 255f, node.ObjectColor.Blue / 255f,
-                node.ObjectColor.Alpha / 255f 
+                node.ObjectColor.Alpha / 255f
             );
-            
+
             Color4[] colors =
             {
                 color, color, color, color
@@ -249,7 +243,13 @@ namespace FEngRender.GL
                 texLowRight,
                 colors);
 
+            var rotEuler = MathHelpers.QuaternionToEuler(node.ObjectRotation);
+
+            _gl.PushMatrix();
+            //_gl.Rotate(
+            //    (float)(rotEuler.Yaw * (180 / Math.PI)), 0, 0, 1);
             q.Render(_gl, texture);
+            _gl.PopMatrix();
         }
 
         private Texture GetTexture(FEResourceRequest resource)

@@ -49,10 +49,10 @@ namespace FEngRender.GL
 
             if (!DoZ)
             {
-                _vertices[0].Position.Z = 1.0f;
-                _vertices[1].Position.Z = 1.0f;
-                _vertices[2].Position.Z = 1.0f;
-                _vertices[3].Position.Z = 1.0f;
+                _vertices[0].Position.Z = 0f;
+                _vertices[1].Position.Z = 0f;
+                _vertices[2].Position.Z = 0f;
+                _vertices[3].Position.Z = 0f;
             }
 
             _vertices[0].TexCoords.X = texTopLeft.X;
