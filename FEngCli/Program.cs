@@ -4,6 +4,7 @@ using System.IO;
 using CommandLine;
 using FEngLib;
 using FEngRender;
+using FEngRender.Data;
 using JetBrains.Annotations;
 using SixLabors.ImageSharp;
 
@@ -28,9 +29,10 @@ namespace FEngCli
             var package = LoadPackageFromChunk(options.InputFile);
             PackageDumper.DumpPackage(package);
 
-            var renderer = new PackageRenderer(package, options.TextureDir);
+            var renderer = new RenderTreeRenderer();
+            renderer.LoadTextures(options.TextureDir);
             var outputFile = options.OutputFile ?? $"{package.Name}.png";
-            var img = renderer.Render();
+            var img = renderer.Render(RenderTree.Create(package));
             using var fs = File.OpenWrite(outputFile);
             img.SaveAsPng(fs);
 
