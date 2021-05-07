@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -33,9 +34,12 @@ namespace FEngRender.GL
 
         private readonly OpenGL _gl;
 
+        private Stopwatch _stopwatch;
+
         public GLRenderTreeRenderer(OpenGL gl)
         {
             _gl = gl;
+            _stopwatch = Stopwatch.StartNew();
         }
 
         public void PrepareRender()
@@ -58,7 +62,6 @@ namespace FEngRender.GL
         /// <summary>
         /// Renders nodes from a <see cref="RenderTree"/> to a surface.
         /// </summary>
-        /// <param name="gl">GL context</param>
         /// <param name="tree">The <see cref="RenderTree"/> to render.</param>
         public void Render(RenderTree tree)
         {
@@ -68,12 +71,13 @@ namespace FEngRender.GL
                 return;
 
             _boundingBox = (0, 0, 0, 0);
-            ComputeObjectMatrices(tree, Matrix4x4.Identity);
+            ComputeObjectMatrices(tree, Matrix4x4.Identity, (int) _stopwatch.ElapsedMilliseconds);
             _gl.LoadIdentity();
 
             // disable depth
             _gl.DepthMask(0);
 
+            _stopwatch.Restart();
             RenderTree(tree);
 
             _gl.MatrixMode(MatrixMode.Projection);
@@ -87,14 +91,14 @@ namespace FEngRender.GL
         }
 
         private void ComputeObjectMatrices(IEnumerable<RenderTreeNode> nodes,
-            Matrix4x4 viewMatrix, RenderTreeNode parent = null)
+            Matrix4x4 viewMatrix, int deltaTime, RenderTreeNode parent = null)
         {
             var nodeList = nodes.ToList();
 
-            nodeList.ForEach(r => r.ApplyContext(viewMatrix, parent));
+            nodeList.ForEach(r => r.PrepareForRender(viewMatrix, parent, deltaTime));
             foreach (var renderTreeGroup in nodeList.OfType<RenderTreeGroup>())
             {
-                ComputeObjectMatrices(renderTreeGroup, renderTreeGroup.ObjectMatrix, renderTreeGroup);
+                ComputeObjectMatrices(renderTreeGroup, renderTreeGroup.ObjectMatrix, deltaTime, renderTreeGroup);
             }
         }
 

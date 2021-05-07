@@ -10,5 +10,7 @@
         public int Time { get; set; }
 
         public object Val { get; set; }
+
+        public T GetValue<T>() => (T) Val;
     }
 }

@@ -1,7 +1,10 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Numerics;
 using FEngLib;
+using FEngLib.Data;
 using FEngLib.Structures;
+using FEngRender.Script;
 using FEngRender.Utils;
 
 namespace FEngRender.Data
@@ -23,6 +26,16 @@ namespace FEngRender.Data
         public FrontendObject FrontendObject { get; }
 
         /// <summary>
+        /// The <see cref="FrontendScript"/> that is currently running.
+        /// </summary>
+        public FrontendScript CurrentScript { get; private set; }
+
+        /// <summary>
+        /// The current time offset of the current script.
+        /// </summary>
+        public int CurrentScriptTime { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RenderTreeNode"/> class.
         /// </summary>
         /// <param name="frontendObject">
@@ -31,22 +44,70 @@ namespace FEngRender.Data
         public RenderTreeNode(FrontendObject frontendObject)
         {
             FrontendObject = frontendObject;
+            SetScript(frontendObject.Scripts.Find(s => s.Id == 0x001744B3));
         }
 
         /// <summary>
-        /// Computes transformations based on context.
+        /// Applies script state and computes transformations.
         /// </summary>
         /// <param name="viewMatrix"></param>
         /// <param name="parentNode"></param>
-        public void ApplyContext(Matrix4x4 viewMatrix, RenderTreeNode parentNode)
+        /// <param name="deltaTime"></param>
+        public void PrepareForRender(Matrix4x4 viewMatrix, RenderTreeNode parentNode, int deltaTime)
         {
-            var scaleMatrix = Matrix4x4.CreateScale(FrontendObject.Size.X, FrontendObject.Size.Y, FrontendObject.Size.Z);
-            var transMatrix = Matrix4x4.CreateTranslation(FrontendObject.Position.X, FrontendObject.Position.Y,
-                FrontendObject.Position.Z);
+            var size = FrontendObject.Size;
+            var position = FrontendObject.Position;
+            var rotation = FrontendObject.Rotation;
+            var color = FrontendObject.Color;
+
+            // test
+            //deltaTime = 20;
+
+            //deltaTime = Math.Max(0, Math.Min(60, deltaTime));
+
+            if (CurrentScript != null 
+                && CurrentScript.Length > 0
+                && CurrentScriptTime >= 0)
+            {
+                var canRunScript = true;
+
+                if (CurrentScriptTime > CurrentScript.Length)
+                {
+                    if ((CurrentScript.Flags & 1) == 1)
+                    {
+                        Debug.WriteLine("looping");
+                        CurrentScriptTime = 0;
+                    }
+                    else
+                    {
+                        Debug.WriteLine("done");
+                        SetScript(null);
+                        canRunScript = false;
+                    }
+                }
+
+                if (canRunScript)
+                {
+                    var colorTrack = GetKeyTrack(CurrentScript, KeyTrackType.Color);
+                    var posTrack = GetKeyTrack(CurrentScript, KeyTrackType.Position);
+                    var sizeTrack = GetKeyTrack(CurrentScript, KeyTrackType.Size);
+                    //var rotTrack = GetKeyTrack(CurrentScript, KeyTrackType.Color);
+                    if (colorTrack != null) color = TrackInterpolation.Interpolate<FEColor>(colorTrack, CurrentScriptTime);
+                    if (posTrack != null) position = TrackInterpolation.Interpolate<FEVector3>(posTrack, CurrentScriptTime);
+                    if (sizeTrack != null) size = TrackInterpolation.Interpolate<FEVector3>(sizeTrack, CurrentScriptTime);
+
+                    Debug.WriteLine("T={0} L={1}", CurrentScriptTime, CurrentScript.Length);
+                    CurrentScriptTime += deltaTime;
+                }
+            }
+
+            var scaleMatrix = Matrix4x4.CreateScale(size.X, size.Y, size.Z);
+            var transMatrix = Matrix4x4.CreateTranslation(position.X, position.Y,
+                position.Z);
 
             ObjectMatrix = scaleMatrix * transMatrix * viewMatrix;
-            ObjectRotation = FrontendObject.Rotation.ToQuaternion();
-            ObjectColor = FrontendObject.Color;
+            ObjectRotation = rotation.ToQuaternion();
+            ObjectColor = color;
 
             if (parentNode != null)
             {
@@ -56,12 +117,38 @@ namespace FEngRender.Data
         }
 
         /// <summary>
+        /// Sets the currently running script and resets the script time.
+        /// </summary>
+        /// <param name="script">The script to run.</param>
+        public void SetScript(FrontendScript script)
+        {
+            this.CurrentScript = script;
+            this.CurrentScriptTime = script == null ? -1 : 0;
+        }
+
+        /// <summary>
         /// Gets the object's Z-coordinate.
         /// </summary>
         /// <returns></returns>
         public float GetZ()
         {
             return ObjectMatrix.M43;
+        }
+
+        private FEKeyTrack GetKeyTrack(FrontendScript script, KeyTrackType trackType)
+        {
+            uint offset = (uint)trackType;
+
+            return script.Tracks.Find(e => e.Offset == offset);
+        }
+
+        private enum KeyTrackType
+        {
+            Color = 0,
+            Pivot = 4,
+            Position = 7,
+            Rotation = 10,
+            Size = 14
         }
     }
 }

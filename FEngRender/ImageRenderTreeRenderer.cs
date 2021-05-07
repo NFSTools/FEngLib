@@ -21,7 +21,7 @@ namespace FEngRender
     /// <summary>
     /// Implements render-tree rendering APIs.
     /// </summary>
-    public class RenderTreeRenderer
+    public class ImageRenderTreeRenderer
     {
         private const int Width = 640;
         private const int Height = 480;
@@ -69,7 +69,7 @@ namespace FEngRender
         {
             var nodeList = nodes.ToList();
 
-            nodeList.ForEach(r => r.ApplyContext(viewMatrix, parent));
+            nodeList.ForEach(r => r.PrepareForRender(viewMatrix, parent, 0));
             foreach (var renderTreeGroup in nodeList.OfType<RenderTreeGroup>())
             {
                 ApplyContext(renderTreeGroup, renderTreeGroup.ObjectMatrix, renderTreeGroup);

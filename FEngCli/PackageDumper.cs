@@ -110,9 +110,8 @@ namespace FEngCli
                             {29, "FETrack_Color3"},
                             {33, "FETrack_Color4"}
                         };
-                        for (var trackIndex = 0; trackIndex < frontendScript.Tracks.Count; trackIndex++)
+                        foreach (var track in frontendScript.Tracks)
                         {
-                            var track = frontendScript.Tracks[trackIndex];
                             Console.WriteLine("\t\t---------- {0}:", offsetToIndex[track.Offset]);
                             Console.WriteLine("\t\tLength       : {0}", track.Length);
                             Console.WriteLine("\t\tOffset       : {0}", track.Offset);
@@ -122,10 +121,11 @@ namespace FEngCli
                             Console.WriteLine("\t\tInterpType   : {0}", track.InterpType);
                             Console.WriteLine("\t\tBaseKey      : {0}", DumpKey(track.BaseKey));
 
-                            for (var i = 0; i < track.DeltaKeys.Count; i++)
-                                Console.WriteLine("\t\tDeltaKeys[{0:D2}]: {1}", i, DumpKey(track.DeltaKeys[i]));
+                            var deltaKeys = track.DeltaKeys.ToList();
+                            for (var i = 0; i < deltaKeys.Count; i++)
+                                Console.WriteLine("\t\tDeltaKeys[{0:D2}]: {1}", i, DumpKey(deltaKeys[i]));
 
-                            string DumpKey(FEKeyNode keyNode)
+                            static string DumpKey(FEKeyNode keyNode)
                             {
                                 return $"T={keyNode.Time} V={keyNode.Val}";
                             }

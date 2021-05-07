@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace FEngLib.Data
 {
@@ -46,7 +47,7 @@ namespace FEngLib.Data
     {
         public FEKeyTrack()
         {
-            DeltaKeys = new List<FEKeyNode>();
+            DeltaKeys = new LinkedList<FEKeyNode>();
         }
 
         public FEParamType ParamType { get; set; }
@@ -56,6 +57,19 @@ namespace FEngLib.Data
         public uint Length { get; set; }
         public uint Offset { get; set; }
         public FEKeyNode BaseKey { get; set; }
-        public List<FEKeyNode> DeltaKeys { get; set; }
+        public LinkedList<FEKeyNode> DeltaKeys { get; set; }
+
+        public LinkedListNode<FEKeyNode> GetDeltaKeyAt(int time)
+        {
+            LinkedListNode<FEKeyNode> node;
+            for (node = DeltaKeys.First;
+                node?.Next != null && node.Value.Time < time;
+                node = node.Next)
+            {
+                //
+            }
+
+            return node;
+        }
     }
 }

@@ -42,12 +42,15 @@ namespace FEngViewer
             this.toggleObjectVisibilityItem = new System.Windows.Forms.ToolStripMenuItem();
             this.changeObjectPositionItem = new System.Windows.Forms.ToolStripMenuItem();
             this.changeObjectColorItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scriptContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toggleScriptItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.objectContextMenu.SuspendLayout();
+            this.scriptContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -106,9 +109,11 @@ namespace FEngViewer
             this.viewOutput.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.viewOutput.BackColor = System.Drawing.Color.Black;
             this.viewOutput.Location = new System.Drawing.Point(0, 0);
+            this.viewOutput.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.viewOutput.MaximumSize = new System.Drawing.Size(640, 480);
             this.viewOutput.MinimumSize = new System.Drawing.Size(640, 480);
             this.viewOutput.Name = "viewOutput";
+            this.viewOutput.SelectedNode = null;
             this.viewOutput.Size = new System.Drawing.Size(640, 480);
             this.viewOutput.TabIndex = 0;
             this.viewOutput.TabStop = false;
@@ -159,6 +164,20 @@ namespace FEngViewer
             this.changeObjectColorItem.Size = new System.Drawing.Size(161, 22);
             this.changeObjectColorItem.Text = "Change color";
             // 
+            // scriptContextMenu
+            // 
+            this.scriptContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toggleScriptItem});
+            this.scriptContextMenu.Name = "scriptContextMenu";
+            this.scriptContextMenu.Size = new System.Drawing.Size(181, 26);
+            // 
+            // toggleScriptItem
+            // 
+            this.toggleScriptItem.Name = "toggleScriptItem";
+            this.toggleScriptItem.Size = new System.Drawing.Size(180, 22);
+            this.toggleScriptItem.Text = "toolStripMenuItem1";
+            this.toggleScriptItem.Click += new System.EventHandler(this.toggleScriptItem_Click);
+            // 
             // PackageView
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -176,6 +195,7 @@ namespace FEngViewer
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.objectContextMenu.ResumeLayout(false);
+            this.scriptContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -195,5 +215,7 @@ namespace FEngViewer
         private System.Windows.Forms.ToolStripMenuItem toggleObjectVisibilityItem;
         private System.Windows.Forms.ToolStripMenuItem changeObjectPositionItem;
         private System.Windows.Forms.ToolStripMenuItem changeObjectColorItem;
+        private System.Windows.Forms.ContextMenuStrip scriptContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem toggleScriptItem;
     }
 }

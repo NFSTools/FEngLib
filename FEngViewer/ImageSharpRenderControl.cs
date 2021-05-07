@@ -14,7 +14,7 @@ namespace FEngViewer
 {
     public partial class ImageSharpRenderControl : UserControl, IRenderControl
     {
-        private RenderTreeRenderer _renderer;
+        private ImageRenderTreeRenderer _renderer;
         
         public ImageSharpRenderControl()
         {
@@ -23,7 +23,7 @@ namespace FEngViewer
 
         public void Init(string textureDir)
         {
-            _renderer = new RenderTreeRenderer();
+            _renderer = new ImageRenderTreeRenderer();
             _renderer.LoadTextures(textureDir);
         }
 

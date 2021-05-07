@@ -67,7 +67,7 @@ namespace FEngLib.Tags
                 if (i == 0)
                     track.BaseKey = keyNode;
                 else
-                    track.DeltaKeys.Add(keyNode);
+                    track.DeltaKeys.AddLast(keyNode);
             }
         }
     }

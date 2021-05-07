@@ -40,7 +40,7 @@ namespace FEngViewer
             var args = Environment.GetCommandLineArgs();
 
             var opts = Parser.Default.ParseArguments<Options>(args);
-            
+
             opts.WithParsed(parsed => LoadFile(parsed.InputFile))
                 .WithNotParsed(err => Application.Exit());
         }
@@ -96,7 +96,6 @@ namespace FEngViewer
 
             if (nodeImageKey == null)
             {
-                Debug.WriteLine("Encountered an object type that we don't have an icon for: " + feObj.Type);
                 nodeText = feObj.Type + " " + nodeText;
             }
 
@@ -115,6 +114,7 @@ namespace FEngViewer
             var node = collection.Add(script.Name ?? $"0x{script.Id:X}");
             // ReSharper disable once LocalizableElement
             node.ImageKey = node.SelectedImageKey = "TreeItem_Script";
+            node.Tag = script;
 
             foreach (var scriptEvent in script.Events)
             {
@@ -229,9 +229,19 @@ namespace FEngViewer
             TreeNode hit_node = treeView1.GetNodeAt(e.X, e.Y);
             treeView1.SelectedNode = hit_node;
 
+            var ctxPoint = new Point(e.X, e.Y);
+
             if (hit_node?.Tag is RenderTreeNode)
             {
-                objectContextMenu.Show(treeView1, new Point(e.X, e.Y));
+                objectContextMenu.Show(treeView1, ctxPoint);
+            }
+            else if (hit_node?.Tag is FrontendScript script)
+            {
+                var viewNode = (RenderTreeNode)hit_node.Parent.Tag;
+
+                toggleScriptItem.Text = ReferenceEquals(viewNode.CurrentScript, script) ? "Stop" : "Start";
+
+                scriptContextMenu.Show(treeView1, ctxPoint);
             }
         }
 
@@ -250,6 +260,15 @@ namespace FEngViewer
                 }
 
                 Render();
+            }
+        }
+
+        private void toggleScriptItem_Click(object sender, EventArgs e)
+        {
+            if (treeView1.SelectedNode?.Tag is FrontendScript script)
+            {
+                var viewNode = (RenderTreeNode)treeView1.SelectedNode.Parent.Tag;
+                viewNode.SetScript(ReferenceEquals(viewNode.CurrentScript, script) ? null : script);
             }
         }
     }
