@@ -103,6 +103,14 @@ namespace FEngRender.GL
         {
             foreach (var node in nodes)
             {
+                if (node.Hidden) continue;
+                
+                if ((node.FrontendObject.Flags & FE_ObjectFlags.FF_Invisible) != 0 ||
+                    (node.FrontendObject.Flags & FE_ObjectFlags.FF_HideInEdit) != 0)
+                {
+                    continue;
+                }
+
                 yield return node;
 
                 if (!(node is RenderTreeGroup grp)) continue;

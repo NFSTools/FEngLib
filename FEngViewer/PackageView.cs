@@ -249,15 +249,7 @@ namespace FEngViewer
         {
             if (treeView1.SelectedNode?.Tag is RenderTreeNode viewNode)
             {
-                var frontendObject = viewNode.FrontendObject;
-                if ((frontendObject.Flags & FE_ObjectFlags.FF_Invisible) != 0)
-                {
-                    frontendObject.Flags &= ~FE_ObjectFlags.FF_Invisible;
-                }
-                else
-                {
-                    frontendObject.Flags |= FE_ObjectFlags.FF_Invisible;
-                }
+                viewNode.Hidden = !viewNode.Hidden;
 
                 Render();
             }
