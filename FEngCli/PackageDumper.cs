@@ -134,6 +134,19 @@ namespace FEngCli
                 }
             }
 
+            if (frontendObject.MessageResponses.Count > 0)
+            {
+                Console.WriteLine("Message Responses ({0}):", frontendObject.MessageResponses.Count);
+                foreach (var messageResponse in frontendObject.MessageResponses)
+                {
+                    Console.WriteLine("\t----------");
+                    Console.WriteLine("\tID: 0x{0:X}", messageResponse.Id);
+                    Console.WriteLine("\tResponses ({0}):", messageResponse.Responses.Count);
+                    messageResponse.Responses.ForEach(t =>
+                        Console.WriteLine("\t\t- ID: 0x{0:X}; Target: 0x{1:X}; Param: {2}", t.Id, t.Target, t.Param));
+                }
+            }
+
             Console.WriteLine("Extended data:");
             switch (frontendObject)
             {
