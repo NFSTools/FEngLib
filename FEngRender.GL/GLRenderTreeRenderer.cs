@@ -87,7 +87,7 @@ namespace FEngRender.GL
         {
             var nodeList = nodes.ToList();
 
-            nodeList.ForEach(r => r.PrepareForRender(viewMatrix, parent, deltaTime));
+            nodeList.ForEach(r => r.PrepareForRender(viewMatrix, parent, deltaTime, true));
             foreach (var renderTreeGroup in nodeList.OfType<RenderTreeGroup>())
             {
                 PrepareNodes(renderTreeGroup, renderTreeGroup.ObjectMatrix, deltaTime, renderTreeGroup);

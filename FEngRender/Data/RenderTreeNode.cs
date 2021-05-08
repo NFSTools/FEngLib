@@ -53,7 +53,9 @@ namespace FEngRender.Data
         /// <param name="viewMatrix"></param>
         /// <param name="parentNode"></param>
         /// <param name="deltaTime"></param>
-        public void PrepareForRender(Matrix4x4 viewMatrix, RenderTreeNode parentNode, int deltaTime)
+        /// <param name="matrixRotate"></param>
+        public void PrepareForRender(Matrix4x4 viewMatrix, RenderTreeNode parentNode, int deltaTime,
+            bool matrixRotate = false)
         {
             var size = FrontendObject.Size;
             var position = FrontendObject.Position;
@@ -65,7 +67,7 @@ namespace FEngRender.Data
 
             //deltaTime = Math.Max(0, Math.Min(60, deltaTime));
 
-            if (CurrentScript != null 
+            if (CurrentScript != null
                 && CurrentScript.Length > 0
                 && CurrentScriptTime >= 0)
             {
@@ -92,9 +94,12 @@ namespace FEngRender.Data
                     var posTrack = GetKeyTrack(CurrentScript, KeyTrackType.Position);
                     var sizeTrack = GetKeyTrack(CurrentScript, KeyTrackType.Size);
                     //var rotTrack = GetKeyTrack(CurrentScript, KeyTrackType.Color);
-                    if (colorTrack != null) color = TrackInterpolation.Interpolate<FEColor>(colorTrack, CurrentScriptTime);
-                    if (posTrack != null) position = TrackInterpolation.Interpolate<FEVector3>(posTrack, CurrentScriptTime);
-                    if (sizeTrack != null) size = TrackInterpolation.Interpolate<FEVector3>(sizeTrack, CurrentScriptTime);
+                    if (colorTrack != null)
+                        color = TrackInterpolation.Interpolate<FEColor>(colorTrack, CurrentScriptTime);
+                    if (posTrack != null)
+                        position = TrackInterpolation.Interpolate<FEVector3>(posTrack, CurrentScriptTime);
+                    if (sizeTrack != null)
+                        size = TrackInterpolation.Interpolate<FEVector3>(sizeTrack, CurrentScriptTime);
 
                     Debug.WriteLine("T={0} L={1}", CurrentScriptTime, CurrentScript.Length);
                     CurrentScriptTime += deltaTime;
@@ -102,10 +107,13 @@ namespace FEngRender.Data
             }
 
             var scaleMatrix = Matrix4x4.CreateScale(size.X, size.Y, size.Z);
-            var transMatrix = Matrix4x4.CreateTranslation(position.X, position.Y,
-                position.Z);
+            var rotateMatrix = Matrix4x4.CreateFromQuaternion(rotation.ToQuaternion());
+            var transMatrix = Matrix4x4.CreateTranslation(position.X, position.Y, position.Z);
 
-            ObjectMatrix = scaleMatrix * transMatrix * viewMatrix;
+            if (matrixRotate)
+                ObjectMatrix = scaleMatrix * rotateMatrix * transMatrix * viewMatrix;
+            else
+                ObjectMatrix = scaleMatrix * transMatrix * viewMatrix;
             ObjectRotation = rotation.ToQuaternion();
             ObjectColor = color;
 
@@ -137,7 +145,7 @@ namespace FEngRender.Data
 
         private FEKeyTrack GetKeyTrack(FrontendScript script, KeyTrackType trackType)
         {
-            uint offset = (uint)trackType;
+            uint offset = (uint) trackType;
 
             return script.Tracks.Find(e => e.Offset == offset);
         }
