@@ -67,30 +67,22 @@ namespace FEngRender.GL
         {
             _gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
 
-            if (!CanRender(tree))
-                return;
-
             _boundingBox = (0, 0, 0, 0);
-            ComputeObjectMatrices(tree, Matrix4x4.Identity, (int) _stopwatch.ElapsedMilliseconds);
             _gl.LoadIdentity();
 
             // disable depth
             _gl.DepthMask(0);
 
-            _stopwatch.Restart();
+            PrepareNodes(tree, Matrix4x4.Identity, (int) _stopwatch.ElapsedMilliseconds);
             RenderTree(tree);
 
             _gl.MatrixMode(MatrixMode.Projection);
             _gl.Ortho(0, 640, 480, 0, -1, 1);
             _gl.Flush();
+            _stopwatch.Restart();
         }
 
-        private bool CanRender(RenderTree tree)
-        {
-            return tree != null && _textures.Count > 0;
-        }
-
-        private void ComputeObjectMatrices(IEnumerable<RenderTreeNode> nodes,
+        private void PrepareNodes(IEnumerable<RenderTreeNode> nodes,
             Matrix4x4 viewMatrix, int deltaTime, RenderTreeNode parent = null)
         {
             var nodeList = nodes.ToList();
@@ -98,7 +90,7 @@ namespace FEngRender.GL
             nodeList.ForEach(r => r.PrepareForRender(viewMatrix, parent, deltaTime));
             foreach (var renderTreeGroup in nodeList.OfType<RenderTreeGroup>())
             {
-                ComputeObjectMatrices(renderTreeGroup, renderTreeGroup.ObjectMatrix, deltaTime, renderTreeGroup);
+                PrepareNodes(renderTreeGroup, renderTreeGroup.ObjectMatrix, deltaTime, renderTreeGroup);
             }
         }
 
@@ -172,17 +164,6 @@ namespace FEngRender.GL
 
         private void RenderImage(RenderTreeNode node, FrontendImage image)
         {
-            var imgMatrix = node.ObjectMatrix;
-            float sizeX = imgMatrix.M11;
-            float sizeY = imgMatrix.M22;
-            float posX = imgMatrix.M41 + Width / 2f - sizeX * 0.5f;
-            float posY = imgMatrix.M42 + Height / 2f - sizeY * 0.5f;
-
-            // Bounds checking
-            //if (posX < 0 || posY < 0 || posX > Width || posY > Height)
-            //    return;
-
-
             var texture = GetTexture(image.ResourceRequest);
 
             if (texture == null)
@@ -217,8 +198,8 @@ namespace FEngRender.GL
                 return divisor;
             }
 
-            var widthDivide = CalculateDivisor(texture.Width);
-            var heightDivide = CalculateDivisor(texture.Height);
+            var widthDivide = (float)CalculateDivisor(texture.Width);
+            var heightDivide = (float)CalculateDivisor(texture.Height);
 
             var texUpLeft = new Vector2(
                 (texture.Width / widthDivide) * image.UpperLeft.X,
@@ -247,13 +228,7 @@ namespace FEngRender.GL
                 texLowRight,
                 colors);
 
-            var rotEuler = MathHelpers.QuaternionToEuler(node.ObjectRotation);
-
-            _gl.PushMatrix();
-            //_gl.Rotate(
-            //    (float)(rotEuler.Yaw * (180 / Math.PI)), 0, 0, 1);
             q.Render(_gl, texture);
-            _gl.PopMatrix();
         }
 
         private Texture GetTexture(FEResourceRequest resource)
@@ -264,7 +239,10 @@ namespace FEngRender.GL
             }
 
             var key = CleanResourcePath(resource.Name);
-            return _textures.TryGetValue(key, out var tex) ? tex : null;
+            if (_textures.TryGetValue(key, out var tex))
+                return tex;
+            Debug.WriteLine("Texture not found: {0}", new object[] { key });
+            return null;
         }
 
         private static string CleanResourcePath(string path)

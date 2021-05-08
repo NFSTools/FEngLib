@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using FEngLib;
 using FEngLib.Data;
@@ -88,7 +89,7 @@ namespace FEngCli
                     {
                         Console.WriteLine("\tEvents ({0}):", frontendScript.Events.Count);
                         foreach (var scriptEvent in frontendScript.Events)
-                            Console.WriteLine("\t\tTarget={0:X8} Time={1} EventId={2:X8}", scriptEvent.Target,
+                            Console.WriteLine("\t\tTarget=0x{0:X} Time={1} EventId={2:X8}", scriptEvent.Target,
                                 scriptEvent.Time, scriptEvent.EventId);
                     }
 
@@ -96,23 +97,9 @@ namespace FEngCli
                     {
                         Console.WriteLine("\tTracks ({0}):", frontendScript.Tracks.Count);
 
-                        var offsetToIndex = new Dictionary<uint, string>
-                        {
-                            {0, "FETrack_Color"},
-                            {4, "FETrack_Pivot"},
-                            {7, "FETrack_Position"},
-                            {10, "FETrack_Rotation"},
-                            {14, "FETrack_Size"},
-                            {17, "FETrack_UpperLeft"},
-                            {19, "FETrack_UpperRight"},
-                            {21, "FETrack_FrameNumber OR FETrack_Color1"},
-                            {25, "FETrack_Color2"},
-                            {29, "FETrack_Color3"},
-                            {33, "FETrack_Color4"}
-                        };
                         foreach (var track in frontendScript.Tracks)
                         {
-                            Console.WriteLine("\t\t---------- {0}:", offsetToIndex[track.Offset]);
+                            Console.WriteLine("\t\t---------- TRACK:");
                             Console.WriteLine("\t\tLength       : {0}", track.Length);
                             Console.WriteLine("\t\tOffset       : {0}", track.Offset);
                             Console.WriteLine("\t\tParamType    : {0}", track.ParamType);

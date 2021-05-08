@@ -47,23 +47,20 @@ namespace FEngRender.GL
             _vertices[2].Position = MultIgnoringCol4(transform, _vertices[2].Position);
             _vertices[3].Position = MultIgnoringCol4(transform, _vertices[3].Position);
 
-            if (!DoZ)
-            {
-                _vertices[0].Position.Z = 0f;
-                _vertices[1].Position.Z = 0f;
-                _vertices[2].Position.Z = 0f;
-                _vertices[3].Position.Z = 0f;
-            }
+            _vertices[0].Position.Z = 0f;
+            _vertices[1].Position.Z = 0f;
+            _vertices[2].Position.Z = 0f;
+            _vertices[3].Position.Z = 0f;
 
             _vertices[0].TexCoords.X = texTopLeft.X;
             _vertices[0].TexCoords.Y = texTopLeft.Y;
-            
+
             _vertices[1].TexCoords.X = texBottomRight.X;
             _vertices[1].TexCoords.Y = texTopLeft.X;
-            
+
             _vertices[2].TexCoords.X = texBottomRight.X;
             _vertices[2].TexCoords.Y = texBottomRight.Y;
-            
+
             _vertices[3].TexCoords.X = texTopLeft.X;
             _vertices[3].TexCoords.Y = texBottomRight.Y;
 
@@ -81,7 +78,7 @@ namespace FEngRender.GL
             tex.GLTexture.Bind(gl);
             gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
             gl.Enable(OpenGL.GL_BLEND);
-            
+
             gl.Begin(BeginMode.TriangleFan);
 
             for (var j = 0; j < _vertices.Length; j++)
@@ -102,7 +99,7 @@ namespace FEngRender.GL
 
             gl.End();
         }
-        
+
         // we need Vector3 for the vertex format
         private static Vector3 MultIgnoringCol4(Matrix4 mat, Vector3 vec)
         {
