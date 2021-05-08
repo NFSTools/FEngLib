@@ -138,7 +138,10 @@ namespace FEngRender
                 posX += xOffset;
                 posY += yOffset;
 
-                m.DrawText(str.Value, font, Color.FromRgba((byte)(node.ObjectColor.Red & 0xff),
+                m.DrawText(new TextGraphicsOptions(new GraphicsOptions(), new TextOptions
+                {
+                    WrapTextWidth = str.MaxWidth
+                }),  str.Value, font, Color.FromRgba((byte)(node.ObjectColor.Red & 0xff),
                     (byte)(node.ObjectColor.Green & 0xff), (byte)(node.ObjectColor.Blue & 0xff),
                     (byte)(node.ObjectColor.Alpha & 0xff)), new PointF(posX, posY));
 
