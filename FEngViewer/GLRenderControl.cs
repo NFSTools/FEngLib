@@ -16,7 +16,11 @@ namespace FEngViewer
             InitializeComponent();
         }
 
-        public RenderTreeNode SelectedNode { get; set; }
+        public RenderTreeNode SelectedNode
+        {
+            get => _renderer.SelectedNode;
+            set => _renderer.SelectedNode = value;
+        }
         
         public void Init(string textureDir)
         {

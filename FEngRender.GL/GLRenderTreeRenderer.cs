@@ -76,6 +76,11 @@ namespace FEngRender.GL
             PrepareNodes(tree, Matrix4x4.Identity, (int) _stopwatch.ElapsedMilliseconds);
             RenderTree(tree);
 
+            if (SelectedNode != null)
+            {
+                RenderNode(SelectedNode, true);
+            }
+
             _gl.MatrixMode(MatrixMode.Projection);
             _gl.Ortho(0, 640, 480, 0, -1, 1);
             _gl.Flush();
@@ -117,20 +122,20 @@ namespace FEngRender.GL
             }
         }
 
-        private void RenderNode(RenderTreeNode node)
+        private void RenderNode(RenderTreeNode node, bool doBoundingBox = false)
         {
             switch (node.FrontendObject)
             {
                 case FrontendImage image:
-                    RenderImage(node, image);
+                    RenderImage(node, image, doBoundingBox);
                     break;
                 case FrontendString str:
-                    RenderString(node, str);
+                    RenderString(node, str, doBoundingBox);
                     break;
             }
         }
 
-        private void RenderString(RenderTreeNode node, FrontendString str)
+        private void RenderString(RenderTreeNode node, FrontendString str, bool doBoundingBox = false)
         {
             var strMatrix = node.ObjectMatrix;
             float posX = strMatrix.M41 + Width / 2f;
@@ -162,7 +167,7 @@ namespace FEngRender.GL
             });*/
         }
 
-        private void RenderImage(RenderTreeNode node, FrontendImage image)
+        private void RenderImage(RenderTreeNode node, FrontendImage image, bool doBoundingBox = false)
         {
             var texture = GetTexture(image.ResourceRequest);
 
@@ -228,7 +233,10 @@ namespace FEngRender.GL
                 texLowRight,
                 colors);
 
-            q.Render(_gl, texture);
+            if (doBoundingBox)
+                q.DrawBoundingBox(_gl);
+            else
+                q.Render(_gl, texture);
         }
 
         private Texture GetTexture(FEResourceRequest resource)

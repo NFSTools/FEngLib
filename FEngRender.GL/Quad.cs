@@ -81,20 +81,27 @@ namespace FEngRender.GL
 
             gl.Begin(BeginMode.TriangleFan);
 
-            for (var j = 0; j < _vertices.Length; j++)
-            {
-                _vertices[j].Position.X = _vertices[j].Position.X * XScale - 1.0f;
-                _vertices[j].Position.Y = -(_vertices[j].Position.Y * YScale - 1.0f);
-
-                _vertices[j].TexCoords.X += 0.5f / tex.Width;
-                _vertices[j].TexCoords.Y += 0.5f / tex.Height;
-            }
-
             foreach (var vertex in _vertices)
             {
                 gl.Color(vertex.Color.R, vertex.Color.G, vertex.Color.B, vertex.Color.A);
-                gl.TexCoord(vertex.TexCoords.X, vertex.TexCoords.Y);
-                gl.Vertex(vertex.Position.X, vertex.Position.Y, vertex.Position.Z);
+                gl.TexCoord(vertex.TexCoords.X + 0.5f / tex.Width, vertex.TexCoords.Y + 0.5f / tex.Height);
+                gl.Vertex(vertex.Position.X * XScale - 1.0f, -(vertex.Position.Y * YScale - 1.0f), vertex.Position.Z);
+            }
+
+            gl.End();
+        }
+
+        public void DrawBoundingBox(OpenGL gl)
+        {
+            //gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
+            //gl.Enable(OpenGL.GL_BLEND);
+            
+            gl.Begin(BeginMode.LineLoop);
+            
+            gl.Color(1.0f, 0, 0, 1.0f);
+            foreach (var vertex in _vertices)
+            {
+                gl.Vertex(vertex.Position.X * XScale - 1.0f, -(vertex.Position.Y * YScale - 1.0f), vertex.Position.Z);
             }
 
             gl.End();
