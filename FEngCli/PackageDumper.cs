@@ -30,6 +30,19 @@ namespace FEngCli
                     Console.WriteLine("MSG Category : {0} ({1})", messageDefinition.Category,
                         messageDefinition.Category.ToUpper());
             }
+
+            foreach (var messageTargetList in package.MessageTargetLists)
+            {
+                Console.WriteLine("--------- MESSAGE TARGET LIST: 0x{0:X} ---------", messageTargetList.MsgId);
+                messageTargetList.Targets.ForEach(t => Console.WriteLine("- 0x{0:X}", t));
+            }
+
+            foreach (var messageResponse in package.MessageResponses)
+            {
+                Console.WriteLine("--------- MESSAGE RESPONSE: 0x{0:X} ---------", messageResponse.Id);
+                messageResponse.Responses.ForEach(t =>
+                    Console.WriteLine("- ID: 0x{0:X}; Target: 0x{1:X}; Param: {2}", t.Id, t.Target, t.Param));
+            }
         }
 
         private static void DumpPackageMeta(FrontendPackage package)
