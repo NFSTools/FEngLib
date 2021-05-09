@@ -68,8 +68,6 @@ namespace FEngRender.Data
                 && (CurrentScript.Length > 0 || CurrentScript.ChainedId != 0xFFFFFFFF)
                 && CurrentScriptTime >= 0)
             {
-                var canRunScript = true;
-
                 if (CurrentScriptTime >= CurrentScript.Length)
                 {
                     if ((CurrentScript.Flags & 1) == 1)
@@ -87,36 +85,21 @@ namespace FEngRender.Data
 
                         SetScript(nextScript);
                     }
-                    else
-                    {
-                        Debug.WriteLine("done with script {0:X} for object {1:X}", CurrentScript.Id, FrontendObject.NameHash);
-                        SetScript(null);
-                        canRunScript = false;
-                    }
-                }
-                else
-                {
-                    Debug.WriteLine("script {0:X} for object {1:X} is at position {2}/{3}", CurrentScript.Id,
-                        FrontendObject.NameHash, CurrentScriptTime, CurrentScript.Length);
                 }
 
-                if (canRunScript)
-                {
-                    var colorTrack = GetKeyTrack(CurrentScript, KeyTrackType.Color);
-                    var posTrack = GetKeyTrack(CurrentScript, KeyTrackType.Position);
-                    var sizeTrack = GetKeyTrack(CurrentScript, KeyTrackType.Size);
-                    var rotTrack = GetKeyTrack(CurrentScript, KeyTrackType.Rotation);
-                    if (colorTrack != null)
-                        color = TrackInterpolation.Interpolate<FEColor>(colorTrack, CurrentScriptTime);
-                    if (posTrack != null)
-                        position = TrackInterpolation.Interpolate<FEVector3>(posTrack, CurrentScriptTime);
-                    if (sizeTrack != null)
-                        size = TrackInterpolation.Interpolate<FEVector3>(sizeTrack, CurrentScriptTime);
-                    if (rotTrack != null)
-                        rotation = TrackInterpolation.Interpolate<FEQuaternion>(rotTrack, CurrentScriptTime); 
-                    //Debug.WriteLine("T={0} L={1}", CurrentScriptTime, CurrentScript.Length);
-                    CurrentScriptTime += deltaTime;
-                }
+                var colorTrack = GetKeyTrack(CurrentScript, KeyTrackType.Color);
+                var posTrack = GetKeyTrack(CurrentScript, KeyTrackType.Position);
+                var sizeTrack = GetKeyTrack(CurrentScript, KeyTrackType.Size);
+                var rotTrack = GetKeyTrack(CurrentScript, KeyTrackType.Rotation);
+                if (colorTrack != null)
+                    color = TrackInterpolation.Interpolate<FEColor>(colorTrack, CurrentScriptTime);
+                if (posTrack != null)
+                    position = TrackInterpolation.Interpolate<FEVector3>(posTrack, CurrentScriptTime);
+                if (sizeTrack != null)
+                    size = TrackInterpolation.Interpolate<FEVector3>(sizeTrack, CurrentScriptTime);
+                if (rotTrack != null)
+                    rotation = TrackInterpolation.Interpolate<FEQuaternion>(rotTrack, CurrentScriptTime);
+                CurrentScriptTime += deltaTime;
             }
 
             var scaleMatrix = Matrix4x4.CreateScale(size.X, size.Y, size.Z);
