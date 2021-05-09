@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Numerics;
 using FEngLib.Data;
 using FEngLib.Structures;
+using FEngRender.Utils;
 
 namespace FEngRender.Script
 {
@@ -128,9 +130,24 @@ namespace FEngRender.Script
                             Z = v1.Z + v2.Z,
                         };
                     }
+                case FEParamType.PT_Quaternion:
+                    return MultiplyQuats(node1.GetValue<FEQuaternion>(), node2.GetValue<FEQuaternion>());
                 default:
                     throw new IndexOutOfRangeException($"Unsupported ParamType for ADD: {track.ParamType}");
             }
+        }
+
+        private static FEQuaternion MultiplyQuats(FEQuaternion q1, FEQuaternion q2)
+        {
+            var addition = Quaternion.Multiply(q1.ToQuaternion(), q2.ToQuaternion());
+
+            return new FEQuaternion
+            {
+                X = addition.X,
+                Y = addition.Y,
+                Z = addition.Z,
+                W = addition.W
+            };
         }
 
         private static object LerpKeys(FEKeyTrack track, float t, FEKeyNode node1, FEKeyNode node2, FEKeyNode offset)
@@ -148,9 +165,25 @@ namespace FEngRender.Script
                 case FEParamType.PT_Vector3:
                     return LerpVector3(node1.GetValue<FEVector3>(), node2.GetValue<FEVector3>(), t,
                         offset.GetValue<FEVector3>());
+                case FEParamType.PT_Quaternion:
+                    return LerpQuaternion(node1.GetValue<FEQuaternion>(), node2.GetValue<FEQuaternion>(), t,
+                        offset.GetValue<FEQuaternion>());
                 default:
                     throw new IndexOutOfRangeException($"Unsupported ParamType for LERP: {track.ParamType}");
             }
+        }
+
+        private static FEQuaternion LerpQuaternion(FEQuaternion q1, FEQuaternion q2, float t, FEQuaternion offset)
+        {
+            var lerp = Quaternion.Lerp(q1.ToQuaternion(), q2.ToQuaternion(), t) * offset.ToQuaternion();
+
+            return new FEQuaternion
+            {
+                X = lerp.X,
+                Y = lerp.Y,
+                Z = lerp.Z,
+                W = lerp.W
+            };
         }
 
         private static FEVector3 LerpVector3(FEVector3 v1, FEVector3 v2, float t, FEVector3 offset)

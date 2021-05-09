@@ -64,30 +64,40 @@ namespace FEngRender.Data
             var rotation = FrontendObject.Rotation;
             var color = FrontendObject.Color;
 
-            // test
-            //deltaTime = 20;
-
-            //deltaTime = Math.Max(0, Math.Min(60, deltaTime));
-
             if (CurrentScript != null
-                && CurrentScript.Length > 0
+                && (CurrentScript.Length > 0 || CurrentScript.ChainedId != 0xFFFFFFFF)
                 && CurrentScriptTime >= 0)
             {
                 var canRunScript = true;
 
-                if (CurrentScriptTime > CurrentScript.Length)
+                if (CurrentScriptTime >= CurrentScript.Length)
                 {
                     if ((CurrentScript.Flags & 1) == 1)
                     {
-                        Debug.WriteLine("looping");
+                        Debug.WriteLine("looping script {0:X} for object {1:X}", CurrentScript.Id, FrontendObject.NameHash);
                         CurrentScriptTime = 0;
+                    }
+                    else if (CurrentScript.ChainedId != 0xFFFFFFFF)
+                    {
+                        var nextScript = FrontendObject.Scripts.Find(s => s.Id == CurrentScript.ChainedId) ??
+                                         throw new Exception(
+                                             $"Cannot find chained script (object {FrontendObject.NameHash:X}, base script {CurrentScript.Id:X}): {CurrentScript.ChainedId:X}");
+                        Debug.WriteLine("activating chained script for object {1:X}: {0}",
+                            nextScript.Name ?? nextScript.Id.ToString("X"), FrontendObject.NameHash);
+
+                        SetScript(nextScript);
                     }
                     else
                     {
-                        Debug.WriteLine("done");
+                        Debug.WriteLine("done with script {0:X} for object {1:X}", CurrentScript.Id, FrontendObject.NameHash);
                         SetScript(null);
                         canRunScript = false;
                     }
+                }
+                else
+                {
+                    Debug.WriteLine("script {0:X} for object {1:X} is at position {2}/{3}", CurrentScript.Id,
+                        FrontendObject.NameHash, CurrentScriptTime, CurrentScript.Length);
                 }
 
                 if (canRunScript)
@@ -95,15 +105,16 @@ namespace FEngRender.Data
                     var colorTrack = GetKeyTrack(CurrentScript, KeyTrackType.Color);
                     var posTrack = GetKeyTrack(CurrentScript, KeyTrackType.Position);
                     var sizeTrack = GetKeyTrack(CurrentScript, KeyTrackType.Size);
-                    //var rotTrack = GetKeyTrack(CurrentScript, KeyTrackType.Color);
+                    var rotTrack = GetKeyTrack(CurrentScript, KeyTrackType.Rotation);
                     if (colorTrack != null)
                         color = TrackInterpolation.Interpolate<FEColor>(colorTrack, CurrentScriptTime);
                     if (posTrack != null)
                         position = TrackInterpolation.Interpolate<FEVector3>(posTrack, CurrentScriptTime);
                     if (sizeTrack != null)
                         size = TrackInterpolation.Interpolate<FEVector3>(sizeTrack, CurrentScriptTime);
-
-                    Debug.WriteLine("T={0} L={1}", CurrentScriptTime, CurrentScript.Length);
+                    if (rotTrack != null)
+                        rotation = TrackInterpolation.Interpolate<FEQuaternion>(rotTrack, CurrentScriptTime); 
+                    //Debug.WriteLine("T={0} L={1}", CurrentScriptTime, CurrentScript.Length);
                     CurrentScriptTime += deltaTime;
                 }
             }
@@ -147,7 +158,7 @@ namespace FEngRender.Data
 
         private FEKeyTrack GetKeyTrack(FrontendScript script, KeyTrackType trackType)
         {
-            uint offset = (uint) trackType;
+            uint offset = (uint)trackType;
 
             return script.Tracks.Find(e => e.Offset == offset);
         }
