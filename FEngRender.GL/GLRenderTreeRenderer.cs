@@ -257,7 +257,7 @@ namespace FEngRender.GL
             var key = CleanResourcePath(resource.Name);
             if (_textures.TryGetValue(key, out var tex))
                 return tex;
-            Debug.WriteLine("Texture not found: {0}", new object[] { key });
+            //Debug.WriteLine("Texture not found: {0}", new object[] { key });
             return null;
         }
 
