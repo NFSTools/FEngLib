@@ -94,23 +94,23 @@ namespace FEngRender.Data
                 if (colorTrack != null)
                     color = TrackInterpolation.Interpolate<FEColor>(colorTrack, CurrentScriptTime);
                 if (posTrack != null)
-                    position = TrackInterpolation.Interpolate<FEVector3>(posTrack, CurrentScriptTime);
+                    position = TrackInterpolation.Interpolate<Vector3>(posTrack, CurrentScriptTime);
                 if (sizeTrack != null)
-                    size = TrackInterpolation.Interpolate<FEVector3>(sizeTrack, CurrentScriptTime);
+                    size = TrackInterpolation.Interpolate<Vector3>(sizeTrack, CurrentScriptTime);
                 if (rotTrack != null)
-                    rotation = TrackInterpolation.Interpolate<FEQuaternion>(rotTrack, CurrentScriptTime);
+                    rotation = TrackInterpolation.Interpolate<Quaternion>(rotTrack, CurrentScriptTime);
                 CurrentScriptTime += deltaTime;
             }
 
             var scaleMatrix = Matrix4x4.CreateScale(size.X, size.Y, size.Z);
-            var rotateMatrix = Matrix4x4.CreateFromQuaternion(rotation.ToQuaternion());
+            var rotateMatrix = Matrix4x4.CreateFromQuaternion(rotation);
             var transMatrix = Matrix4x4.CreateTranslation(position.X, position.Y, position.Z);
 
             if (matrixRotate)
                 ObjectMatrix = scaleMatrix * rotateMatrix * transMatrix * viewMatrix;
             else
                 ObjectMatrix = scaleMatrix * transMatrix * viewMatrix;
-            ObjectRotation = rotation.ToQuaternion();
+            ObjectRotation = rotation;
             ObjectColor = color;
 
             if (parentNode != null)

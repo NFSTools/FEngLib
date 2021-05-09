@@ -1,35 +1,34 @@
 ﻿using System.IO;
+using System.Numerics;
 using FEngLib.Structures;
 
 namespace FEngLib.Data
 {
     public class FEMultiImageData : FEImageData
     {
-        public FEVector2[] TopLeftUV { get; set; }
-        public FEVector2[] BottomRightUV { get; set; }
-        public FEVector3 PivotRotation { get; set; }
+        public Vector2[] TopLeftUV { get; set; }
+        public Vector2[] BottomRightUV { get; set; }
+        public Vector3 PivotRotation { get; set; }
 
         public override void Read(BinaryReader br)
         {
             base.Read(br);
 
-            TopLeftUV = new FEVector2[3];
-            BottomRightUV = new FEVector2[3];
-            PivotRotation = new FEVector3();
+            TopLeftUV = new Vector2[3];
+            BottomRightUV = new Vector2[3];
+            PivotRotation = new Vector3();
 
             for (int i = 0; i < TopLeftUV.Length; i++)
             {
-                TopLeftUV[i] = new FEVector2();
-                TopLeftUV[i].Read(br);
+                TopLeftUV[i] = new Vector2(br.ReadSingle(), br.ReadSingle());
             }
 
             for (int i = 0; i < BottomRightUV.Length; i++)
             {
-                BottomRightUV[i] = new FEVector2();
-                BottomRightUV[i].Read(br);
+                BottomRightUV[i] = new Vector2(br.ReadSingle(), br.ReadSingle());
             }
 
-            PivotRotation.Read(br);
+            PivotRotation = new Vector3(br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
         }
 
         public override void Write(BinaryWriter bw)
@@ -38,15 +37,19 @@ namespace FEngLib.Data
 
             foreach (var t in TopLeftUV)
             {
-                t.Write(bw);
+                bw.Write(t.X);
+                bw.Write(t.Y);
             }
 
             foreach (var t in BottomRightUV)
             {
-                t.Write(bw);
+                bw.Write(t.X);
+                bw.Write(t.Y);
             }
 
-            PivotRotation.Write(bw);
+            bw.Write(PivotRotation.X);
+            bw.Write(PivotRotation.Y);
+            bw.Write(PivotRotation.Z);
         }
     }
 }

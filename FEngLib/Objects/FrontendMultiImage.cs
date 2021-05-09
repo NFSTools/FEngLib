@@ -1,12 +1,13 @@
-﻿using FEngLib.Structures;
+﻿using System.Numerics;
+using FEngLib.Structures;
 
 namespace FEngLib.Objects
 {
     public class FrontendMultiImage : FrontendImage
     {
-        public FEVector2[] TopLeftUV { get; set; }
-        public FEVector2[] BottomRightUV { get; set; }
-        public FEVector3 PivotRotation { get; set; }
+        public Vector2[] TopLeftUV { get; set; }
+        public Vector2[] BottomRightUV { get; set; }
+        public Vector3 PivotRotation { get; set; }
         public uint[] Texture { get; set; }
         public uint[] TextureFlags { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using FEngLib.Structures;
+﻿using System.Numerics;
+using FEngLib.Structures;
 
 namespace FEngLib.Objects
 {
@@ -6,8 +7,8 @@ namespace FEngLib.Objects
     {
         public uint ImageFlags { get; set; }
 
-        public FEVector2 UpperLeft { get; set; }
-        public FEVector2 LowerRight { get; set; }
+        public Vector2 UpperLeft { get; set; }
+        public Vector2 LowerRight { get; set; }
 
         public FrontendImage()
         {

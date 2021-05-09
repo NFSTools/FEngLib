@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Numerics;
 using FEngLib.Data;
 using FEngLib.Structures;
 
@@ -34,9 +35,9 @@ namespace FEngLib
         public FrontendPackage Package { get; set; }
 
         public FEColor Color { get; set; }
-        public FEVector3 Pivot { get; set; }
-        public FEVector3 Position { get; set; }
-        public FEQuaternion Rotation { get; set; }
-        public FEVector3 Size { get; set; }
+        public Vector3 Pivot { get; set; }
+        public Vector3 Position { get; set; }
+        public Quaternion Rotation { get; set; }
+        public Vector3 Size { get; set; }
     }
 }

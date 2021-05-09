@@ -108,46 +108,14 @@ namespace FEngRender.Script
                         };
                     }
                 case FEParamType.PT_Vector2:
-                    {
-                        var v1 = node1.GetValue<FEVector2>();
-                        var v2 = node2.GetValue<FEVector2>();
-
-                        return new FEVector2
-                        {
-                            X = v1.X + v2.X,
-                            Y = v1.Y + v2.Y
-                        };
-                    }
+                    return node1.GetValue<Vector2>() + node2.GetValue<Vector2>();
                 case FEParamType.PT_Vector3:
-                    {
-                        var v1 = node1.GetValue<FEVector3>();
-                        var v2 = node2.GetValue<FEVector3>();
-
-                        return new FEVector3
-                        {
-                            X = v1.X + v2.X,
-                            Y = v1.Y + v2.Y,
-                            Z = v1.Z + v2.Z,
-                        };
-                    }
+                    return node1.GetValue<Vector3>() + node2.GetValue<Vector3>();
                 case FEParamType.PT_Quaternion:
-                    return MultiplyQuats(node1.GetValue<FEQuaternion>(), node2.GetValue<FEQuaternion>());
+                    return node1.GetValue<Quaternion>() * node2.GetValue<Quaternion>();
                 default:
                     throw new IndexOutOfRangeException($"Unsupported ParamType for ADD: {track.ParamType}");
             }
-        }
-
-        private static FEQuaternion MultiplyQuats(FEQuaternion q1, FEQuaternion q2)
-        {
-            var addition = Quaternion.Multiply(q1.ToQuaternion(), q2.ToQuaternion());
-
-            return new FEQuaternion
-            {
-                X = addition.X,
-                Y = addition.Y,
-                Z = addition.Z,
-                W = addition.W
-            };
         }
 
         private static object LerpKeys(FEKeyTrack track, float t, FEKeyNode node1, FEKeyNode node2, FEKeyNode offset)
@@ -160,49 +128,17 @@ namespace FEngRender.Script
                     return LerpColor(node1.GetValue<FEColor>(), node2.GetValue<FEColor>(), t,
                         offset.GetValue<FEColor>());
                 case FEParamType.PT_Vector2:
-                    return LerpVector2(node1.GetValue<FEVector2>(), node2.GetValue<FEVector2>(), t,
-                        offset.GetValue<FEVector2>());
+                    return Vector2.Lerp(node1.GetValue<Vector2>(), node2.GetValue<Vector2>(), t) +
+                           offset.GetValue<Vector2>();
                 case FEParamType.PT_Vector3:
-                    return LerpVector3(node1.GetValue<FEVector3>(), node2.GetValue<FEVector3>(), t,
-                        offset.GetValue<FEVector3>());
+                    return Vector3.Lerp(node1.GetValue<Vector3>(), node2.GetValue<Vector3>(), t) +
+                           offset.GetValue<Vector3>();
                 case FEParamType.PT_Quaternion:
-                    return LerpQuaternion(node1.GetValue<FEQuaternion>(), node2.GetValue<FEQuaternion>(), t,
-                        offset.GetValue<FEQuaternion>());
+                    return Quaternion.Lerp(node1.GetValue<Quaternion>(), node2.GetValue<Quaternion>(), t) *
+                           offset.GetValue<Quaternion>();
                 default:
                     throw new IndexOutOfRangeException($"Unsupported ParamType for LERP: {track.ParamType}");
             }
-        }
-
-        private static FEQuaternion LerpQuaternion(FEQuaternion q1, FEQuaternion q2, float t, FEQuaternion offset)
-        {
-            var lerp = Quaternion.Lerp(q1.ToQuaternion(), q2.ToQuaternion(), t) * offset.ToQuaternion();
-
-            return new FEQuaternion
-            {
-                X = lerp.X,
-                Y = lerp.Y,
-                Z = lerp.Z,
-                W = lerp.W
-            };
-        }
-
-        private static FEVector3 LerpVector3(FEVector3 v1, FEVector3 v2, float t, FEVector3 offset)
-        {
-            return new FEVector3
-            {
-                X = (v2.X - v1.X) * t + offset.X + v1.X,
-                Y = (v2.Y - v1.Y) * t + offset.Y + v1.Y,
-                Z = (v2.Z - v1.Z) * t + offset.Z + v1.Z,
-            };
-        }
-
-        private static FEVector2 LerpVector2(FEVector2 v1, FEVector2 v2, float t, FEVector2 offset)
-        {
-            return new FEVector2
-            {
-                X = (v2.X - v1.X) * t + offset.X + v1.X,
-                Y = (v2.Y - v1.Y) * t + offset.Y + v1.Y
-            };
         }
 
         private static FEColor LerpColor(FEColor c1, FEColor c2, float t, FEColor offset)

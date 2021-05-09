@@ -31,13 +31,6 @@ namespace FEngRender.Utils
         }
 
         /// <summary>
-        /// Converts a <see cref="FEQuaternion"/> to a <see cref="Quaternion"/>.
-        /// </summary>
-        /// <param name="quaternion"></param>
-        /// <returns></returns>
-        public static Quaternion ToQuaternion(this FEQuaternion quaternion) => new Quaternion(quaternion.X, quaternion.Y, quaternion.Z, quaternion.W);
-
-        /// <summary>
         /// A structure holding roll, pitch and yaw values.
         /// </summary>
         public readonly struct EulerAngles

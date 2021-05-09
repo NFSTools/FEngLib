@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Numerics;
 using FEngLib.Data;
 using FEngLib.Structures;
 
@@ -41,21 +42,15 @@ namespace FEngLib.Tags
                 }
                 else if (track.ParamType == FEParamType.PT_Vector2)
                 {
-                    var feVec2 = new FEVector2();
-                    feVec2.Read(br);
-                    nodeValue = feVec2;
+                    nodeValue = new Vector2(br.ReadSingle(), br.ReadSingle());
                 }
                 else if (track.ParamType == FEParamType.PT_Vector3)
                 {
-                    var feVec3 = new FEVector3();
-                    feVec3.Read(br);
-                    nodeValue = feVec3;
+                    nodeValue = new Vector3(br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
                 }
                 else if (track.ParamType == FEParamType.PT_Quaternion)
                 {
-                    var feQuaternion = new FEQuaternion();
-                    feQuaternion.Read(br);
-                    nodeValue = feQuaternion;
+                    nodeValue = new Quaternion(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
                 }
                 else
                 {

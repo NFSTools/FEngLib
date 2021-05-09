@@ -30,10 +30,10 @@ namespace FEngViewer
             }
 
             labelObjDataColor.Text = obj.Color?.ToString() ?? "<n/a>";
-            labelObjDataPivot.Text = obj.Pivot?.ToString() ?? "<n/a>";
-            labelObjDataPosition.Text = obj.Position?.ToString() ?? "<n/a>";
-            labelObjDataRotation.Text = obj.Rotation?.ToString() ?? "<n/a>";
-            labelObjDataSize.Text = obj.Size?.ToString() ?? "<n/a>";
+            labelObjDataPivot.Text = obj.Pivot.ToString();
+            labelObjDataPosition.Text = obj.Position.ToString();
+            labelObjDataRotation.Text = obj.Rotation.ToString();
+            labelObjDataSize.Text = obj.Size.ToString();
         }
     }
 }
