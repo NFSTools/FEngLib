@@ -42,6 +42,9 @@ namespace FEngLib.Chunks
                     frontendScript.Name = scriptNameTag.Name;
                     frontendScript.Id = scriptNameTag.NameHash;
                     break;
+                case ScriptChainTag scriptChainTag:
+                    frontendScript.ChainedId = scriptChainTag.Id;
+                    break;
             }
         }
 

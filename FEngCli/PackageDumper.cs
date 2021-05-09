@@ -93,16 +93,18 @@ namespace FEngCli
                 foreach (var frontendScript in frontendObject.Scripts)
                 {
                     Console.WriteLine("\t----------");
-                    Console.WriteLine("\tID     : 0x{0:X8}", frontendScript.Id);
+                    Console.WriteLine("\tID     : 0x{0:X}", frontendScript.Id);
                     if (!string.IsNullOrEmpty(frontendScript.Name))
                         Console.WriteLine("\tName   : {0} ({1})", frontendScript.Name, frontendScript.Name.ToUpper());
-                    Console.WriteLine("\tFlags  : 0x{0:X8}", frontendScript.Flags);
+                    if (frontendScript.ChainedId != 0xFFFFFFFF)
+                        Console.WriteLine("\tChained to: 0x{0:X}", frontendScript.ChainedId);
+                    Console.WriteLine("\tFlags  : 0x{0:X}", frontendScript.Flags);
                     Console.WriteLine("\tLength : {0}", frontendScript.Length);
                     if (frontendScript.Events.Count > 0)
                     {
                         Console.WriteLine("\tEvents ({0}):", frontendScript.Events.Count);
                         foreach (var scriptEvent in frontendScript.Events)
-                            Console.WriteLine("\t\tTarget=0x{0:X} Time={1} EventId={2:X8}", scriptEvent.Target,
+                            Console.WriteLine("\t\tTarget=0x{0:X} Time={1} EventId=0x{2:X}", scriptEvent.Target,
                                 scriptEvent.Time, scriptEvent.EventId);
                     }
 
@@ -151,7 +153,7 @@ namespace FEngCli
             switch (frontendObject)
             {
                 case FrontendString frontendString:
-                    Console.WriteLine("\tString hash   : 0x{0:X8}", frontendString.Hash);
+                    Console.WriteLine("\tString hash   : 0x{0:X}", frontendString.Hash);
                     if (!string.IsNullOrEmpty(frontendString.Label))
                         Console.WriteLine("\tString ID     : {0} ({1})", frontendString.Label,
                             frontendString.Label.ToUpper());

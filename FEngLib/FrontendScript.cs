@@ -13,6 +13,7 @@ namespace FEngLib
 
         public string Name { get; set; }
         public uint Id { get; set; }
+        public uint ChainedId { get; set; } = 0xFFFFFFFF;
         public uint Length { get; set; }
         public uint Flags { get; set; }
         public List<FEKeyTrack> Tracks { get; set; }
