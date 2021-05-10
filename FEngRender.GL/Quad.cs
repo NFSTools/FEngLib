@@ -1,4 +1,4 @@
-﻿using OpenTK.Mathematics;
+﻿using System.Numerics;
 using SharpGL;
 using SharpGL.Enumerations;
 
@@ -8,22 +8,13 @@ namespace FEngRender.GL
     {
         private VertexDeclaration[] _vertices = new VertexDeclaration[4];
 
-        private static readonly int[] Indices =
-        {
-            0, 1, 2, 3
-        };
-
-        private readonly Matrix4 _transform;
-
-        private const bool DoZ = false;
-
         public Quad(
             float left, float up,
             float right, float down,
             float z,
-            Matrix4 transform,
+            Matrix4x4 transform,
             Vector2 texTopLeft, Vector2 texBottomRight,
-            Color4[] colors)
+            OpenTK.Mathematics.Color4[] colors)
         {
             _vertices[0].Position.X = left;
             _vertices[0].Position.Y = up;
@@ -41,16 +32,10 @@ namespace FEngRender.GL
             _vertices[3].Position.Y = down;
             _vertices[3].Position.Z = z;
 
-            _transform = transform;
-            _vertices[0].Position = MultIgnoringCol4(transform, _vertices[0].Position);
-            _vertices[1].Position = MultIgnoringCol4(transform, _vertices[1].Position);
-            _vertices[2].Position = MultIgnoringCol4(transform, _vertices[2].Position);
-            _vertices[3].Position = MultIgnoringCol4(transform, _vertices[3].Position);
-
-            _vertices[0].Position.Z = 0f;
-            _vertices[1].Position.Z = 0f;
-            _vertices[2].Position.Z = 0f;
-            _vertices[3].Position.Z = 0f;
+            _vertices[0].Position = Vector3.Transform(_vertices[0].Position, transform);
+            _vertices[1].Position = Vector3.Transform(_vertices[1].Position, transform);
+            _vertices[2].Position = Vector3.Transform(_vertices[2].Position, transform);
+            _vertices[3].Position = Vector3.Transform(_vertices[3].Position, transform);
 
             _vertices[0].TexCoords.X = texTopLeft.X;
             _vertices[0].TexCoords.Y = texTopLeft.Y;
@@ -85,7 +70,7 @@ namespace FEngRender.GL
             {
                 gl.Color(vertex.Color.R, vertex.Color.G, vertex.Color.B, vertex.Color.A);
                 gl.TexCoord(vertex.TexCoords.X + 0.5f / tex.Width, vertex.TexCoords.Y + 0.5f / tex.Height);
-                gl.Vertex(vertex.Position.X * XScale - 1.0f, -(vertex.Position.Y * YScale - 1.0f), vertex.Position.Z);
+                gl.Vertex(vertex.Position.X * XScale - 1.0f, -(vertex.Position.Y * YScale - 1.0f), 0);
             }
 
             gl.End();
@@ -93,30 +78,15 @@ namespace FEngRender.GL
 
         public void DrawBoundingBox(OpenGL gl)
         {
-            //gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
-            //gl.Enable(OpenGL.GL_BLEND);
-            
             gl.Begin(BeginMode.LineLoop);
             
             gl.Color(1.0f, 0, 0, 1.0f);
             foreach (var vertex in _vertices)
             {
-                gl.Vertex(vertex.Position.X * XScale - 1.0f, -(vertex.Position.Y * YScale - 1.0f), vertex.Position.Z);
+                gl.Vertex(vertex.Position.X * XScale - 1.0f, -(vertex.Position.Y * YScale - 1.0f), 0);
             }
 
             gl.End();
-        }
-
-        // we need Vector3 for the vertex format
-        private static Vector3 MultIgnoringCol4(Matrix4 mat, Vector3 vec)
-        {
-            var (x, y, z) = vec;
-            return new Vector3
-            {
-                X = mat.M11 * x + mat.M21 * y + mat.M31 * z + mat.M41,
-                Y = mat.M12 * x + mat.M22 * y + mat.M32 * z + mat.M42,
-                Z = mat.M13 * x + mat.M23 * y + mat.M33 * z + mat.M43
-            };
         }
     }
 }

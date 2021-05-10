@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using SharpGL;
-using OpenTK.Mathematics;
 
 namespace FEngRender.GL
 {
@@ -9,7 +9,7 @@ namespace FEngRender.GL
     public struct VertexDeclaration
     {
         public Vector3 Position;
-        public Color4 Color;
+        public OpenTK.Mathematics.Color4 Color;
         public Vector2 TexCoords;
 
         /// <summary>

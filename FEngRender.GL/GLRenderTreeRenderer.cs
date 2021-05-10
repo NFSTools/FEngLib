@@ -8,14 +8,8 @@ using FEngLib;
 using FEngLib.Data;
 using FEngLib.Objects;
 using FEngRender.Data;
-using FEngRender.Utils;
-using OpenTK.Mathematics;
 using SharpGL;
 using SharpGL.Enumerations;
-using SharpGL.VertexBuffers;
-using Quaternion = System.Numerics.Quaternion;
-using Vector2 = OpenTK.Mathematics.Vector2;
-using Texture = SharpGL.SceneGraph.Assets.Texture;
 
 namespace FEngRender.GL
 {
@@ -182,18 +176,7 @@ namespace FEngRender.GL
             if (texture == null)
                 return;
 
-            var otkMat4 = new Matrix4(
-                node.ObjectMatrix.M11, node.ObjectMatrix.M12, node.ObjectMatrix.M13, node.ObjectMatrix.M14,
-                node.ObjectMatrix.M21, node.ObjectMatrix.M22, node.ObjectMatrix.M23, node.ObjectMatrix.M24,
-                node.ObjectMatrix.M31, node.ObjectMatrix.M32, node.ObjectMatrix.M33, node.ObjectMatrix.M34,
-                node.ObjectMatrix.M41, node.ObjectMatrix.M42, node.ObjectMatrix.M43, node.ObjectMatrix.M44);
-
-            var feTranslateMat = Matrix4.Identity;
-            feTranslateMat.M41 = 320.0f;
-            feTranslateMat.M42 = 240.0f;
-            feTranslateMat.M43 = 0.0f;
-
-            otkMat4 *= feTranslateMat;
+            var otkMat4 = node.ObjectMatrix * Matrix4x4.CreateTranslation(320, 240, 0);
 
             // this is done by the game, basically a noop in most cases but sometimes relevant?
             // i think it's to do with square-ness and powers of two. or something
@@ -224,12 +207,12 @@ namespace FEngRender.GL
                 (texture.Height / heightDivide) * image.LowerRight.Y
             );
 
-            var color = new Color4(
+            var color = new OpenTK.Mathematics.Color4(
                 node.ObjectColor.Red / 255f, node.ObjectColor.Green / 255f, node.ObjectColor.Blue / 255f,
                 node.ObjectColor.Alpha / 255f
             );
 
-            Color4[] colors =
+            OpenTK.Mathematics.Color4[] colors =
             {
                 color, color, color, color
             };
