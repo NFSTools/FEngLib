@@ -14,7 +14,7 @@ namespace FEngRender.GL
             float z,
             Matrix4x4 transform,
             Vector2 texTopLeft, Vector2 texBottomRight,
-            OpenTK.Mathematics.Color4[] colors)
+            Vector4[] colors)
         {
             _vertices[0].Position.X = left;
             _vertices[0].Position.Y = up;
@@ -68,7 +68,7 @@ namespace FEngRender.GL
 
             foreach (var vertex in _vertices)
             {
-                gl.Color(vertex.Color.R, vertex.Color.G, vertex.Color.B, vertex.Color.A);
+                gl.Color(vertex.Color.X, vertex.Color.Y, vertex.Color.Z, vertex.Color.W);
                 gl.TexCoord(vertex.TexCoords.X + 0.5f / tex.Width, vertex.TexCoords.Y + 0.5f / tex.Height);
                 gl.Vertex(vertex.Position.X * XScale - 1.0f, -(vertex.Position.Y * YScale - 1.0f), 0);
             }

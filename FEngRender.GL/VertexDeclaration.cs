@@ -9,7 +9,7 @@ namespace FEngRender.GL
     public struct VertexDeclaration
     {
         public Vector3 Position;
-        public OpenTK.Mathematics.Color4 Color;
+        public Vector4 Color;
         public Vector2 TexCoords;
 
         /// <summary>

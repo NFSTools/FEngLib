@@ -207,12 +207,12 @@ namespace FEngRender.GL
                 (texture.Height / heightDivide) * image.LowerRight.Y
             );
 
-            var color = new OpenTK.Mathematics.Color4(
+            var color = new Vector4(
                 node.ObjectColor.Red / 255f, node.ObjectColor.Green / 255f, node.ObjectColor.Blue / 255f,
                 node.ObjectColor.Alpha / 255f
             );
 
-            OpenTK.Mathematics.Color4[] colors =
+            Vector4[] colors =
             {
                 color, color, color, color
             };
