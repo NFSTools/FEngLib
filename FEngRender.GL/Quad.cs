@@ -6,7 +6,7 @@ namespace FEngRender.GL
 {
     public class Quad
     {
-        private VertexDeclaration[] _vertices = new VertexDeclaration[4];
+        private readonly VertexDeclaration[] _vertices = new VertexDeclaration[4];
 
         public Quad(
             float left, float up,
@@ -16,26 +16,10 @@ namespace FEngRender.GL
             Vector2 texTopLeft, Vector2 texBottomRight,
             Vector4[] colors)
         {
-            _vertices[0].Position.X = left;
-            _vertices[0].Position.Y = up;
-            _vertices[0].Position.Z = z;
-
-            _vertices[1].Position.X = right;
-            _vertices[1].Position.Y = up;
-            _vertices[1].Position.Z = z;
-
-            _vertices[2].Position.X = right;
-            _vertices[2].Position.Y = down;
-            _vertices[2].Position.Z = z;
-
-            _vertices[3].Position.X = left;
-            _vertices[3].Position.Y = down;
-            _vertices[3].Position.Z = z;
-
-            _vertices[0].Position = Vector3.Transform(_vertices[0].Position, transform);
-            _vertices[1].Position = Vector3.Transform(_vertices[1].Position, transform);
-            _vertices[2].Position = Vector3.Transform(_vertices[2].Position, transform);
-            _vertices[3].Position = Vector3.Transform(_vertices[3].Position, transform);
+            _vertices[0].Position = Vector3.Transform(new Vector3(left, up, z), transform);
+            _vertices[1].Position = Vector3.Transform(new Vector3(right, up, z), transform);
+            _vertices[2].Position = Vector3.Transform(new Vector3(right, down, z), transform);
+            _vertices[3].Position = Vector3.Transform(new Vector3(left, down, z), transform);
 
             _vertices[0].TexCoords.X = texTopLeft.X;
             _vertices[0].TexCoords.Y = texTopLeft.Y;
