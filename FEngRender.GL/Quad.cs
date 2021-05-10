@@ -62,6 +62,7 @@ namespace FEngRender.GL
 
         public void DrawBoundingBox(OpenGL gl)
         {
+            gl.Disable(OpenGL.GL_BLEND);
             gl.Begin(BeginMode.LineLoop);
             
             gl.Color(1.0f, 0, 0, 1.0f);
