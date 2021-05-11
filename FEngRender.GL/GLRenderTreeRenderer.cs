@@ -67,8 +67,9 @@ namespace FEngRender.GL
             // disable depth
             _gl.DepthMask(0);
 
-            PrepareNodes(tree, Matrix4x4.Identity, (int) _stopwatch.ElapsedMilliseconds);
+            PrepareNodes(tree, Matrix4x4.Identity);
             RenderTree(tree);
+            _stopwatch.Restart();
 
             if (SelectedNode != null)
             {
@@ -78,18 +79,17 @@ namespace FEngRender.GL
             _gl.MatrixMode(MatrixMode.Projection);
             _gl.Ortho(0, 640, 480, 0, -1, 1);
             _gl.Flush();
-            _stopwatch.Restart();
         }
 
         private void PrepareNodes(IEnumerable<RenderTreeNode> nodes,
-            Matrix4x4 viewMatrix, int deltaTime, RenderTreeNode parent = null)
+            Matrix4x4 viewMatrix, RenderTreeNode parent = null)
         {
             var nodeList = nodes.ToList();
 
-            nodeList.ForEach(r => r.PrepareForRender(viewMatrix, parent, deltaTime, true));
+            nodeList.ForEach(r => r.PrepareForRender(viewMatrix, parent, (int) _stopwatch.ElapsedMilliseconds, true));
             foreach (var renderTreeGroup in nodeList.OfType<RenderTreeGroup>())
             {
-                PrepareNodes(renderTreeGroup, renderTreeGroup.ObjectMatrix, deltaTime, renderTreeGroup);
+                PrepareNodes(renderTreeGroup, renderTreeGroup.ObjectMatrix, renderTreeGroup);
             }
         }
 
@@ -198,13 +198,13 @@ namespace FEngRender.GL
             var heightDivide = (float)CalculateDivisor(texture.Height);
 
             var texUpLeft = new Vector2(
-                (texture.Width / widthDivide) * image.UpperLeft.X,
-                (texture.Height / heightDivide) * image.UpperLeft.Y
+                (texture.Width / widthDivide) * node.UpperLeft.X,
+                (texture.Height / heightDivide) * node.UpperLeft.Y
             );
 
             var texLowRight = new Vector2(
-                (texture.Width / widthDivide) * image.LowerRight.X,
-                (texture.Height / heightDivide) * image.LowerRight.Y
+                (texture.Width / widthDivide) * node.LowerRight.X,
+                (texture.Height / heightDivide) * node.LowerRight.Y
             );
 
             var color = new Vector4(
