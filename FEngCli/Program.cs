@@ -29,14 +29,18 @@ namespace FEngCli
             var package = LoadPackageFromChunk(options.InputFile);
             PackageDumper.DumpPackage(package);
 
-            var renderer = new ImageRenderTreeRenderer();
-            renderer.LoadTextures(options.TextureDir);
-            var outputFile = options.OutputFile ?? $"{package.Name}.png";
-            var img = renderer.Render(RenderTree.Create(package));
-            using var fs = File.OpenWrite(outputFile);
-            img.SaveAsPng(fs);
+            var outputFile = options.OutputFile;
+            if (!string.IsNullOrWhiteSpace(outputFile))
+            {
+                var renderer = new ImageRenderTreeRenderer();
+                renderer.LoadTextures(options.TextureDir);
+                var img = renderer.Render(RenderTree.Create(package));
+                using var fs = File.OpenWrite(outputFile);
+                img.SaveAsPng(fs);
 
-            if (!options.NoOpen) Process.Start(new ProcessStartInfo(outputFile) {UseShellExecute = true});
+                if (!options.NoOpen) Process.Start(new ProcessStartInfo(outputFile) { UseShellExecute = true });
+            }
+
             return 0;
         }
 
