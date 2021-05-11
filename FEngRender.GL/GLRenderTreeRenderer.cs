@@ -129,11 +129,21 @@ namespace FEngRender.GL
         {
             switch (node.FrontendObject)
             {
+                // there are some things we just don't need to handle
+                case FrontendGroup _:
+                case FrontendMovie _:
+                    break;
                 case FrontendImage image:
                     RenderImage(node, image, doBoundingBox);
                     break;
                 case FrontendString str:
                     RenderString(node, str, doBoundingBox);
+                    break;
+                case FrontendSimpleImage simpleImage:
+                    RenderSimpleImage(node, simpleImage, doBoundingBox);
+                    break;
+                default:
+                    Debug.Assert(false, "Unsupported object", "Type: {0}", node.FrontendObject.GetType());
                     break;
             }
         }
@@ -168,6 +178,26 @@ namespace FEngRender.GL
                     _boundingBox = (rect.Width, rect.Height, posX, posY);
                 }
             });*/
+        }
+
+        private void RenderSimpleImage(RenderTreeNode node, FrontendSimpleImage image, bool doBoundingBox = false)
+        {
+            // top left, top right, bottom right, bottom left
+            Vector4[] colors = new Vector4[4];
+            colors[0] = colors[1] = colors[2] = colors[3] = ColorHelpers.ColorToVector(node.ObjectColor);
+
+            var otkMat4 = node.ObjectMatrix * Matrix4x4.CreateTranslation(320, 240, 0);
+            var q = new Quad(-0.5f, -0.5f, 0.5f, 0.5f,
+                1.0f,
+                otkMat4,
+                Vector2.Zero,
+                Vector2.Zero,
+                colors);
+
+            if (doBoundingBox)
+                q.DrawBoundingBox(_gl);
+            else
+                q.Render(_gl);
         }
 
         private void RenderImage(RenderTreeNode node, FrontendImage image, bool doBoundingBox = false)
