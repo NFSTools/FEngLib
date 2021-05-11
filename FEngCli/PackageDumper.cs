@@ -174,6 +174,8 @@ namespace FEngCli
                     break;
                 case FrontendImage frontendImage:
                     Console.WriteLine("\tImage flags   : {0}", frontendImage.ImageFlags);
+                    Console.WriteLine("\tUpper Left    : {0}", frontendImage.UpperLeft);
+                    Console.WriteLine("\tLower Right   : {0}", frontendImage.LowerRight);
                     break;
             }
         }
