@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Numerics;
 using FEngLib;
 using FEngLib.Data;
+using FEngLib.Objects;
 using FEngLib.Structures;
 using FEngRender.Script;
 using FEngRender.Utils;
@@ -19,6 +20,11 @@ namespace FEngRender.Data
         public Quaternion ObjectRotation { get; private set; }
 
         public FEColor ObjectColor { get; private set; }
+
+        // TODO: THESE SHOULD *NOT* BE HERE!!!
+        // TODO cont: REFACTORING IS NECESSARY!!!!!!!!!!!
+        public Vector2 UpperLeft { get; private set; }
+        public Vector2 LowerRight { get; private set; }
 
         /// <summary>
         /// The <see cref="FEngLib.FrontendObject"/> instance owned by the node.
@@ -64,6 +70,12 @@ namespace FEngRender.Data
             var rotation = FrontendObject.Rotation;
             var color = FrontendObject.Color;
 
+            if (FrontendObject is FrontendImage img)
+            {
+                UpperLeft = img.UpperLeft;
+                LowerRight = img.LowerRight;
+            }
+
             if (CurrentScript != null
                 && (CurrentScript.Length > 0 || CurrentScript.ChainedId != 0xFFFFFFFF)
                 && CurrentScriptTime >= 0)
@@ -99,6 +111,18 @@ namespace FEngRender.Data
                     size = TrackInterpolation.Interpolate<Vector3>(sizeTrack, CurrentScriptTime);
                 if (rotTrack != null)
                     rotation = TrackInterpolation.Interpolate<Quaternion>(rotTrack, CurrentScriptTime);
+
+                if (FrontendObject is FrontendImage)
+                {
+                    var upperLeftTrack = GetKeyTrack(CurrentScript, KeyTrackType.UpperLeft);
+                    var lowerRightTrack = GetKeyTrack(CurrentScript, KeyTrackType.LowerRight);
+
+                    if (upperLeftTrack != null)
+                        UpperLeft = TrackInterpolation.Interpolate<Vector2>(upperLeftTrack, CurrentScriptTime);
+                    if (lowerRightTrack != null)
+                        LowerRight = TrackInterpolation.Interpolate<Vector2>(lowerRightTrack, CurrentScriptTime);
+                }
+
                 CurrentScriptTime += deltaTime;
             }
 
@@ -152,7 +176,9 @@ namespace FEngRender.Data
             Pivot = 4,
             Position = 7,
             Rotation = 10,
-            Size = 14
+            Size = 14,
+            UpperLeft = 17,
+            LowerRight = 19
         }
     }
 }
