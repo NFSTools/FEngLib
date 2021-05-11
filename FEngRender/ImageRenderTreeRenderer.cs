@@ -208,7 +208,7 @@ namespace FEngRender
 
                     c.Rotate((float)rotateZ);
 
-                    var colorScaleVector = ColorHelpers.GetLevels(node.ObjectColor);
+                    var colorScaleVector = ColorHelpers.ColorToVector(node.ObjectColor);
 
                     c.ProcessPixelRowsAsVector4(span =>
                     {

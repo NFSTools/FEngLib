@@ -8,6 +8,7 @@ using FEngLib;
 using FEngLib.Data;
 using FEngLib.Objects;
 using FEngRender.Data;
+using FEngRender.Utils;
 using SharpGL;
 using SharpGL.Enumerations;
 
@@ -207,15 +208,20 @@ namespace FEngRender.GL
                 (texture.Height / heightDivide) * node.LowerRight.Y
             );
 
-            var color = new Vector4(
-                node.ObjectColor.Red / 255f, node.ObjectColor.Green / 255f, node.ObjectColor.Blue / 255f,
-                node.ObjectColor.Alpha / 255f
-            );
+            // top left, top right, bottom right, bottom left
+            Vector4[] colors = new Vector4[4];
 
-            Vector4[] colors =
+            if (image is FrontendColoredImage ci)
             {
-                color, color, color, color
-            };
+                colors[0] = ColorHelpers.ColorToVector(ci.VertexColors[0]);
+                colors[1] = ColorHelpers.ColorToVector(ci.VertexColors[1]);
+                colors[2] = ColorHelpers.ColorToVector(ci.VertexColors[2]);
+                colors[3] = ColorHelpers.ColorToVector(ci.VertexColors[3]);
+            }
+            else
+            {
+                colors[0] = colors[1] = colors[2] = colors[3] = ColorHelpers.ColorToVector(node.ObjectColor);
+            }
 
             var q = new Quad(-0.5f, -0.5f, 0.5f, 0.5f,
                 1.0f,

@@ -30,7 +30,7 @@ namespace FEngRender.Utils
         /// </summary>
         /// <param name="color">The color to compute channel levels for.</param>
         /// <returns>The channel levels</returns>
-        public static Vector4 GetLevels(FEColor color)
+        public static Vector4 ColorToVector(FEColor color)
         {
             return new Vector4(
                 color.Red / 255f, 
