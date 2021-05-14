@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using FEngLib.Data;
 using FEngLib.Tags;
 
@@ -72,18 +73,13 @@ namespace FEngLib.Chunks
         private void ProcessMessageResponseInfoTag(FrontendPackage frontendPackage,
             MessageResponseInfoTag tag)
         {
-            FEMessageResponse foundResponse;
+            if (frontendPackage.MessageResponses.Find(r => r.Id == tag.Hash) != null)
+                throw new Exception(
+                    $"This is supposed to be impossible! Duplicate MessageResponse (0x{tag.Hash:X}) in package {frontendPackage.Name}");
 
-            if ((foundResponse = frontendPackage.MessageResponses.Find(r => r.Id == tag.Hash)) != null)
-            {
-                foundResponse.Responses.Clear();
-            }
-            else
-            {
-                var response = new FEMessageResponse {Id = tag.Hash};
+            var response = new FEMessageResponse {Id = tag.Hash};
 
-                frontendPackage.MessageResponses.Add(response);
-            }
+            frontendPackage.MessageResponses.Add(response);
         }
 
         public override FrontendChunkType GetChunkType()
