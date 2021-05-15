@@ -1,11 +1,12 @@
 ﻿using System.IO;
 using FEngLib.Data;
+using FEngLib.Object;
 
 namespace FEngLib.Tags
 {
     public class MessageTargetListTag : FrontendTag
     {
-        public MessageTargetListTag(FrontendObject frontendObject) : base(frontendObject)
+        public MessageTargetListTag(IObject<ObjectData> frontendObject) : base(frontendObject)
         {
         }
 

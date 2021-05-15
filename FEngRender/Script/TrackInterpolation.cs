@@ -97,9 +97,9 @@ namespace FEngRender.Script
                     return node1.GetValue<int>() + node2.GetValue<int>();
                 case FEParamType.PT_Color:
                     {
-                        var c1 = node1.GetValue<FEColor>();
-                        var c2 = node2.GetValue<FEColor>();
-                        return new FEColor
+                        var c1 = node1.GetValue<Color4>();
+                        var c2 = node2.GetValue<Color4>();
+                        return new Color4
                         {
                             Alpha = c1.Alpha + c2.Alpha,
                             Blue = c1.Blue + c2.Blue,
@@ -125,8 +125,8 @@ namespace FEngRender.Script
                 case FEParamType.PT_Int:
                     return LerpInteger(node1.GetValue<int>(), node2.GetValue<int>(), t, offset.GetValue<int>());
                 case FEParamType.PT_Color:
-                    return LerpColor(node1.GetValue<FEColor>(), node2.GetValue<FEColor>(), t,
-                        offset.GetValue<FEColor>());
+                    return LerpColor(node1.GetValue<Color4>(), node2.GetValue<Color4>(), t,
+                        offset.GetValue<Color4>());
                 case FEParamType.PT_Vector2:
                     return Vector2.Lerp(node1.GetValue<Vector2>(), node2.GetValue<Vector2>(), t) +
                            offset.GetValue<Vector2>();
@@ -141,9 +141,9 @@ namespace FEngRender.Script
             }
         }
 
-        private static FEColor LerpColor(FEColor c1, FEColor c2, float t, FEColor offset)
+        private static Color4 LerpColor(Color4 c1, Color4 c2, float t, Color4 offset)
         {
-            return new FEColor
+            return new Color4
             {
                 Blue = offset.Blue + c1.Blue + (int)((c2.Blue - c1.Blue) * t + 0.5f),
                 Green = offset.Green + c1.Green + (int)((c2.Green - c1.Green) * t + 0.5f),

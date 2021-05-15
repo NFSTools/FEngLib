@@ -1,10 +1,11 @@
 ﻿using System.IO;
+using FEngLib.Object;
 
 namespace FEngLib.Tags
 {
     public class ImageInfoTag : FrontendTag
     {
-        public ImageInfoTag(FrontendObject frontendObject) : base(frontendObject)
+        public ImageInfoTag(IObject<ObjectData> frontendObject) : base(frontendObject)
         {
         }
 

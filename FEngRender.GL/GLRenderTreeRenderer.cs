@@ -6,7 +6,7 @@ using System.Linq;
 using System.Numerics;
 using FEngLib;
 using FEngLib.Data;
-using FEngLib.Objects;
+using FEngLib.Object;
 using FEngRender.Data;
 using FEngRender.Utils;
 using SharpGL;
@@ -100,8 +100,8 @@ namespace FEngRender.GL
             {
                 if (node.Hidden) continue;
                 
-                if ((node.FrontendObject.Flags & FE_ObjectFlags.FF_Invisible) != 0 ||
-                    (node.FrontendObject.Flags & FE_ObjectFlags.FF_HideInEdit) != 0)
+                if ((node.FrontendObject.Flags & ObjectFlags.Invisible) != 0 ||
+                    (node.FrontendObject.Flags & ObjectFlags.HideInEdit) != 0)
                 {
                     continue;
                 }
@@ -130,17 +130,17 @@ namespace FEngRender.GL
             switch (node.FrontendObject)
             {
                 // there are some things we just don't need to handle
-                case FrontendGroup _:
-                case FrontendMovie _:
+                case Group _:
+                case Movie _:
                     break;
-                case FrontendImage image:
+                case Image image:
                     RenderImage(node, image, doBoundingBox);
                     break;
-                case FrontendString str:
+                case Text str:
                     RenderString(node, str, doBoundingBox);
                     break;
-                case FrontendSimpleImage simpleImage:
-                    RenderSimpleImage(node, simpleImage, doBoundingBox);
+                case SimpleImage _:
+                    RenderSimpleImage(node, doBoundingBox);
                     break;
                 default:
                     Debug.Assert(false, "Unsupported object", "Type: {0}", node.FrontendObject.GetType());
@@ -148,7 +148,7 @@ namespace FEngRender.GL
             }
         }
 
-        private void RenderString(RenderTreeNode node, FrontendString str, bool doBoundingBox = false)
+        private void RenderString(RenderTreeNode node, Text str, bool doBoundingBox = false)
         {
             var strMatrix = node.ObjectMatrix;
             float posX = strMatrix.M41 + Width / 2f;
@@ -180,7 +180,7 @@ namespace FEngRender.GL
             });*/
         }
 
-        private void RenderSimpleImage(RenderTreeNode node, FrontendSimpleImage image, bool doBoundingBox = false)
+        private void RenderSimpleImage(RenderTreeNode node, bool doBoundingBox = false)
         {
             // top left, top right, bottom right, bottom left
             Vector4[] colors = new Vector4[4];
@@ -200,7 +200,7 @@ namespace FEngRender.GL
                 q.Render(_gl);
         }
 
-        private void RenderImage(RenderTreeNode node, FrontendImage image, bool doBoundingBox = false)
+        private void RenderImage(RenderTreeNode node, IObject<ImageData> image, bool doBoundingBox = false)
         {
             var texture = GetTexture(image.ResourceRequest);
 
@@ -241,12 +241,12 @@ namespace FEngRender.GL
             // top left, top right, bottom right, bottom left
             Vector4[] colors = new Vector4[4];
 
-            if (image is FrontendColoredImage ci)
+            if (image is ColoredImage ci)
             {
-                colors[0] = ColorHelpers.ColorToVector(ci.VertexColors[0]);
-                colors[1] = ColorHelpers.ColorToVector(ci.VertexColors[1]);
-                colors[2] = ColorHelpers.ColorToVector(ci.VertexColors[2]);
-                colors[3] = ColorHelpers.ColorToVector(ci.VertexColors[3]);
+                colors[0] = ColorHelpers.ColorToVector(ci.Data.TopLeft);
+                colors[1] = ColorHelpers.ColorToVector(ci.Data.TopRight);
+                colors[2] = ColorHelpers.ColorToVector(ci.Data.BottomRight);
+                colors[3] = ColorHelpers.ColorToVector(ci.Data.BottomLeft);
             }
             else
             {
@@ -283,16 +283,6 @@ namespace FEngRender.GL
         private static string CleanResourcePath(string path)
         {
             return path.Split('\\')[^1].Split('.')[0].ToUpperInvariant();
-        }
-
-        private static Quaternion ComputeObjectRotation(FrontendObject frontendObject)
-        {
-            var q = new Quaternion(frontendObject.Rotation.X, frontendObject.Rotation.Y, frontendObject.Rotation.Z,
-                frontendObject.Rotation.W);
-
-            if (frontendObject.Parent is { } parent) return ComputeObjectRotation(parent) * q;
-
-            return q;
         }
     }
 }

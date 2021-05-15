@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using FEngLib.Object;
 
 namespace FEngLib
 {
@@ -20,6 +21,6 @@ namespace FEngLib
             return Reader.BaseStream.Position < _endPosition;
         }
 
-        public abstract FrontendTag NextTag(FrontendObject frontendObject);
+        public abstract FrontendTag NextTag(IObject<ObjectData> frontendObject);
     }
 }

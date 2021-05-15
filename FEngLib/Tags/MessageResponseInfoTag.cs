@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using FEngLib.Object;
 
 namespace FEngLib.Tags
 {
@@ -6,7 +7,7 @@ namespace FEngLib.Tags
     {
         public uint Hash { get; set; }
 
-        public MessageResponseInfoTag(FrontendObject frontendObject) : base(frontendObject)
+        public MessageResponseInfoTag(IObject<ObjectData> frontendObject) : base(frontendObject)
         {
         }
 

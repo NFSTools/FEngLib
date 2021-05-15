@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using FEngLib.Object;
 
 namespace FEngLib.Tags
 {
@@ -9,7 +10,7 @@ namespace FEngLib.Tags
         public uint Flags { get; set; }
         public uint TrackCount { get; set; }
 
-        public ScriptHeaderTag(FrontendObject frontendObject, FrontendScript frontendScript) : base(frontendObject, frontendScript)
+        public ScriptHeaderTag(IObject<ObjectData> frontendObject, FrontendScript frontendScript) : base(frontendObject, frontendScript)
         {
         }
 

@@ -1,19 +1,20 @@
 ﻿using System.IO;
 using FEngLib.Data;
+using FEngLib.Object;
 using FEngLib.Tags;
 
 namespace FEngLib.Chunks
 {
     public class MessageResponsesDataChunk : FrontendObjectChunk
     {
-        public MessageResponsesDataChunk(FrontendObject frontendObject) : base(frontendObject)
+        public MessageResponsesDataChunk(IObject<ObjectData> frontendObject) : base(frontendObject)
         {
         }
 
-        public override FrontendObject Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader)
+        public override IObject<ObjectData> Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader)
         {
             var newFrontendObject = FrontendObject;
-            FrontendTagStream tagStream = new FrontendMessagesTagStream(reader, newFrontendObject.Package,
+            FrontendTagStream tagStream = new FrontendMessagesTagStream(reader, package,
                 readerState.CurrentChunkBlock,
                 readerState.CurrentChunkBlock.Size);
 
@@ -26,7 +27,7 @@ namespace FEngLib.Chunks
             return newFrontendObject;
         }
 
-        private FrontendObject ProcessTag(FrontendObject frontendObject, FrontendChunkBlock frontendChunkBlock,
+        private IObject<ObjectData> ProcessTag(IObject<ObjectData> frontendObject, FrontendChunkBlock frontendChunkBlock,
             FrontendTag tag)
         {
             switch (tag)
@@ -48,26 +49,26 @@ namespace FEngLib.Chunks
             return frontendObject;
         }
 
-        private void ProcessResponseParamTag(FrontendObject frontendObject, FrontendChunkBlock frontendChunkBlock,
+        private void ProcessResponseParamTag(IObject<ObjectData> frontendObject, FrontendChunkBlock frontendChunkBlock,
             ResponseIntParamTag responseIntParamTag)
         {
             frontendObject.MessageResponses[^1].Responses[^1].Param = responseIntParamTag.Param;
         }
 
-        private void ProcessResponseTargetTag(FrontendObject frontendObject, FrontendChunkBlock frontendChunkBlock,
+        private void ProcessResponseTargetTag(IObject<ObjectData> frontendObject, FrontendChunkBlock frontendChunkBlock,
             ResponseTargetTag responseTargetTag)
         {
             frontendObject.MessageResponses[^1].Responses[^1].Target = responseTargetTag.Target;
         }
 
-        private void ProcessResponseIdTag(FrontendObject frontendObject, FrontendChunkBlock frontendChunkBlock,
+        private void ProcessResponseIdTag(IObject<ObjectData> frontendObject, FrontendChunkBlock frontendChunkBlock,
             ResponseIdTag responseIdTag)
         {
             var response = new FEResponse {Id = responseIdTag.Id};
             frontendObject.MessageResponses[^1].Responses.Add(response);
         }
 
-        private void ProcessMessageResponseInfoTag(FrontendObject frontendObject, FrontendChunkBlock frontendChunkBlock,
+        private void ProcessMessageResponseInfoTag(IObject<ObjectData> frontendObject, FrontendChunkBlock frontendChunkBlock,
             MessageResponseInfoTag tag)
         {
             FEMessageResponse foundResponse;

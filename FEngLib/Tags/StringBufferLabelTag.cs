@@ -1,10 +1,11 @@
 ﻿using System.IO;
+using FEngLib.Object;
 
 namespace FEngLib.Tags
 {
     public class StringBufferLabelTag : FrontendTag
     {
-        public StringBufferLabelTag(FrontendObject frontendObject) : base(frontendObject)
+        public StringBufferLabelTag(IObject<ObjectData> frontendObject) : base(frontendObject)
         {
         }
 

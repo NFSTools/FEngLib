@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FEngLib;
 using FEngLib.Data;
-using FEngLib.Objects;
+using FEngLib.Object;
 
 namespace FEngRender.Data
 {
@@ -46,10 +46,10 @@ namespace FEngRender.Data
             var nodes = new List<RenderTreeNode>();
 
             var childrenDict = package.Objects
-                .Where(o => o.Type == FEObjType.FE_Group)
+                .Where(o => o.Type == ObjectType.Group)
                 .ToDictionary(
                     o => o.Guid, 
-                    o => new List<FrontendObject>());
+                    o => new List<IObject<ObjectData>>());
 
             // Build up children mapping
             foreach (var frontendObject in package.Objects.Where(o => o.Parent != null))
@@ -57,11 +57,11 @@ namespace FEngRender.Data
                 childrenDict[frontendObject.Parent.Guid].Add(frontendObject);
             }
 
-            void GenerateNodes(IEnumerable<FrontendObject> frontendObjects, IList<RenderTreeNode> nodeList)
+            void GenerateNodes(IEnumerable<IObject<ObjectData>> frontendObjects, IList<RenderTreeNode> nodeList)
             {
                 foreach (var frontendObject in frontendObjects)
                 {
-                    if (frontendObject is FrontendGroup grp)
+                    if (frontendObject is Group grp)
                     {
                         var subNodes = new List<RenderTreeNode>();
                         GenerateNodes(childrenDict[grp.Guid], subNodes);

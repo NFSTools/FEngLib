@@ -1,10 +1,11 @@
 ﻿using System.IO;
+using FEngLib.Object;
 
 namespace FEngLib.Tags
 {
     public class StringBufferMaxWidthTag : FrontendTag
     {
-        public StringBufferMaxWidthTag(FrontendObject frontendObject) : base(frontendObject)
+        public StringBufferMaxWidthTag(IObject<ObjectData> frontendObject) : base(frontendObject)
         {
         }
 

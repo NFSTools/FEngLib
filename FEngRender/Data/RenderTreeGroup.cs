@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using FEngLib.Objects;
+using FEngLib.Object;
 
 namespace FEngRender.Data
 {
@@ -14,10 +14,10 @@ namespace FEngRender.Data
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderTreeGroup"/> class.
         /// </summary>
-        /// <param name="frontendGroup">The <see cref="FrontendGroup"/> that the <see cref="RenderTreeGroup"/> refers to.</param>
+        /// <param name="frontendGroup">The <see cref="Group"/> that the <see cref="RenderTreeGroup"/> refers to.</param>
         /// <param name="nodes">The list of child <see cref="RenderTreeNode"/> instances.</param>
         // ReSharper disable once SuggestBaseTypeForParameter - We want to restrict this class to groups only! No other objects can have children.
-        public RenderTreeGroup(FrontendGroup frontendGroup, List<RenderTreeNode> nodes) : base(frontendGroup)
+        public RenderTreeGroup(Group frontendGroup, List<RenderTreeNode> nodes) : base(frontendGroup)
         {
             _children = nodes;
         }

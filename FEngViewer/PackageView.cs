@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using CommandLine;
 using FEngLib;
 using FEngLib.Data;
+using FEngLib.Object;
 using FEngRender.Data;
 using FEngViewer.Properties;
 using JetBrains.Annotations;
@@ -83,12 +84,12 @@ namespace FEngViewer
             var feObj = viewNode.FrontendObject;
             var nodeImageKey = feObj.Type switch
             {
-                FEObjType.FE_String => "TreeItem_String",
-                FEObjType.FE_Image => "TreeItem_Image",
-                FEObjType.FE_Group => "TreeItem_Group",
-                FEObjType.FE_Movie => "TreeItem_Movie",
-                FEObjType.FE_ColoredImage => "TreeItem_ColoredImage",
-                FEObjType.FE_MultiImage => "TreeItem_MultiImage",
+                ObjectType.String => "TreeItem_String",
+                ObjectType.Image => "TreeItem_Image",
+                ObjectType.Group => "TreeItem_Group",
+                ObjectType.Movie => "TreeItem_Movie",
+                ObjectType.ColoredImage => "TreeItem_ColoredImage",
+                ObjectType.MultiImage => "TreeItem_MultiImage",
                 _ => null
             };
 

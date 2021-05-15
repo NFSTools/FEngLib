@@ -1,10 +1,11 @@
 ﻿using System.IO;
+using FEngLib.Object;
 
 namespace FEngLib.Tags
 {
     public class ResponseTargetTag : FrontendTag
     {
-        public ResponseTargetTag(FrontendObject frontendObject) : base(frontendObject)
+        public ResponseTargetTag(IObject<ObjectData> frontendObject) : base(frontendObject)
         {
         }
 

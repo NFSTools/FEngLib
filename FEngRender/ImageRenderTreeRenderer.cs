@@ -5,7 +5,7 @@ using System.Linq;
 using System.Numerics;
 using FEngLib;
 using FEngLib.Data;
-using FEngLib.Objects;
+using FEngLib.Object;
 using FEngRender.Data;
 using FEngRender.Utils;
 using SixLabors.Fonts;
@@ -14,6 +14,7 @@ using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using Image = FEngLib.Object.Image;
 using Path = System.IO.Path;
 
 namespace FEngRender
@@ -29,7 +30,7 @@ namespace FEngRender
         public RenderTreeNode SelectedNode { get; set; }
         private (float width, float height, float x, float y) _boundingBox;
 
-        private readonly Dictionary<string, Image> _textures = new Dictionary<string, Image>();
+        private readonly Dictionary<string, SixLabors.ImageSharp.Image> _textures = new Dictionary<string, SixLabors.ImageSharp.Image>();
 
         public void LoadTextures(string directory)
         {
@@ -37,7 +38,7 @@ namespace FEngRender
             foreach (var pngFile in Directory.GetFiles(directory, "*.png"))
             {
                 var filename = Path.GetFileNameWithoutExtension(pngFile) ?? "";
-                _textures.Add(filename.ToUpperInvariant(), Image.Load(pngFile));
+                _textures.Add(filename.ToUpperInvariant(), SixLabors.ImageSharp.Image.Load(pngFile));
             }
         }
 
@@ -45,9 +46,9 @@ namespace FEngRender
         /// Renders nodes from a <see cref="RenderTree"/> to a surface.
         /// </summary>
         /// <param name="tree">The <see cref="RenderTree"/> to render.</param>
-        public Image<Rgba32> Render(RenderTree tree)
+        public SixLabors.ImageSharp.Image<Rgba32> Render(RenderTree tree)
         {
-            var img = new Image<Rgba32>(Width, Height, Color.Black);
+            var img = new SixLabors.ImageSharp.Image<Rgba32>(Width, Height, Color.Black);
 
             _boundingBox = (0, 0, 0, 0);
             ApplyContext(tree, Matrix4x4.Identity);
@@ -82,8 +83,8 @@ namespace FEngRender
             {
                 if (node.Hidden) continue;
                 
-                if ((node.FrontendObject.Flags & FE_ObjectFlags.FF_Invisible) != 0 ||
-                    (node.FrontendObject.Flags & FE_ObjectFlags.FF_HideInEdit) != 0)
+                if ((node.FrontendObject.Flags & ObjectFlags.Invisible) != 0 ||
+                    (node.FrontendObject.Flags & ObjectFlags.HideInEdit) != 0)
                 {
                     continue;
                 }
@@ -99,7 +100,7 @@ namespace FEngRender
             }
         }
 
-        private void RenderTree(Image<Rgba32> surface, IEnumerable<RenderTreeNode> nodes)
+        private void RenderTree(SixLabors.ImageSharp.Image<Rgba32> surface, IEnumerable<RenderTreeNode> nodes)
         {
             foreach (var renderTreeNode in GetAllTreeNodes(nodes).OrderByDescending(n => n.GetZ()))
             {
@@ -107,20 +108,20 @@ namespace FEngRender
             }
         }
 
-        private void RenderNode(Image<Rgba32> surface, RenderTreeNode node)
+        private void RenderNode(SixLabors.ImageSharp.Image<Rgba32> surface, RenderTreeNode node)
         {
             switch (node.FrontendObject)
             {
-                case FrontendImage image:
+                case Image image:
                     RenderImage(surface, node, image);
                     break;
-                case FrontendString str:
+                case Text str:
                     RenderString(surface, node, str);
                     break;
             }
         }
 
-        private void RenderString(Image<Rgba32> surface, RenderTreeNode node, FrontendString str)
+        private void RenderString(SixLabors.ImageSharp.Image<Rgba32> surface, RenderTreeNode node, Text str)
         {
             var strMatrix = node.ObjectMatrix;
             var posX = strMatrix.M41 + Width / 2f;
@@ -154,7 +155,7 @@ namespace FEngRender
             });
         }
 
-        private void RenderImage(Image<Rgba32> surface, RenderTreeNode node, FrontendImage image)
+        private void RenderImage(SixLabors.ImageSharp.Image<Rgba32> surface, RenderTreeNode node, Image image)
         {
             var imgMatrix = node.ObjectMatrix;
             float sizeX = imgMatrix.M11;
@@ -233,7 +234,7 @@ namespace FEngRender
 
         }
 
-        private Image GetTexture(FEResourceRequest resource)
+        private SixLabors.ImageSharp.Image GetTexture(FEResourceRequest resource)
         {
             if (resource.Type != FEResourceType.RT_Image)
             {
@@ -247,15 +248,6 @@ namespace FEngRender
         private static string CleanResourcePath(string path)
         {
             return path.Split('\\')[^1].Split('.')[0].ToUpperInvariant();
-        }
-        private static Quaternion ComputeObjectRotation(FrontendObject frontendObject)
-        {
-            var q = new Quaternion(frontendObject.Rotation.X, frontendObject.Rotation.Y, frontendObject.Rotation.Z,
-                frontendObject.Rotation.W);
-
-            if (frontendObject.Parent is { } parent) return ComputeObjectRotation(parent) * q;
-
-            return q;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FEngLib.Data;
+using FEngLib.Object;
 
 namespace FEngLib
 {
@@ -10,7 +11,7 @@ namespace FEngLib
     {
         public FrontendPackage()
         {
-            Objects = new List<FrontendObject>();
+            Objects = new List<IObject<ObjectData>>();
             MessageDefinitions = new List<MessageDefinition>();
             MessageResponses = new List<FEMessageResponse>();
             MessageTargetLists = new List<FEMessageTargetList>();
@@ -19,19 +20,19 @@ namespace FEngLib
 
         public string Name { get; set; }
         public string Filename { get; set; }
-        public List<FrontendObject> Objects { get; set; }
+        public List<IObject<ObjectData>> Objects { get; set; }
         public List<MessageDefinition> MessageDefinitions { get; set; }
         public List<FEMessageResponse> MessageResponses { get; set; }
         public List<FEMessageTargetList> MessageTargetLists { get; set; }
         public List<FEResourceRequest> ResourceRequests { get; set; }
 
-        public FrontendObject FindObjectByGuid(uint guid)
+        public IObject<ObjectData> FindObjectByGuid(uint guid)
         {
             return Objects.Find(o => o.Guid == guid) ??
                    throw new KeyNotFoundException($"Could not find object with GUID: 0x{guid:X8}");
         }
 
-        public FrontendObject FindObjectByHash(uint hash)
+        public IObject<ObjectData> FindObjectByHash(uint hash)
         {
             return Objects.Find(o => o.NameHash == hash) ??
                    throw new KeyNotFoundException($"Could not find object with hash: 0x{hash:X8}");

@@ -1,12 +1,13 @@
 ﻿using System.IO;
+using FEngLib.Object;
 
 namespace FEngLib
 {
     public abstract class FrontendTag
     {
-        public FrontendObject FrontendObject { get; }
+        public IObject<ObjectData> FrontendObject { get; }
 
-        protected FrontendTag(FrontendObject frontendObject)
+        protected FrontendTag(IObject<ObjectData> frontendObject)
         {
             FrontendObject = frontendObject;
         }

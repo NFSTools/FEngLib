@@ -1,17 +1,18 @@
 ﻿using System.IO;
+using FEngLib.Object;
 
 namespace FEngLib
 {
     public abstract class FrontendObjectChunk
     {
-        public FrontendObject FrontendObject { get; }
+        public IObject<ObjectData> FrontendObject { get; }
 
-        protected FrontendObjectChunk(FrontendObject frontendObject)
+        protected FrontendObjectChunk(IObject<ObjectData> frontendObject)
         {
             FrontendObject = frontendObject;
         }
 
-        public abstract FrontendObject Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader);
+        public abstract IObject<ObjectData> Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader);
         public abstract FrontendChunkType GetChunkType();
     }
 }

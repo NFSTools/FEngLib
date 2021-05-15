@@ -2,13 +2,14 @@
 using System.IO;
 using System.Numerics;
 using FEngLib.Data;
+using FEngLib.Object;
 using FEngLib.Structures;
 
 namespace FEngLib.Tags
 {
     public class ScriptKeyNodeTag : FrontendScriptTag
     {
-        public ScriptKeyNodeTag(FrontendObject frontendObject, FrontendScript frontendScript) : base(frontendObject,
+        public ScriptKeyNodeTag(IObject<ObjectData> frontendObject, FrontendScript frontendScript) : base(frontendObject,
             frontendScript)
         {
         }
@@ -32,30 +33,14 @@ namespace FEngLib.Tags
                     Time = br.ReadInt32()
                 };
 
-                object nodeValue;
-
-                if (track.ParamType == FEParamType.PT_Color)
+                object nodeValue = track.ParamType switch
                 {
-                    var feColor = new FEColor();
-                    feColor.Read(br);
-                    nodeValue = feColor;
-                }
-                else if (track.ParamType == FEParamType.PT_Vector2)
-                {
-                    nodeValue = new Vector2(br.ReadSingle(), br.ReadSingle());
-                }
-                else if (track.ParamType == FEParamType.PT_Vector3)
-                {
-                    nodeValue = new Vector3(br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
-                }
-                else if (track.ParamType == FEParamType.PT_Quaternion)
-                {
-                    nodeValue = new Quaternion(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
-                }
-                else
-                {
-                    throw new Exception("unhandled ParamType: " + track.ParamType);
-                }
+                    FEParamType.PT_Color => br.ReadColor(),
+                    FEParamType.PT_Vector2 => br.ReadVector2(),
+                    FEParamType.PT_Vector3 => br.ReadVector3(),
+                    FEParamType.PT_Quaternion => br.ReadQuaternion(),
+                    _ => throw new Exception("unhandled ParamType: " + track.ParamType)
+                };
 
                 keyNode.Val = nodeValue;
 

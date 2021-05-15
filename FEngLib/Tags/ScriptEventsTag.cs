@@ -1,12 +1,13 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using FEngLib.Data;
+using FEngLib.Object;
 
 namespace FEngLib.Tags
 {
     public class ScriptEventsTag : FrontendScriptTag
     {
-        public ScriptEventsTag(FrontendObject frontendObject, FrontendScript frontendScript) : base(frontendObject, frontendScript)
+        public ScriptEventsTag(IObject<ObjectData> frontendObject, FrontendScript frontendScript) : base(frontendObject, frontendScript)
         {
         }
 

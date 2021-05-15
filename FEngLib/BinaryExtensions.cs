@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
+using FEngLib.Structures;
 
 namespace FEngLib
 {
@@ -97,6 +99,41 @@ namespace FEngLib
                 var bytesToWrite = boundary - bw.BaseStream.Position % boundary;
                 bw.Write(new byte[bytesToWrite]);
             }
+        }
+
+        public static Vector2 ReadVector2(this BinaryReader br) => new Vector2(br.ReadSingle(), br.ReadSingle());
+        public static Vector3 ReadVector3(this BinaryReader br) => new Vector3(br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+        public static Quaternion ReadQuaternion(this BinaryReader br) =>
+            new Quaternion(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+        public static Color4 ReadColor(this BinaryReader br) => new Color4(br.ReadInt32(), br.ReadInt32(), br.ReadInt32(), br.ReadInt32());
+
+        public static void Write(this BinaryWriter bw, Vector2 vec)
+        {
+            bw.Write(vec.X);
+            bw.Write(vec.Y);
+        }
+
+        public static void Write(this BinaryWriter bw, Vector3 vec)
+        {
+            bw.Write(vec.X);
+            bw.Write(vec.Y);
+            bw.Write(vec.Z);
+        }
+
+        public static void Write(this BinaryWriter bw, Quaternion quaternion)
+        {
+            bw.Write(quaternion.X);
+            bw.Write(quaternion.Y);
+            bw.Write(quaternion.Z);
+            bw.Write(quaternion.W);
+        }
+
+        public static void Write(this BinaryWriter bw, Color4 color)
+        {
+            bw.Write(color.Blue);
+            bw.Write(color.Green);
+            bw.Write(color.Red);
+            bw.Write(color.Alpha);
         }
     }
 }

@@ -1,21 +1,35 @@
-﻿using System.IO;
-using FEngLib.Objects;
+﻿using System;
+using System.IO;
+using FEngLib.Object;
 
 namespace FEngLib.Tags
 {
     public class MultiImageTextureFlagsTag : FrontendTag
     {
-        public MultiImageTextureFlagsTag(FrontendObject frontendObject) : base(frontendObject)
+        public MultiImageTextureFlagsTag(IObject<ObjectData> frontendObject) : base(frontendObject)
         {
         }
 
         public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, FrontendPackage package, ushort id,
             ushort length)
         {
-            FrontendMultiImage multiImage = (FrontendMultiImage) FrontendObject;
+            MultiImage multiImage = (MultiImage)FrontendObject;
             int index = (id >> 8) - 0x61;
 
-            multiImage.TextureFlags[index] = br.ReadUInt32();
+            switch (index)
+            {
+                case 0:
+                    multiImage.TextureFlags1 = br.ReadUInt32();
+                    break;
+                case 1:
+                    multiImage.TextureFlags2 = br.ReadUInt32();
+                    break;
+                case 2:
+                    multiImage.TextureFlags3 = br.ReadUInt32();
+                    break;
+                default:
+                    throw new IndexOutOfRangeException($"Invalid MultiImageTextureFlags index: {index}");
+            }
         }
     }
 }

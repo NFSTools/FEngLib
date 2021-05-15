@@ -1,10 +1,11 @@
 ﻿using System.IO;
+using FEngLib.Object;
 
 namespace FEngLib.Tags
 {
     public class ScriptTrackOffsetTag : FrontendScriptTag
     {
-        public ScriptTrackOffsetTag(FrontendObject frontendObject, FrontendScript frontendScript) : base(frontendObject,
+        public ScriptTrackOffsetTag(IObject<ObjectData> frontendObject, FrontendScript frontendScript) : base(frontendObject,
             frontendScript)
         {
         }

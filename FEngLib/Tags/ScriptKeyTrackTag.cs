@@ -1,11 +1,12 @@
 ﻿using System.IO;
 using FEngLib.Data;
+using FEngLib.Object;
 
 namespace FEngLib.Tags
 {
     public class ScriptKeyTrackTag : FrontendScriptTag
     {
-        public ScriptKeyTrackTag(FrontendObject frontendObject, FrontendScript frontendScript) : base(frontendObject,
+        public ScriptKeyTrackTag(IObject<ObjectData> frontendObject, FrontendScript frontendScript) : base(frontendObject,
             frontendScript)
         {
         }

@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Numerics;
 using FEngLib;
 using FEngLib.Data;
-using FEngLib.Objects;
+using FEngLib.Object;
 using FEngLib.Structures;
 using FEngRender.Script;
 using FEngRender.Utils;
@@ -19,7 +19,7 @@ namespace FEngRender.Data
 
         public Quaternion ObjectRotation { get; private set; }
 
-        public FEColor ObjectColor { get; private set; }
+        public Color4 ObjectColor { get; private set; }
 
         // TODO: THESE SHOULD *NOT* BE HERE!!!
         // TODO cont: REFACTORING IS NECESSARY!!!!!!!!!!!
@@ -27,9 +27,9 @@ namespace FEngRender.Data
         public Vector2 LowerRight { get; private set; }
 
         /// <summary>
-        /// The <see cref="FEngLib.FrontendObject"/> instance owned by the node.
+        /// The <see cref="IObject{TData}"/> instance owned by the node.
         /// </summary>
-        public FrontendObject FrontendObject { get; }
+        public IObject<ObjectData> FrontendObject { get; }
 
         /// <summary>
         /// The <see cref="FrontendScript"/> that is currently running.
@@ -47,9 +47,9 @@ namespace FEngRender.Data
         /// Initializes a new instance of the <see cref="RenderTreeNode"/> class.
         /// </summary>
         /// <param name="frontendObject">
-        ///   The <see cref="FEngLib.FrontendObject"/> instance owned by the <see cref="RenderTreeNode"/> instance.
+        ///   The <see cref="IObject{TData}"/> instance owned by the <see cref="RenderTreeNode"/> instance.
         /// </param>
-        public RenderTreeNode(FrontendObject frontendObject)
+        public RenderTreeNode(IObject<ObjectData> frontendObject)
         {
             FrontendObject = frontendObject;
             SetScript(frontendObject.Scripts.Find(s => s.Id == 0x001744B3));
@@ -65,15 +65,16 @@ namespace FEngRender.Data
         public void PrepareForRender(Matrix4x4 viewMatrix, RenderTreeNode parentNode, int deltaTime,
             bool matrixRotate = false)
         {
-            var size = FrontendObject.Size;
-            var position = FrontendObject.Position;
-            var rotation = FrontendObject.Rotation;
-            var color = FrontendObject.Color;
+            var frontendObjectData = FrontendObject.Data;
+            var size = frontendObjectData.Size;
+            var position = frontendObjectData.Position;
+            var rotation = frontendObjectData.Rotation;
+            var color = frontendObjectData.Color;
 
-            if (FrontendObject is FrontendImage img)
+            if (frontendObjectData is ImageData imageData)
             {
-                UpperLeft = img.UpperLeft;
-                LowerRight = img.LowerRight;
+                UpperLeft = imageData.UpperLeft;
+                LowerRight = imageData.LowerRight;
             }
 
             if (CurrentScript != null
@@ -104,7 +105,7 @@ namespace FEngRender.Data
                 var sizeTrack = GetKeyTrack(CurrentScript, KeyTrackType.Size);
                 var rotTrack = GetKeyTrack(CurrentScript, KeyTrackType.Rotation);
                 if (colorTrack != null)
-                    color = TrackInterpolation.Interpolate<FEColor>(colorTrack, CurrentScriptTime);
+                    color = TrackInterpolation.Interpolate<Color4>(colorTrack, CurrentScriptTime);
                 if (posTrack != null)
                     position = TrackInterpolation.Interpolate<Vector3>(posTrack, CurrentScriptTime);
                 if (sizeTrack != null)
@@ -112,7 +113,7 @@ namespace FEngRender.Data
                 if (rotTrack != null)
                     rotation = TrackInterpolation.Interpolate<Quaternion>(rotTrack, CurrentScriptTime);
 
-                if (FrontendObject is FrontendImage)
+                if (FrontendObject is Image)
                 {
                     var upperLeftTrack = GetKeyTrack(CurrentScript, KeyTrackType.UpperLeft);
                     var lowerRightTrack = GetKeyTrack(CurrentScript, KeyTrackType.LowerRight);

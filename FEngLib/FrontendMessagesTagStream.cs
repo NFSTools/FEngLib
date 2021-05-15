@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using FEngLib.Object;
 using FEngLib.Tags;
 
 namespace FEngLib
@@ -14,7 +15,7 @@ namespace FEngLib
 
         public FrontendPackage Package { get; }
 
-        public override FrontendTag NextTag(FrontendObject frontendObject)
+        public override FrontendTag NextTag(IObject<ObjectData> frontendObject)
         {
             var (id, size) = (Reader.ReadUInt16(), Reader.ReadUInt16());
             var pos = Reader.BaseStream.Position;

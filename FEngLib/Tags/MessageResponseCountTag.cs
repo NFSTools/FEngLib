@@ -1,10 +1,11 @@
 ﻿using System.IO;
+using FEngLib.Object;
 
 namespace FEngLib.Tags
 {
     public class MessageResponseCountTag : FrontendTag
     {
-        public MessageResponseCountTag(FrontendObject frontendObject) : base(frontendObject)
+        public MessageResponseCountTag(IObject<ObjectData> frontendObject) : base(frontendObject)
         {
         }
 

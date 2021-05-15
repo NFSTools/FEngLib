@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using FEngLib.Chunks;
+using FEngLib.Object;
 
 namespace FEngLib
 {
@@ -98,10 +99,8 @@ namespace FEngLib
                         buttonMapCountChunk.Read(Package, block, this, Reader);
                         break;
                     case FrontendChunkType.FrontendObjectContainer:
-                        var frontendObject = new FrontendObject();
-                        frontendObject.Package = Package;
-                        var objectContainerChunk = new FrontendObjectContainerChunk(frontendObject);
-                        frontendObject = objectContainerChunk.Read(Package, new ObjectReaderState(block, this), Reader);
+                        var objectContainerChunk = new FrontendObjectContainerChunk(null);
+                        var frontendObject = objectContainerChunk.Read(Package, new ObjectReaderState(block, this), Reader);
                         Package.Objects.Add(frontendObject);
                         break;
                     default:
@@ -126,7 +125,7 @@ namespace FEngLib
                 Package.Objects.Add(frontendObject);
          */
 
-        public FrontendObject ReadFrontendObjectChunks(FrontendObject frontendObject, long length)
+        public IObject<ObjectData> ReadFrontendObjectChunks(IObject<ObjectData> frontendObject, long length)
         {
             var endPos = Reader.BaseStream.Position + length;
 

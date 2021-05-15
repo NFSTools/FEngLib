@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using FEngLib;
 using FEngLib.Data;
-using FEngLib.Objects;
+using FEngLib.Object;
 
 namespace FEngCli
 {
@@ -65,9 +65,9 @@ namespace FEngCli
             Console.WriteLine("ID     : 0x{0:X8}", resourceRequest.ID);
         }
 
-        public static void DumpObject(FrontendObject frontendObject, FrontendPackage package)
+        public static void DumpObject(IObject<ObjectData> frontendObject, FrontendPackage package)
         {
-            // if ((frontendObject.Type != FEObjType.FE_Image || frontendObject.ResourceIndex != 4) && frontendObject.Type != FEObjType.FE_Group) return;
+            // if ((frontendObject.Type != ObjectType.Image || frontendObject.ResourceIndex != 4) && frontendObject.Type != ObjectType.Group) return;
 
             Console.WriteLine("--------- OBJECT ---------");
             if (!string.IsNullOrEmpty(frontendObject.Name))
@@ -77,11 +77,14 @@ namespace FEngCli
             Console.WriteLine("Flags    : {0}", frontendObject.Flags);
             if (frontendObject.Parent != null)
                 Console.WriteLine("Parent   : 0x{0:X}", frontendObject.Parent.Guid);
-            Console.WriteLine("Position : {0}", frontendObject.Position);
-            Console.WriteLine("Size     : {0}", frontendObject.Size);
-            Console.WriteLine("Pivot    : {0}", frontendObject.Pivot);
-            Console.WriteLine("Rotation : {0}", frontendObject.Rotation);
-            Console.WriteLine("Color    : {0}", frontendObject.Color);
+            if (frontendObject.Data is { } data)
+            {
+                Console.WriteLine("Position : {0}", data.Position);
+                Console.WriteLine("Size     : {0}", data.Size);
+                Console.WriteLine("Pivot    : {0}", data.Pivot);
+                Console.WriteLine("Rotation : {0}", data.Rotation);
+                Console.WriteLine("Color    : {0}", data.Color);
+            }
             Console.WriteLine("Type     : {0}", frontendObject.Type);
             if (frontendObject.ResourceRequest != null)
                 Console.WriteLine("Resource : {0}", frontendObject.ResourceRequest.Name);
@@ -150,9 +153,10 @@ namespace FEngCli
             }
 
             Console.WriteLine("Extended data:");
+
             switch (frontendObject)
             {
-                case FrontendString frontendString:
+                case Text frontendString:
                     Console.WriteLine("\tString hash   : 0x{0:X}", frontendString.Hash);
                     if (!string.IsNullOrEmpty(frontendString.Label))
                         Console.WriteLine("\tString ID     : {0} ({1})", frontendString.Label,
@@ -162,20 +166,35 @@ namespace FEngCli
                     Console.WriteLine("\tText leading  : {0}", frontendString.Leading);
                     Console.WriteLine("\tText format   : {0}", frontendString.Formatting);
                     break;
-                case FrontendMultiImage frontendMultiImage:
+                case MultiImage frontendMultiImage:
                     Console.WriteLine("\tImage flags   : {0}", frontendMultiImage.ImageFlags);
                     Console.WriteLine("\tTextures      : {0}",
-                        string.Join(", ", frontendMultiImage.Texture.Select(h => h.ToString("X8"))));
+                        string.Join(", ",
+                            new[]
+                            {
+                                frontendMultiImage.Texture1, frontendMultiImage.Texture2, frontendMultiImage.Texture3
+                            }.Select(h => h.ToString("X8"))));
                     break;
-                case FrontendColoredImage frontendMultiImage:
-                    Console.WriteLine("\tImage flags   : {0}", frontendMultiImage.ImageFlags);
-                    Console.WriteLine("\tColors        : {0}",
-                        string.Join(", ", frontendMultiImage.VertexColors.Select(h => h.ToString())));
+                case ColoredImage coloredImage:
+                    Console.WriteLine("\tImage flags   : {0}", coloredImage.ImageFlags);
+                    if (coloredImage.Data is { } coloredImageData)
+                    {
+                        Console.WriteLine("\tColors        : {0}",
+                            string.Join(", ",
+                                new[]
+                                {
+                                    coloredImageData.TopLeft, coloredImageData.TopRight, coloredImageData.BottomRight,
+                                    coloredImageData.BottomLeft
+                                }));
+                    }
                     break;
-                case FrontendImage frontendImage:
+                case Image frontendImage:
                     Console.WriteLine("\tImage flags   : {0}", frontendImage.ImageFlags);
-                    Console.WriteLine("\tUpper Left    : {0}", frontendImage.UpperLeft);
-                    Console.WriteLine("\tLower Right   : {0}", frontendImage.LowerRight);
+                    if (frontendImage.Data is { } imageData)
+                    {
+                        Console.WriteLine("\tUpper Left    : {0}", imageData.UpperLeft);
+                        Console.WriteLine("\tLower Right   : {0}", imageData.LowerRight);
+                    }
                     break;
             }
         }

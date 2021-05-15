@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using FEngLib.Object;
 
 namespace FEngLib.Tags
 {
@@ -7,7 +8,7 @@ namespace FEngLib.Tags
     {
         public uint Id { get; set; }
 
-        public ScriptChainTag(FrontendObject frontendObject, FrontendScript frontendScript) : base(frontendObject, frontendScript)
+        public ScriptChainTag(IObject<ObjectData> frontendObject, FrontendScript frontendScript) : base(frontendObject, frontendScript)
         {
         }
 

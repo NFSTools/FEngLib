@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using FEngLib.Object;
 using FEngLib.Tags;
 
 namespace FEngLib
@@ -11,12 +12,12 @@ namespace FEngLib
         {
         }
 
-        public override FrontendTag NextTag(FrontendObject frontendObject)
+        public override FrontendTag NextTag(IObject<ObjectData> frontendObject)
         {
             throw new NotImplementedException("Use NextTag(FrontendObject, FrontendScript) instead");
         }
 
-        public FrontendTag NextTag(FrontendObject frontendObject, FrontendScript frontendScript)
+        public FrontendTag NextTag(IObject<ObjectData> frontendObject, FrontendScript frontendScript)
         {
             var (id, size) = (Reader.ReadUInt16(), Reader.ReadUInt16());
             var pos = Reader.BaseStream.Position;
@@ -32,7 +33,7 @@ namespace FEngLib
                 _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
             };
 
-            tag.Read(Reader, FrontendChunkBlock, frontendObject.Package, id, size);
+            tag.Read(Reader, FrontendChunkBlock, null, id, size);
 
             if (Reader.BaseStream.Position - pos != size)
                 throw new ChunkReadingException(

@@ -29,11 +29,19 @@ namespace FEngViewer
                 labelObjResID.Text = "<n/a>";
             }
 
-            labelObjDataColor.Text = obj.Color?.ToString() ?? "<n/a>";
-            labelObjDataPivot.Text = obj.Pivot.ToString();
-            labelObjDataPosition.Text = obj.Position.ToString();
-            labelObjDataRotation.Text = obj.Rotation.ToString();
-            labelObjDataSize.Text = obj.Size.ToString();
+            if (obj.Data is {} data)
+            {
+                labelObjDataColor.Text = data.Color.ToString();
+                labelObjDataPivot.Text = data.Pivot.ToString();
+                labelObjDataPosition.Text = data.Position.ToString();
+                labelObjDataRotation.Text = data.Rotation.ToString();
+                labelObjDataSize.Text = data.Size.ToString();
+            }
+            else
+            {
+                labelObjDataColor.Text = labelObjDataPivot.Text = labelObjDataPosition.Text =
+                    labelObjDataRotation.Text = labelObjDataSize.Text = "<n/a>";
+            }
         }
     }
 }

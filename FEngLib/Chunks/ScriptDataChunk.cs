@@ -1,15 +1,16 @@
 ﻿using System.IO;
+using FEngLib.Object;
 using FEngLib.Tags;
 
 namespace FEngLib.Chunks
 {
     public class ScriptDataChunk : FrontendObjectChunk
     {
-        public ScriptDataChunk(FrontendObject frontendObject) : base(frontendObject)
+        public ScriptDataChunk(IObject<ObjectData> frontendObject) : base(frontendObject)
         {
         }
 
-        public override FrontendObject Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader)
+        public override IObject<ObjectData> Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader)
         {
             var tagStream = new FrontendScriptTagStream(reader, readerState.CurrentChunkBlock,
                 readerState.CurrentChunkBlock.Size);
@@ -18,7 +19,7 @@ namespace FEngLib.Chunks
             while (tagStream.HasTag())
             {
                 var tag = tagStream.NextTag(FrontendObject, script);
-                ProcessTag(FrontendObject, script, tag);
+                ProcessTag(script, tag);
             }
 
             FrontendObject.Scripts.Add(script);
@@ -31,12 +32,12 @@ namespace FEngLib.Chunks
             return FrontendChunkType.ScriptData;
         }
 
-        private void ProcessTag(FrontendObject frontendObject, FrontendScript frontendScript, FrontendTag tag)
+        private void ProcessTag(FrontendScript frontendScript, FrontendTag tag)
         {
             switch (tag)
             {
                 case ScriptHeaderTag scriptHeaderTag:
-                    ProcessScriptHeaderTag(frontendObject, frontendScript, scriptHeaderTag);
+                    ProcessScriptHeaderTag(frontendScript, scriptHeaderTag);
                     break;
                 case ScriptNameTag scriptNameTag:
                     frontendScript.Name = scriptNameTag.Name;
@@ -48,7 +49,7 @@ namespace FEngLib.Chunks
             }
         }
 
-        private void ProcessScriptHeaderTag(FrontendObject frontendObject, FrontendScript frontendScript,
+        private void ProcessScriptHeaderTag(FrontendScript frontendScript,
             ScriptHeaderTag scriptHeaderTag)
         {
             frontendScript.Id = scriptHeaderTag.Id;

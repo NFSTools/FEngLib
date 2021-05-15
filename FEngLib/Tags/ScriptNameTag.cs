@@ -1,10 +1,11 @@
 ﻿using System.IO;
+using FEngLib.Object;
 
 namespace FEngLib.Tags
 {
     public class ScriptNameTag : FrontendScriptTag
     {
-        public ScriptNameTag(FrontendObject frontendObject, FrontendScript frontendScript) : base(frontendObject,
+        public ScriptNameTag(IObject<ObjectData> frontendObject, FrontendScript frontendScript) : base(frontendObject,
             frontendScript)
         {
         }
