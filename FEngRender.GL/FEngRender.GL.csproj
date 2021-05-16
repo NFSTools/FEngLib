@@ -32,6 +32,7 @@
     <ItemGroup>
       <PackageReference Include="SharpGL" Version="3.1.1" />
       <PackageReference Include="SharpGL.SceneGraph" Version="3.1.1" />
+      <PackageReference Include="SixLabors.Fonts" Version="1.0.0-beta0013" />
       <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
     </ItemGroup>
 

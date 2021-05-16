@@ -29,12 +29,14 @@ namespace FEngRender.GL
         private readonly Dictionary<string, Texture> _textures = new Dictionary<string, Texture>();
 
         private readonly OpenGL _gl;
+        private readonly GLGlyphRenderer _glyphRenderer;
 
         private Stopwatch _stopwatch;
 
         public GLRenderTreeRenderer(OpenGL gl)
         {
             _gl = gl;
+            _glyphRenderer = new GLGlyphRenderer(_gl);
             _stopwatch = Stopwatch.StartNew();
         }
 
@@ -154,31 +156,27 @@ namespace FEngRender.GL
             var strMatrix = node.ObjectMatrix;
             float posX = strMatrix.M41 + Width / 2f;
             float posY = strMatrix.M42 + Height / 2f;
-            // TODO
-            /*surface.Mutate(m =>
+            
+            var font = TextHelpers.GetFont(18);
+            var (_, _, width, height) = TextHelpers.MeasureText(str.Value, new RendererOptions(font)
             {
-                var rect = TextRendering.MeasureText(str.Value, str.MaxWidth);
-                var xOffset = TextRendering.CalculateXOffset((uint)str.Formatting,
-                    rect.Width);
-                var yOffset = TextRendering.CalculateYOffset((uint)str.Formatting,
-                    rect.Height);
+                WrappingWidth = str.MaxWidth
+            });
+            var xOffset = TextHelpers.CalculateXOffset((uint)str.Formatting,
+                width);
+            var yOffset = TextHelpers.CalculateYOffset((uint)str.Formatting,
+                height);
 
-                posX += xOffset;
-                posY += yOffset;
-
-                m.DrawText(new TextGraphicsOptions(new GraphicsOptions(), new TextOptions
-                    {
-                        WrapTextWidth = str.MaxWidth
-                    }),  str.Value, TextRendering.DefaultFont,
-                    Color.FromRgba((byte)(node.ObjectColor.Red & 0xff),
-                        (byte)(node.ObjectColor.Green & 0xff), (byte)(node.ObjectColor.Blue & 0xff),
-                        (byte)(node.ObjectColor.Alpha & 0xff)),
-                    new PointF(posX, posY));
-                if (SelectedNode?.FrontendObject?.Guid == str.Guid)
+            _glyphRenderer.Transform = node.ObjectMatrix * Matrix4x4.CreateTranslation(320, 240, 0);
+            _glyphRenderer.Color = node.ObjectColor;
+            _glyphRenderer.Formatting = str.Formatting;
+            
+            TextRenderer.RenderTextTo(_glyphRenderer, str.Value,
+                new RendererOptions(font, new Vector2(xOffset, yOffset))
                 {
-                    _boundingBox = (rect.Width, rect.Height, posX, posY);
+                    WrappingWidth = str.MaxWidth,
                 }
-            });*/
+            );
         }
 
         private void RenderSimpleImage(RenderTreeNode node, bool doBoundingBox = false)
@@ -216,7 +214,7 @@ namespace FEngRender.GL
             {
                 if (texture.Width == 0) return 0;
 
-                var v10 = (uint)(value - 1) >> 1;
+                var v10 = (uint) (value - 1) >> 1;
                 uint divisor;
                 for (divisor = 2; v10 != 0; divisor *= 2)
                 {
@@ -226,8 +224,8 @@ namespace FEngRender.GL
                 return divisor;
             }
 
-            var widthDivide = (float)CalculateDivisor(texture.Width);
-            var heightDivide = (float)CalculateDivisor(texture.Height);
+            var widthDivide = (float) CalculateDivisor(texture.Width);
+            var heightDivide = (float) CalculateDivisor(texture.Height);
 
             var texUpLeft = new Vector2(
                 texture.Width / widthDivide * node.UpperLeft.X,
