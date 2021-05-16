@@ -12,6 +12,7 @@ using FEngRender.Data;
 using FEngRender.Utils;
 using SharpGL;
 using SharpGL.Enumerations;
+using SixLabors.Fonts;
 
 namespace FEngRender.GL
 {
@@ -185,7 +186,7 @@ namespace FEngRender.GL
         {
             // top left, top right, bottom right, bottom left
             Vector4[] colors = new Vector4[4];
-            colors[0] = colors[1] = colors[2] = colors[3] = ColorHelpers.ColorToVector(node.ObjectColor);
+            colors[0] = colors[1] = colors[2] = colors[3] = node.ObjectColor;
 
             var otkMat4 = node.ObjectMatrix * Matrix4x4.CreateTranslation(320, 240, 0);
             var q = new Quad(-0.5f, -0.5f, 0.5f, 0.5f,
@@ -230,13 +231,13 @@ namespace FEngRender.GL
             var heightDivide = (float)CalculateDivisor(texture.Height);
 
             var texUpLeft = new Vector2(
-                (texture.Width / widthDivide) * node.UpperLeft.X,
-                (texture.Height / heightDivide) * node.UpperLeft.Y
+                texture.Width / widthDivide * node.UpperLeft.X,
+                texture.Height / heightDivide * node.UpperLeft.Y
             );
 
             var texLowRight = new Vector2(
-                (texture.Width / widthDivide) * node.LowerRight.X,
-                (texture.Height / heightDivide) * node.LowerRight.Y
+                texture.Width / widthDivide * node.LowerRight.X,
+                texture.Height / heightDivide * node.LowerRight.Y
             );
 
             // top left, top right, bottom right, bottom left
@@ -244,14 +245,14 @@ namespace FEngRender.GL
 
             if (image is ColoredImage ci)
             {
-                colors[0] = ColorHelpers.ColorToVector(ci.Data.TopLeft);
-                colors[1] = ColorHelpers.ColorToVector(ci.Data.TopRight);
-                colors[2] = ColorHelpers.ColorToVector(ci.Data.BottomRight);
-                colors[3] = ColorHelpers.ColorToVector(ci.Data.BottomLeft);
+                colors[0] = ci.Data.TopLeft;
+                colors[1] = ci.Data.TopRight;
+                colors[2] = ci.Data.BottomRight;
+                colors[3] = ci.Data.BottomLeft;
             }
             else
             {
-                colors[0] = colors[1] = colors[2] = colors[3] = ColorHelpers.ColorToVector(node.ObjectColor);
+                colors[0] = colors[1] = colors[2] = colors[3] = node.ObjectColor;
             }
 
             var q = new Quad(-0.5f, -0.5f, 0.5f, 0.5f,

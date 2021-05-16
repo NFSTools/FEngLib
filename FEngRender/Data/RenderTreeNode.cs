@@ -142,7 +142,7 @@ namespace FEngRender.Data
             if (parentNode != null)
             {
                 ObjectRotation *= parentNode.ObjectRotation;
-                ObjectColor = ColorHelpers.BlendColors(ObjectColor, parentNode.ObjectColor);
+                ObjectColor = Color4.Blend(ObjectColor, parentNode.ObjectColor);
             }
         }
 
