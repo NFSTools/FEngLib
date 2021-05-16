@@ -340,3 +340,5 @@ ASALocalRun/
 healthchecksdb
 /FEngViewer/Properties/launchSettings.json
 /FEngCli/Properties/launchSettings.json
+
+!FEngLib/Packages
