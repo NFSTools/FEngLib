@@ -5,8 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using FEngLib;
-using FEngLib.Data;
 using FEngLib.Object;
+using FEngLib.Objects;
+using FEngLib.Packages;
 using FEngRender.Data;
 using FEngRender.Utils;
 using SharpGL;
@@ -266,9 +267,9 @@ namespace FEngRender.GL
                 q.Render(_gl, texture);
         }
 
-        private Texture GetTexture(FEResourceRequest resource)
+        private Texture GetTexture(ResourceRequest resource)
         {
-            if (resource.Type != FEResourceType.RT_Image)
+            if (resource.Type != ResourceType.Image)
             {
                 return null;
             }

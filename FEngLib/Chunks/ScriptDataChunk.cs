@@ -1,5 +1,9 @@
 ﻿using System.IO;
 using FEngLib.Object;
+using FEngLib.Objects;
+using FEngLib.Packages;
+using FEngLib.Scripts;
+using FEngLib.Scripts.Tags;
 using FEngLib.Tags;
 
 namespace FEngLib.Chunks
@@ -10,11 +14,11 @@ namespace FEngLib.Chunks
         {
         }
 
-        public override IObject<ObjectData> Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader)
+        public override IObject<ObjectData> Read(Package package, ObjectReaderState readerState, BinaryReader reader)
         {
-            var tagStream = new FrontendScriptTagStream(reader, readerState.CurrentChunkBlock,
+            var tagStream = new ScriptTagStream(reader, readerState.CurrentChunkBlock,
                 readerState.CurrentChunkBlock.Size);
-            var script = new FrontendScript();
+            var script = new Script();
 
             while (tagStream.HasTag())
             {
@@ -32,29 +36,29 @@ namespace FEngLib.Chunks
             return FrontendChunkType.ScriptData;
         }
 
-        private void ProcessTag(FrontendScript frontendScript, FrontendTag tag)
+        private void ProcessTag(Script script, Tag tag)
         {
             switch (tag)
             {
                 case ScriptHeaderTag scriptHeaderTag:
-                    ProcessScriptHeaderTag(frontendScript, scriptHeaderTag);
+                    ProcessScriptHeaderTag(script, scriptHeaderTag);
                     break;
                 case ScriptNameTag scriptNameTag:
-                    frontendScript.Name = scriptNameTag.Name;
-                    frontendScript.Id = scriptNameTag.NameHash;
+                    script.Name = scriptNameTag.Name;
+                    script.Id = scriptNameTag.NameHash;
                     break;
                 case ScriptChainTag scriptChainTag:
-                    frontendScript.ChainedId = scriptChainTag.Id;
+                    script.ChainedId = scriptChainTag.Id;
                     break;
             }
         }
 
-        private void ProcessScriptHeaderTag(FrontendScript frontendScript,
+        private void ProcessScriptHeaderTag(Script script,
             ScriptHeaderTag scriptHeaderTag)
         {
-            frontendScript.Id = scriptHeaderTag.Id;
-            frontendScript.Flags = scriptHeaderTag.Flags;
-            frontendScript.Length = scriptHeaderTag.Length;
+            script.Id = scriptHeaderTag.Id;
+            script.Flags = scriptHeaderTag.Flags;
+            script.Length = scriptHeaderTag.Length;
         }
     }
 }

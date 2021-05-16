@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using FEngLib.Data;
 using FEngLib.Object;
+using FEngLib.Object.Tags;
+using FEngLib.Objects;
+using FEngLib.Objects.Tags;
+using FEngLib.Packages;
 using FEngLib.Tags;
+using FEngLib.Utils;
 
 namespace FEngLib.Chunks
 {
@@ -13,10 +17,10 @@ namespace FEngLib.Chunks
         {
         }
 
-        public override IObject<ObjectData> Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader)
+        public override IObject<ObjectData> Read(Package package, ObjectReaderState readerState, BinaryReader reader)
         {
             var newFrontendObject = FrontendObject;
-            FrontendTagStream tagStream = new FrontendObjectTagStream(reader, readerState.CurrentChunkBlock,
+            TagStream tagStream = new ObjectTagStream(reader, readerState.CurrentChunkBlock,
                 readerState.CurrentChunkBlock.Size);
 
             while (tagStream.HasTag())
@@ -28,7 +32,7 @@ namespace FEngLib.Chunks
             return newFrontendObject;
         }
 
-        private IObject<ObjectData> ProcessTag(FrontendPackage package, IObject<ObjectData> frontendObject, FrontendTag tag)
+        private IObject<ObjectData> ProcessTag(Package package, IObject<ObjectData> frontendObject, Tag tag)
         {
             switch (tag)
             {
@@ -59,11 +63,8 @@ namespace FEngLib.Chunks
                 case ObjectReferenceTag objectReferenceTag:
                     ProcessObjectReferenceTag(package, frontendObject, objectReferenceTag);
                     break;
-                case ImageInfoTag imageInfoTag when frontendObject is Image frontendImage:
+                case ImageInfoTag imageInfoTag when frontendObject is IImage<ImageData> frontendImage:
                     ProcessImageInfoTag(frontendImage, imageInfoTag);
-                    break;
-                case ObjectDataTag objectDataTag:
-                    ProcessObjectDataTag(frontendObject, objectDataTag);
                     break;
                 case ObjectParentTag objectParentTag:
                     ProcessObjectParentTag(package, frontendObject, objectParentTag);
@@ -74,6 +75,7 @@ namespace FEngLib.Chunks
                     break;
                 case MultiImageTextureTag _:
                 case MultiImageTextureFlagsTag _:
+                case ObjectDataTag _: // ObjectDataTag calls IObject.InitializeData and then IObject.Data.Read
                     break;
                 default:
                     throw new InvalidDataException($"Unknown tag: {tag}");
@@ -82,7 +84,7 @@ namespace FEngLib.Chunks
             return frontendObject;
         }
 
-        private void ProcessObjectParentTag(FrontendPackage package, IObject<ObjectData> frontendObject,
+        private void ProcessObjectParentTag(Package package, IObject<ObjectData> frontendObject,
             ObjectParentTag objectParentTag)
         {
             frontendObject.Parent = package.FindObjectByGuid(objectParentTag.ParentId);
@@ -114,49 +116,6 @@ namespace FEngLib.Chunks
         {
             frontendString.Formatting = stringBufferFormattingTag.Formatting;
             return frontendString;
-        }
-
-        private void ProcessObjectDataTag(IObject<ObjectData> frontendObject, ObjectDataTag objectDataTag)
-        {
-            frontendObject.InitializeData();
-
-            var frontendObjectData = frontendObject.Data;
-            Debug.Assert(frontendObjectData != null, "frontendObjectData != null");
-
-            var objectData = objectDataTag.Data;
-            frontendObjectData.Position = objectData.Position;
-            frontendObjectData.Pivot = objectData.Pivot;
-            frontendObjectData.Color = objectData.Color;
-            frontendObjectData.Rotation = objectData.Rotation;
-            frontendObjectData.Size = objectData.Size;
-
-            if (objectData is ImageData imageData)
-            {
-                var image = (Image) frontendObject;
-                image.Data.UpperLeft = imageData.UpperLeft;
-                image.Data.LowerRight = imageData.LowerRight;
-            }
-
-            if (objectData is MultiImageData multiImageData)
-            {
-                var multiImage = (MultiImage) frontendObject;
-                multiImage.Data.PivotRotation = multiImageData.PivotRotation;
-                multiImage.Data.TopLeft1 = multiImageData.TopLeft1;
-                multiImage.Data.TopLeft2 = multiImageData.TopLeft2;
-                multiImage.Data.TopLeft3 = multiImageData.TopLeft3;
-                multiImage.Data.BottomRight1 = multiImageData.BottomRight1;
-                multiImage.Data.BottomRight2 = multiImageData.BottomRight2;
-                multiImage.Data.BottomRight3 = multiImageData.BottomRight3;
-            }
-
-            if (objectData is ColoredImageData coloredImageData)
-            {
-                var coloredImage = (ColoredImage) frontendObject;
-                coloredImage.Data.TopLeft = coloredImageData.TopLeft;
-                coloredImage.Data.TopRight = coloredImageData.TopRight;
-                coloredImage.Data.BottomRight = coloredImageData.BottomRight;
-                coloredImage.Data.BottomLeft = coloredImageData.BottomLeft;
-            }
         }
 
         private BaseObject ProcessStringBufferTextTag(Text frontendString,
@@ -202,12 +161,12 @@ namespace FEngLib.Chunks
             return newInstance;
         }
 
-        private void ProcessImageInfoTag(Image image, ImageInfoTag imageInfoTag)
+        private void ProcessImageInfoTag(IImage<ImageData> image, ImageInfoTag imageInfoTag)
         {
             image.ImageFlags = imageInfoTag.ImageFlags;
         }
 
-        private void ProcessObjectReferenceTag(FrontendPackage package, IObject<ObjectData> frontendObject,
+        private void ProcessObjectReferenceTag(Package package, IObject<ObjectData> frontendObject,
             ObjectReferenceTag objectReferenceTag)
         {
             frontendObject.Flags = objectReferenceTag.Flags;

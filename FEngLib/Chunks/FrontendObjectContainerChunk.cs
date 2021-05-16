@@ -1,11 +1,13 @@
 ﻿using System.IO;
 using FEngLib.Object;
+using FEngLib.Objects;
+using FEngLib.Packages;
 
 namespace FEngLib.Chunks
 {
     public class FrontendObjectContainerChunk : FrontendObjectChunk
     {
-        public override IObject<ObjectData> Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader)
+        public override IObject<ObjectData> Read(Package package, ObjectReaderState readerState, BinaryReader reader)
         {
             return readerState.ChunkReader.ReadFrontendObjectChunks(FrontendObject, readerState.CurrentChunkBlock.Size);
         }

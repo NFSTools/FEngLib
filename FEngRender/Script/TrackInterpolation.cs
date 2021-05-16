@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
-using FEngLib.Data;
+using FEngLib.Scripts;
 using FEngLib.Structures;
 using FEngRender.Utils;
 
 namespace FEngRender.Script
 {
     /// <summary>
-    /// Implements interpolation of keys in <see cref="FEKeyTrack"/> objects
+    /// Implements interpolation of keys in <see cref="Track"/> objects
     /// </summary>
     public static class TrackInterpolation
     {
-        public static T Interpolate<T>(FEKeyTrack track, int time)
+        public static T Interpolate<T>(Track track, int time)
         {
             var nextDeltaKeyNode = track.GetDeltaKeyAt(time);
 
@@ -24,7 +24,7 @@ namespace FEngRender.Script
             }
 
             var nextDeltaKey = nextDeltaKeyNode.Value;
-            LinkedListNode<FEKeyNode> prevDeltaKeyNode;
+            LinkedListNode<TrackNode> prevDeltaKeyNode;
             float lerpFactor;
 
             if (track.InterpAction == 0)
@@ -89,13 +89,13 @@ namespace FEngRender.Script
             return (T)LerpKeys(track, lerpFactor, prevDeltaKeyNode!.Value, nextDeltaKey, track.BaseKey);
         }
 
-        private static object AddKeys(FEKeyTrack track, FEKeyNode node1, FEKeyNode node2)
+        private static object AddKeys(Track track, TrackNode node1, TrackNode node2)
         {
             switch (track.ParamType)
             {
-                case FEParamType.PT_Int:
+                case TrackParamType.Integer:
                     return node1.GetValue<int>() + node2.GetValue<int>();
-                case FEParamType.PT_Color:
+                case TrackParamType.Color:
                     {
                         var c1 = node1.GetValue<Color4>();
                         var c2 = node2.GetValue<Color4>();
@@ -107,33 +107,33 @@ namespace FEngRender.Script
                             Red = c1.Red + c2.Red
                         };
                     }
-                case FEParamType.PT_Vector2:
+                case TrackParamType.Vector2:
                     return node1.GetValue<Vector2>() + node2.GetValue<Vector2>();
-                case FEParamType.PT_Vector3:
+                case TrackParamType.Vector3:
                     return node1.GetValue<Vector3>() + node2.GetValue<Vector3>();
-                case FEParamType.PT_Quaternion:
+                case TrackParamType.Quaternion:
                     return node1.GetValue<Quaternion>() * node2.GetValue<Quaternion>();
                 default:
                     throw new IndexOutOfRangeException($"Unsupported ParamType for ADD: {track.ParamType}");
             }
         }
 
-        private static object LerpKeys(FEKeyTrack track, float t, FEKeyNode node1, FEKeyNode node2, FEKeyNode offset)
+        private static object LerpKeys(Track track, float t, TrackNode node1, TrackNode node2, TrackNode offset)
         {
             switch (track.ParamType)
             {
-                case FEParamType.PT_Int:
+                case TrackParamType.Integer:
                     return LerpInteger(node1.GetValue<int>(), node2.GetValue<int>(), t, offset.GetValue<int>());
-                case FEParamType.PT_Color:
+                case TrackParamType.Color:
                     return LerpColor(node1.GetValue<Color4>(), node2.GetValue<Color4>(), t,
                         offset.GetValue<Color4>());
-                case FEParamType.PT_Vector2:
+                case TrackParamType.Vector2:
                     return Vector2.Lerp(node1.GetValue<Vector2>(), node2.GetValue<Vector2>(), t) +
                            offset.GetValue<Vector2>();
-                case FEParamType.PT_Vector3:
+                case TrackParamType.Vector3:
                     return Vector3.Lerp(node1.GetValue<Vector3>(), node2.GetValue<Vector3>(), t) +
                            offset.GetValue<Vector3>();
-                case FEParamType.PT_Quaternion:
+                case TrackParamType.Quaternion:
                     return Quaternion.Lerp(node1.GetValue<Quaternion>(), node2.GetValue<Quaternion>(), t) *
                            offset.GetValue<Quaternion>();
                 default:

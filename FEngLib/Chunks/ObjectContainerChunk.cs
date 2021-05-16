@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using FEngLib.Object;
+using FEngLib.Objects;
+using FEngLib.Packages;
 
 namespace FEngLib.Chunks
 {
@@ -13,7 +15,7 @@ namespace FEngLib.Chunks
             Objects = new List<BaseObject>();
         }
 
-        public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock, FrontendChunkReader chunkReader, BinaryReader reader)
+        public override void Read(Package package, FrontendChunkBlock chunkBlock, FrontendChunkReader chunkReader, BinaryReader reader)
         {
             chunkReader.ReadObjects(chunkBlock.Size);
             //foreach (var frontendObject in chunkReader.ReadObjects(chunkBlock.Size))

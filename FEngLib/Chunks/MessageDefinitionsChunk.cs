@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using FEngLib.Packages;
 
 namespace FEngLib.Chunks
 {
     public class MessageDefinitionsChunk : FrontendChunk
     {
-        public List<FrontendPackage.MessageDefinition> Definitions { get; set; } =
-            new List<FrontendPackage.MessageDefinition>();
+        public List<Package.MessageDefinition> Definitions { get; set; } =
+            new List<Package.MessageDefinition>();
 
-        public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock,
+        public override void Read(Package package, FrontendChunkBlock chunkBlock,
             FrontendChunkReader chunkReader, BinaryReader reader)
         {
             while (reader.BaseStream.Position < chunkBlock.EndOffset)
@@ -19,7 +20,7 @@ namespace FEngLib.Chunks
                 switch (tagId)
                 {
                     case 0x4E4D:
-                        Definitions.Add(new FrontendPackage.MessageDefinition
+                        Definitions.Add(new Package.MessageDefinition
                         {
                             Name = new string(reader.ReadChars(tagLen)).Trim('\x00')
                         });

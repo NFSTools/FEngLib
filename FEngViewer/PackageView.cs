@@ -6,8 +6,9 @@ using System.IO;
 using System.Windows.Forms;
 using CommandLine;
 using FEngLib;
-using FEngLib.Data;
 using FEngLib.Object;
+using FEngLib.Packages;
+using FEngLib.Scripts;
 using FEngRender.Data;
 using FEngViewer.Properties;
 using JetBrains.Annotations;
@@ -17,6 +18,7 @@ namespace FEngViewer
     public partial class PackageView : Form
     {
         private RenderTree _currentRenderTree;
+        private Package _currentPackage;
 
         public PackageView()
         {
@@ -52,7 +54,7 @@ namespace FEngViewer
         }
 
 
-        private void PopulateTreeView(FrontendPackage package, IEnumerable<RenderTreeNode> feObjectNodes)
+        private void PopulateTreeView(Package package, IEnumerable<RenderTreeNode> feObjectNodes)
         {
             // map group guid to children guids
             treeView1.BeginUpdate();
@@ -110,7 +112,7 @@ namespace FEngViewer
             return objTreeNode;
         }
 
-        private static void CreateScriptTreeNode(TreeNodeCollection collection, FrontendScript script)
+        private static void CreateScriptTreeNode(TreeNodeCollection collection, Script script)
         {
             var node = collection.Add(script.Name ?? $"0x{script.Id:X}");
             // ReSharper disable once LocalizableElement
@@ -146,7 +148,7 @@ namespace FEngViewer
             }
         }
 
-        private static FrontendPackage LoadPackageFromChunk(string path)
+        private static Package LoadPackageFromChunk(string path)
         {
             using var fs = new FileStream(path, FileMode.Open);
             using var fr = new BinaryReader(fs);
@@ -215,6 +217,7 @@ namespace FEngViewer
                 return;
             var package = LoadPackageFromChunk(path);
             // window title
+            _currentPackage = package;
             _currentRenderTree = RenderTree.Create(package);
             PopulateTreeView(package, _currentRenderTree);
             viewOutput.Init(Path.Combine(Path.GetDirectoryName(path) ?? "", "textures"));
@@ -236,7 +239,7 @@ namespace FEngViewer
             {
                 objectContextMenu.Show(treeView1, ctxPoint);
             }
-            else if (hit_node?.Tag is FrontendScript script)
+            else if (hit_node?.Tag is Script script)
             {
                 var viewNode = (RenderTreeNode)hit_node.Parent.Tag;
 
@@ -258,7 +261,7 @@ namespace FEngViewer
 
         private void toggleScriptItem_Click(object sender, EventArgs e)
         {
-            if (treeView1.SelectedNode?.Tag is FrontendScript script)
+            if (treeView1.SelectedNode?.Tag is Script script)
             {
                 var viewNode = (RenderTreeNode)treeView1.SelectedNode.Parent.Tag;
                 viewNode.SetScript(ReferenceEquals(viewNode.CurrentScript, script) ? null : script);

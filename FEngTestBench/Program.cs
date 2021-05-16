@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using FEngLib;
+using FEngLib.Packages;
 
 namespace FEngTestBench
 {
@@ -20,7 +21,7 @@ namespace FEngTestBench
             }
         }
 
-        private static FrontendPackage LoadPackageFromChunk(string path)
+        private static Package LoadPackageFromChunk(string path)
         {
             using var fs = new FileStream(path, FileMode.Open);
             using var fr = new BinaryReader(fs);

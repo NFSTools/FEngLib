@@ -3,9 +3,13 @@ using System.Diagnostics;
 using System.IO;
 using CommandLine;
 using FEngLib;
+using FEngLib.Packages;
 using FEngRender;
 using FEngRender.Data;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using SixLabors.ImageSharp;
 
 namespace FEngCli
@@ -27,7 +31,7 @@ namespace FEngCli
             }
 
             var package = LoadPackageFromChunk(options.InputFile);
-            PackageDumper.DumpPackage(package);
+            //PackageDumper.DumpPackage(package);
 
             var outputFile = options.OutputFile;
             if (!string.IsNullOrWhiteSpace(outputFile))
@@ -41,10 +45,20 @@ namespace FEngCli
                 if (!options.NoOpen) Process.Start(new ProcessStartInfo(outputFile) { UseShellExecute = true });
             }
 
+            Console.WriteLine(JsonConvert.SerializeObject(package, Formatting.Indented, new JsonSerializerSettings()
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                Converters =
+                {
+                    new StringEnumConverter(new DefaultNamingStrategy())
+                }
+            }));
+
             return 0;
         }
 
-        private static FrontendPackage LoadPackageFromChunk(string path)
+        private static Package LoadPackageFromChunk(string path)
         {
             using var fs = new FileStream(path, FileMode.Open);
             using var fr = new BinaryReader(fs);

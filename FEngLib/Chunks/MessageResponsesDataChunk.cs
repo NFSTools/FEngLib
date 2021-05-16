@@ -1,6 +1,9 @@
 ﻿using System.IO;
-using FEngLib.Data;
 using FEngLib.Object;
+using FEngLib.Objects;
+using FEngLib.Packages;
+using FEngLib.Scripts;
+using FEngLib.Scripts.Tags;
 using FEngLib.Tags;
 
 namespace FEngLib.Chunks
@@ -11,10 +14,10 @@ namespace FEngLib.Chunks
         {
         }
 
-        public override IObject<ObjectData> Read(FrontendPackage package, ObjectReaderState readerState, BinaryReader reader)
+        public override IObject<ObjectData> Read(Package package, ObjectReaderState readerState, BinaryReader reader)
         {
             var newFrontendObject = FrontendObject;
-            FrontendTagStream tagStream = new FrontendMessagesTagStream(reader, package,
+            TagStream tagStream = new MessageTagStream(reader, package,
                 readerState.CurrentChunkBlock,
                 readerState.CurrentChunkBlock.Size);
 
@@ -28,7 +31,7 @@ namespace FEngLib.Chunks
         }
 
         private IObject<ObjectData> ProcessTag(IObject<ObjectData> frontendObject, FrontendChunkBlock frontendChunkBlock,
-            FrontendTag tag)
+            Tag tag)
         {
             switch (tag)
             {
@@ -64,14 +67,14 @@ namespace FEngLib.Chunks
         private void ProcessResponseIdTag(IObject<ObjectData> frontendObject, FrontendChunkBlock frontendChunkBlock,
             ResponseIdTag responseIdTag)
         {
-            var response = new FEResponse {Id = responseIdTag.Id};
+            var response = new Response {Id = responseIdTag.Id};
             frontendObject.MessageResponses[^1].Responses.Add(response);
         }
 
         private void ProcessMessageResponseInfoTag(IObject<ObjectData> frontendObject, FrontendChunkBlock frontendChunkBlock,
             MessageResponseInfoTag tag)
         {
-            FEMessageResponse foundResponse;
+            MessageResponse foundResponse;
 
             if ((foundResponse = frontendObject.MessageResponses.Find(r => r.Id == tag.Hash)) != null)
             {
@@ -79,7 +82,7 @@ namespace FEngLib.Chunks
             }
             else
             {
-                var response = new FEMessageResponse {Id = tag.Hash};
+                var response = new MessageResponse {Id = tag.Hash};
 
                 frontendObject.MessageResponses.Add(response);
             }

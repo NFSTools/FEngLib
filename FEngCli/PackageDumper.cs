@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FEngLib;
-using FEngLib.Data;
 using FEngLib.Object;
+using FEngLib.Objects;
+using FEngLib.Packages;
+using FEngLib.Scripts;
 
 namespace FEngCli
 {
     public static class PackageDumper
     {
-        public static void DumpPackage(FrontendPackage package)
+        public static void DumpPackage(Package package)
         {
             DumpPackageMeta(package);
             for (var index = 0; index < package.ResourceRequests.Count; index++)
@@ -45,7 +47,7 @@ namespace FEngCli
             }
         }
 
-        private static void DumpPackageMeta(FrontendPackage package)
+        private static void DumpPackageMeta(Package package)
         {
             Console.WriteLine("--------- PACKAGE ---------");
             Console.WriteLine("Name      : {0}", package.Name);
@@ -54,7 +56,7 @@ namespace FEngCli
             Console.WriteLine("Resources : {0}", package.ResourceRequests.Count);
         }
 
-        public static void DumpResourceRequest(int index, FEResourceRequest resourceRequest)
+        public static void DumpResourceRequest(int index, ResourceRequest resourceRequest)
         {
             Console.WriteLine("--------- RESOURCE REQUEST ---------");
             Console.WriteLine("Index  : {0}", index);
@@ -65,7 +67,7 @@ namespace FEngCli
             Console.WriteLine("ID     : 0x{0:X8}", resourceRequest.ID);
         }
 
-        public static void DumpObject(IObject<ObjectData> frontendObject, FrontendPackage package)
+        public static void DumpObject(IObject<ObjectData> frontendObject, Package package)
         {
             // if ((frontendObject.Type != ObjectType.Image || frontendObject.ResourceIndex != 4) && frontendObject.Type != ObjectType.Group) return;
 
@@ -86,8 +88,8 @@ namespace FEngCli
                 Console.WriteLine("Color    : {0}", data.Color);
             }
             Console.WriteLine("Type     : {0}", frontendObject.Type);
-            if (frontendObject.ResourceRequest != null)
-                Console.WriteLine("Resource : {0}", frontendObject.ResourceRequest.Name);
+            if (frontendObject.ResourceRequest is {} resourceRequest)
+                Console.WriteLine("Resource : {0}", resourceRequest.Name);
 
             if (frontendObject.Scripts.Count > 0)
             {
@@ -130,7 +132,7 @@ namespace FEngCli
                             for (var i = 0; i < deltaKeys.Count; i++)
                                 Console.WriteLine("\t\tDeltaKeys[{0:D2}]: {1}", i, DumpKey(deltaKeys[i]));
 
-                            static string DumpKey(FEKeyNode keyNode)
+                            static string DumpKey(TrackNode keyNode)
                             {
                                 return $"T={keyNode.Time} V={keyNode.Val}";
                             }

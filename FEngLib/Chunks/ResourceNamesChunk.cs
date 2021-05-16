@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using FEngLib.Packages;
+using FEngLib.Utils;
 
 namespace FEngLib.Chunks
 {
@@ -7,7 +9,7 @@ namespace FEngLib.Chunks
     {
         public Dictionary<long, string> Names { get; set; }
 
-        public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock,
+        public override void Read(Package package, FrontendChunkBlock chunkBlock,
             FrontendChunkReader chunkReader, BinaryReader reader)
         {
             Names = new Dictionary<long, string>();

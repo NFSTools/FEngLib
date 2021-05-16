@@ -1,16 +1,18 @@
 ﻿using System;
 using System.IO;
-using FEngLib.Data;
+using FEngLib.Packages;
+using FEngLib.Scripts;
+using FEngLib.Scripts.Tags;
 using FEngLib.Tags;
 
 namespace FEngLib.Chunks
 {
     public class PackageResponsesChunk : FrontendChunk
     {
-        public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock,
+        public override void Read(Package package, FrontendChunkBlock chunkBlock,
             FrontendChunkReader chunkReader, BinaryReader reader)
         {
-            FrontendTagStream tagStream = new FrontendMessagesTagStream(reader, package, chunkBlock,
+            TagStream tagStream = new MessageTagStream(reader, package, chunkBlock,
                 chunkBlock.Size);
 
             while (tagStream.HasTag())
@@ -21,65 +23,65 @@ namespace FEngLib.Chunks
             }
         }
 
-        private FrontendPackage ProcessTag(FrontendPackage frontendPackage, FrontendTag tag)
+        private Package ProcessTag(Package package, Tag tag)
         {
             switch (tag)
             {
                 case MessageResponseInfoTag messageResponseInfoTag:
-                    ProcessMessageResponseInfoTag(frontendPackage, messageResponseInfoTag);
+                    ProcessMessageResponseInfoTag(package, messageResponseInfoTag);
                     break;
                 case ResponseIdTag responseIdTag:
-                    ProcessResponseIdTag(frontendPackage, responseIdTag);
+                    ProcessResponseIdTag(package, responseIdTag);
                     break;
                 case ResponseIntParamTag responseParamTag:
-                    ProcessResponseIntParamTag(frontendPackage, responseParamTag);
+                    ProcessResponseIntParamTag(package, responseParamTag);
                     break;
                 case ResponseStringParamTag responseParamTag:
-                    ProcessResponseStringParamTag(frontendPackage, responseParamTag);
+                    ProcessResponseStringParamTag(package, responseParamTag);
                     break;
                 case ResponseTargetTag responseTargetTag:
-                    ProcessResponseTargetTag(frontendPackage, responseTargetTag);
+                    ProcessResponseTargetTag(package, responseTargetTag);
                     break;
             }
 
-            return frontendPackage;
+            return package;
         }
 
-        private void ProcessResponseIntParamTag(FrontendPackage frontendPackage,
+        private void ProcessResponseIntParamTag(Package package,
             ResponseIntParamTag responseIntParamTag)
         {
-            frontendPackage.MessageResponses[^1].Responses[^1].Param = responseIntParamTag.Param;
+            package.MessageResponses[^1].Responses[^1].Param = responseIntParamTag.Param;
         }
 
-        private void ProcessResponseStringParamTag(FrontendPackage frontendPackage,
+        private void ProcessResponseStringParamTag(Package package,
             ResponseStringParamTag responseStringParamTag)
         {
-            frontendPackage.MessageResponses[^1].Responses[^1].Param = responseStringParamTag.Param;
+            package.MessageResponses[^1].Responses[^1].Param = responseStringParamTag.Param;
         }
 
-        private void ProcessResponseTargetTag(FrontendPackage frontendPackage,
+        private void ProcessResponseTargetTag(Package package,
             ResponseTargetTag responseTargetTag)
         {
-            frontendPackage.MessageResponses[^1].Responses[^1].Target = responseTargetTag.Target;
+            package.MessageResponses[^1].Responses[^1].Target = responseTargetTag.Target;
         }
 
-        private void ProcessResponseIdTag(FrontendPackage frontendPackage,
+        private void ProcessResponseIdTag(Package package,
             ResponseIdTag responseIdTag)
         {
-            var response = new FEResponse {Id = responseIdTag.Id};
-            frontendPackage.MessageResponses[^1].Responses.Add(response);
+            var response = new Response {Id = responseIdTag.Id};
+            package.MessageResponses[^1].Responses.Add(response);
         }
 
-        private void ProcessMessageResponseInfoTag(FrontendPackage frontendPackage,
+        private void ProcessMessageResponseInfoTag(Package package,
             MessageResponseInfoTag tag)
         {
-            if (frontendPackage.MessageResponses.Find(r => r.Id == tag.Hash) != null)
+            if (package.MessageResponses.Find(r => r.Id == tag.Hash) != null)
                 throw new Exception(
-                    $"This is supposed to be impossible! Duplicate MessageResponse (0x{tag.Hash:X}) in package {frontendPackage.Name}");
+                    $"This is supposed to be impossible! Duplicate MessageResponse (0x{tag.Hash:X}) in package {package.Name}");
 
-            var response = new FEMessageResponse {Id = tag.Hash};
+            var response = new MessageResponse {Id = tag.Hash};
 
-            frontendPackage.MessageResponses.Add(response);
+            package.MessageResponses.Add(response);
         }
 
         public override FrontendChunkType GetChunkType()

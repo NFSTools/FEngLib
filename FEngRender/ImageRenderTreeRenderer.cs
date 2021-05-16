@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using FEngLib;
-using FEngLib.Data;
 using FEngLib.Object;
+using FEngLib.Packages;
 using FEngRender.Data;
 using FEngRender.Utils;
 using SixLabors.Fonts;
@@ -234,9 +234,9 @@ namespace FEngRender
 
         }
 
-        private SixLabors.ImageSharp.Image GetTexture(FEResourceRequest resource)
+        private SixLabors.ImageSharp.Image GetTexture(ResourceRequest resource)
         {
-            if (resource.Type != FEResourceType.RT_Image)
+            if (resource.Type != ResourceType.Image)
             {
                 return null;
             }

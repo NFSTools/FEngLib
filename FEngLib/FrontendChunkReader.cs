@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using FEngLib.Chunks;
 using FEngLib.Object;
+using FEngLib.Objects;
+using FEngLib.Packages;
 
 namespace FEngLib
 {
@@ -11,13 +13,13 @@ namespace FEngLib
     /// </summary>
     public class FrontendChunkReader
     {
-        public FrontendChunkReader(FrontendPackage package, BinaryReader reader)
+        public FrontendChunkReader(Package package, BinaryReader reader)
         {
             Package = package;
             Reader = reader;
         }
 
-        public FrontendPackage Package { get; }
+        public Package Package { get; }
         public BinaryReader Reader { get; }
 
         /// <summary>

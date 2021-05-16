@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using FEngLib.Packages;
+using FEngLib.Utils;
 
 namespace FEngLib.Chunks
 {
@@ -19,7 +21,7 @@ namespace FEngLib.Chunks
         /// </summary>
         public string Filename { get; set; }
 
-        public override void Read(FrontendPackage package, FrontendChunkBlock chunkBlock,
+        public override void Read(Package package, FrontendChunkBlock chunkBlock,
             FrontendChunkReader chunkReader, BinaryReader reader)
         {
             if (reader.ReadUInt32() != 0x20000) throw new InvalidDataException("Invalid header constant");

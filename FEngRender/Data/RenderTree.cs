@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using FEngLib;
-using FEngLib.Data;
 using FEngLib.Object;
+using FEngLib.Objects;
+using FEngLib.Packages;
 
 namespace FEngRender.Data
 {
@@ -37,11 +38,11 @@ namespace FEngRender.Data
 
         /// <summary>
         /// Creates a new <see cref="RenderTree"/> from
-        /// the data contained in the given <see cref="FrontendPackage"/> object.
+        /// the data contained in the given <see cref="Package"/> object.
         /// </summary>
-        /// <param name="package">The <see cref="FrontendPackage"/> object to build a tree for.</param>
+        /// <param name="package">The <see cref="Package"/> object to build a tree for.</param>
         /// <returns>The newly constructed <see cref="RenderTree"/> object.</returns>
-        public static RenderTree Create(FrontendPackage package)
+        public static RenderTree Create(Package package)
         {
             var nodes = new List<RenderTreeNode>();
 
