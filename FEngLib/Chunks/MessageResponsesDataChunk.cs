@@ -74,18 +74,14 @@ namespace FEngLib.Chunks
         private void ProcessMessageResponseInfoTag(IObject<ObjectData> frontendObject, FrontendChunkBlock frontendChunkBlock,
             MessageResponseInfoTag tag)
         {
-            MessageResponse foundResponse;
-
-            if ((foundResponse = frontendObject.MessageResponses.Find(r => r.Id == tag.Hash)) != null)
+            if (frontendObject.MessageResponses.Find(r => r.Id == tag.Hash) != null)
             {
-                foundResponse.Responses.Clear();
+                throw new ChunkReadingException($"Encountered a duplicate MessageResponse with ID 0x{tag.Hash:X}. This should not be possible.");
             }
-            else
-            {
-                var response = new MessageResponse {Id = tag.Hash};
 
-                frontendObject.MessageResponses.Add(response);
-            }
+            var response = new MessageResponse {Id = tag.Hash};
+
+            frontendObject.MessageResponses.Add(response);
         }
 
         public override FrontendChunkType GetChunkType()
