@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using FEngLib.Structures;
 using FEngRender;
 using FEngRender.Data;
 using static SixLabors.ImageSharp.ImageExtensions;
@@ -33,6 +34,11 @@ namespace FEngViewer
             var stream = new MemoryStream();
             image.SaveAsBmp(stream);
             viewOutput.Image = Image.FromStream(stream);
+        }
+
+        public Color4 BackgroundColor
+        {
+            set => viewOutput.BackColor = Color.FromArgb(value.Alpha, value.Red, value.Green, value.Blue);
         }
 
         public RenderTreeNode SelectedNode

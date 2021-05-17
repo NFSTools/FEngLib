@@ -1,4 +1,5 @@
 ﻿using System.Windows.Forms;
+using FEngLib.Structures;
 using FEngRender.Data;
 using FEngRender.GL;
 using JetBrains.Annotations;
@@ -10,6 +11,11 @@ namespace FEngViewer
         private GLRenderTreeRenderer _renderer;
         
         [CanBeNull] private RenderTree _renderTree;
+
+        public Color4 BackgroundColor
+        {
+            set => _renderer.SetBackgroundColor(value);
+        }
         
         public GLRenderControl()
         {

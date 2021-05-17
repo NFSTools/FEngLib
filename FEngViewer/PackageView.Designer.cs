@@ -32,6 +32,9 @@ namespace FEngViewer
             this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
+            this.groupBgColor = new System.Windows.Forms.GroupBox();
+            this.radioBgGreen = new System.Windows.Forms.RadioButton();
+            this.radioBgBlack = new System.Windows.Forms.RadioButton();
             this.labelCoordDisplay = new System.Windows.Forms.Label();
             this.objectDetailsView1 = new FEngViewer.ObjectDetailsControl();
             this.viewOutput = new FEngViewer.GLRenderControl();
@@ -48,6 +51,7 @@ namespace FEngViewer
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.groupBgColor.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.objectContextMenu.SuspendLayout();
             this.scriptContextMenu.SuspendLayout();
@@ -66,6 +70,7 @@ namespace FEngViewer
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.groupBgColor);
             this.splitContainer1.Panel2.Controls.Add(this.labelCoordDisplay);
             this.splitContainer1.Panel2.Controls.Add(this.objectDetailsView1);
             this.splitContainer1.Panel2.Controls.Add(this.viewOutput);
@@ -83,6 +88,41 @@ namespace FEngViewer
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             this.treeView1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.treeView1_MouseDown);
             // 
+            // groupBgColor
+            // 
+            this.groupBgColor.Controls.Add(this.radioBgGreen);
+            this.groupBgColor.Controls.Add(this.radioBgBlack);
+            this.groupBgColor.Location = new System.Drawing.Point(486, 487);
+            this.groupBgColor.Name = "groupBgColor";
+            this.groupBgColor.Size = new System.Drawing.Size(154, 58);
+            this.groupBgColor.TabIndex = 3;
+            this.groupBgColor.TabStop = false;
+            this.groupBgColor.Text = "Background";
+            // 
+            // radioBgGreen
+            // 
+            this.radioBgGreen.AutoSize = true;
+            this.radioBgGreen.Location = new System.Drawing.Point(77, 26);
+            this.radioBgGreen.Name = "radioBgGreen";
+            this.radioBgGreen.Size = new System.Drawing.Size(69, 24);
+            this.radioBgGreen.TabIndex = 1;
+            this.radioBgGreen.Text = "Green";
+            this.radioBgGreen.UseVisualStyleBackColor = true;
+            this.radioBgGreen.CheckedChanged += new System.EventHandler(this.radioBgBlack_CheckedChanged);
+            // 
+            // radioBgBlack
+            // 
+            this.radioBgBlack.AutoSize = true;
+            this.radioBgBlack.Checked = true;
+            this.radioBgBlack.Location = new System.Drawing.Point(6, 26);
+            this.radioBgBlack.Name = "radioBgBlack";
+            this.radioBgBlack.Size = new System.Drawing.Size(65, 24);
+            this.radioBgBlack.TabIndex = 0;
+            this.radioBgBlack.TabStop = true;
+            this.radioBgBlack.Text = "Black";
+            this.radioBgBlack.UseVisualStyleBackColor = true;
+            this.radioBgBlack.CheckedChanged += new System.EventHandler(this.radioBgBlack_CheckedChanged);
+            // 
             // labelCoordDisplay
             // 
             this.labelCoordDisplay.AutoSize = true;
@@ -96,10 +136,10 @@ namespace FEngViewer
             // 
             this.objectDetailsView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.objectDetailsView1.Location = new System.Drawing.Point(3, 529);
+            this.objectDetailsView1.Location = new System.Drawing.Point(3, 550);
             this.objectDetailsView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.objectDetailsView1.Name = "objectDetailsView1";
-            this.objectDetailsView1.Size = new System.Drawing.Size(661, 457);
+            this.objectDetailsView1.Size = new System.Drawing.Size(661, 436);
             this.objectDetailsView1.TabIndex = 1;
             // 
             // viewOutput
@@ -192,6 +232,8 @@ namespace FEngViewer
             this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.groupBgColor.ResumeLayout(false);
+            this.groupBgColor.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.objectContextMenu.ResumeLayout(false);
@@ -217,5 +259,8 @@ namespace FEngViewer
         private System.Windows.Forms.ToolStripMenuItem changeObjectColorItem;
         private System.Windows.Forms.ContextMenuStrip scriptContextMenu;
         private System.Windows.Forms.ToolStripMenuItem toggleScriptItem;
+        private System.Windows.Forms.GroupBox groupBgColor;
+        private System.Windows.Forms.RadioButton radioBgGreen;
+        private System.Windows.Forms.RadioButton radioBgBlack;
     }
 }
