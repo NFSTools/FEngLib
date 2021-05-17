@@ -1,4 +1,5 @@
-﻿using FEngRender.Data;
+﻿using FEngLib.Structures;
+using FEngRender.Data;
 
 namespace FEngViewer
 {
@@ -9,5 +10,7 @@ namespace FEngViewer
         void Init(string textureDir);
 
         void Render(RenderTree renderTree);
+        
+        Color4 BackgroundColor { set; }
     }
 }

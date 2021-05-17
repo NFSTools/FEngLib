@@ -9,6 +9,7 @@ using FEngLib;
 using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Scripts;
+using FEngLib.Structures;
 using FEngRender.Data;
 using FEngViewer.Properties;
 using JetBrains.Annotations;
@@ -266,6 +267,20 @@ namespace FEngViewer
                 var viewNode = (RenderTreeNode)treeView1.SelectedNode.Parent.Tag;
                 viewNode.SetScript(ReferenceEquals(viewNode.CurrentScript, script) ? null : script);
             }
+        }
+
+        private void radioBgBlack_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender == radioBgBlack)
+            {
+                viewOutput.BackgroundColor = new Color4(0, 0, 0, 255);
+            }
+            else if (sender == radioBgGreen)
+            {
+                viewOutput.BackgroundColor = new Color4(0, 255, 0, 255);
+            }
+
+            Render();
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Numerics;
 using FEngLib;
 using FEngLib.Objects;
 using FEngLib.Packages;
+using FEngLib.Structures;
 using FEngRender.Data;
 using FEngRender.Utils;
 using SharpGL;
@@ -83,6 +84,12 @@ namespace FEngRender.GL
             _gl.MatrixMode(MatrixMode.Projection);
             _gl.Ortho(0, 640, 480, 0, -1, 1);
             _gl.Flush();
+        }
+        
+        public void SetBackgroundColor(Color4 color)
+        {
+            Vector4 colorV = color;
+            _gl.ClearColor(colorV.X, colorV.Y, colorV.Z, colorV.W);
         }
 
         private void PrepareNodes(IEnumerable<RenderTreeNode> nodes,
