@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Numerics;
+using FEngLib;
 using FEngLib.Objects;
 using FEngLib.Scripts;
 using FEngLib.Structures;
-using FEngRender.Scripts;
+using FEngRender.Script;
+using FEngRender.Utils;
 
 namespace FEngRender.Data
 {
@@ -32,7 +34,7 @@ namespace FEngRender.Data
         /// <summary>
         /// The <see cref="Script"/> that is currently running.
         /// </summary>
-        public Script CurrentScript { get; private set; }
+        public FEngLib.Scripts.Script CurrentScript { get; private set; }
 
         /// <summary>
         /// The current time offset of the current script.
@@ -147,10 +149,10 @@ namespace FEngRender.Data
         /// Sets the currently running script and resets the script time.
         /// </summary>
         /// <param name="script">The script to run.</param>
-        public void SetScript(Script script)
+        public void SetScript(FEngLib.Scripts.Script script)
         {
-            CurrentScript = script;
-            CurrentScriptTime = script == null ? -1 : 0;
+            this.CurrentScript = script;
+            this.CurrentScriptTime = script == null ? -1 : 0;
         }
 
         /// <summary>
@@ -162,7 +164,7 @@ namespace FEngRender.Data
             return ObjectMatrix.M43;
         }
 
-        private Track GetKeyTrack(Script script, KeyTrackType trackType)
+        private Track GetKeyTrack(FEngLib.Scripts.Script script, KeyTrackType trackType)
         {
             uint offset = (uint)trackType;
 

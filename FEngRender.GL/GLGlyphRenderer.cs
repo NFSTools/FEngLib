@@ -37,7 +37,6 @@ namespace FEngRender.GL
 
             _gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
             _gl.Enable(OpenGL.GL_BLEND);
-            _gl.BindTexture(OpenGL.GL_TEXTURE_2D, 0);
 
             // TODO why does the color stay black no matter what?
             Vector4 colorV = Color;
