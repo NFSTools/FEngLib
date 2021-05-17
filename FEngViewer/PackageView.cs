@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using CommandLine;
-using FEngLib;
 using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Scripts;
@@ -36,6 +34,11 @@ namespace FEngViewer
             imageList.Images.Add("TreeItem_Movie", Resources.TreeItem_Movie);
             imageList.Images.Add("TreeItem_ColoredImage", Resources.TreeItem_ColoredImage);
             imageList.Images.Add("TreeItem_MultiImage", Resources.TreeItem_MultiImage);
+            imageList.Images.Add("TreeItem_ObjectList", Resources.TreeItem_ObjectList);
+            imageList.Images.Add("TreeItem_ResourceList", Resources.TreeItem_ResourceList);
+            imageList.Images.Add("TreeItem_GenericResource", Resources.TreeItem_GenericResource);
+            imageList.Images.Add("TreeItem_Font", Resources.TreeItem_Font);
+            imageList.Images.Add("TreeItem_Keyframe", Resources.TreeItem_Keyframe);
             treeView1.ImageList = imageList;
         }
 
@@ -62,6 +65,36 @@ namespace FEngViewer
             treeView1.Nodes.Clear();
 
             var rootNode = treeView1.Nodes.Add(package.Name);
+
+            var resourceListNode = rootNode.Nodes.Add("Resources");
+            resourceListNode.ImageKey = resourceListNode.SelectedImageKey = "TreeItem_ResourceList";
+
+            foreach (var resourceRequest in package.ResourceRequests)
+            {
+                var resourceRequestNode = resourceListNode.Nodes.Add(resourceRequest.Name);
+
+                switch (resourceRequest.Type)
+                {
+                    case ResourceType.Image:
+                        resourceRequestNode.ImageKey = resourceRequestNode.SelectedImageKey = "TreeItem_Image";
+                        break;
+                    case ResourceType.MultiImage:
+                        resourceRequestNode.ImageKey = resourceRequestNode.SelectedImageKey = "TreeItem_MultiImage";
+                        break;
+                    case ResourceType.Movie:
+                        resourceRequestNode.ImageKey = resourceRequestNode.SelectedImageKey = "TreeItem_Movie";
+                        break;
+                    case ResourceType.Font:
+                        resourceRequestNode.ImageKey = resourceRequestNode.SelectedImageKey = "TreeItem_Font";
+                        break;
+                    default:
+                        resourceRequestNode.ImageKey = resourceRequestNode.SelectedImageKey = "TreeItem_GenericResource";
+                        break;
+                }
+            }
+
+            //var objectListNode = rootNode.Nodes.Add("Objects");
+            //objectListNode.ImageKey = "TreeItem_ObjectList";
             ApplyObjectsToTreeNodes(feObjectNodes, rootNode.Nodes);
 
             rootNode.Expand();
@@ -146,6 +179,12 @@ namespace FEngViewer
 
                 var trackNode = node.Nodes.Add(trackName);
                 trackNode.ImageKey = trackNode.SelectedImageKey = "TreeItem_ScriptTrack";
+
+                foreach (var key in track.DeltaKeys)
+                {
+                    var keyNode = trackNode.Nodes.Add($"{key.Val} @ T={key.Time}");
+                    keyNode.ImageKey = keyNode.SelectedImageKey = "TreeItem_Keyframe";
+                }
             }
         }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using FEngLib.Objects.Tags;
 using FEngLib.Objects;
@@ -35,7 +34,7 @@ namespace FEngLib.Chunks
             switch (tag)
             {
                 case ObjectTypeTag objectTypeTag:
-                    return ProcessObjectTypeTag(frontendObject, objectTypeTag);
+                    return ProcessObjectTypeTag(objectTypeTag);
                 case StringBufferTextTag stringBufferTextTag when frontendObject is Text frontendString:
                     return ProcessStringBufferTextTag(frontendString, stringBufferTextTag);
                 case StringBufferFormattingTag stringBufferFormattingTag
@@ -53,7 +52,7 @@ namespace FEngLib.Chunks
                     frontendString.Label = stringBufferLabelTag.Label;
                     frontendString.Hash = Hashing.BinHash(stringBufferLabelTag.Label.ToUpper());
                     break;
-                case StringBufferLengthTag stringBufferLengthTag:
+                case StringBufferLengthTag _:
                     break;
                 case ObjectHashTag objectHashTag:
                     frontendObject.NameHash = objectHashTag.Hash;
@@ -123,7 +122,7 @@ namespace FEngLib.Chunks
             return frontendString;
         }
 
-        private IObject<ObjectData> ProcessObjectTypeTag(IObject<ObjectData> frontendObject, ObjectTypeTag objectTypeTag)
+        private IObject<ObjectData> ProcessObjectTypeTag(ObjectTypeTag objectTypeTag)
         {
             IObject<ObjectData> newInstance;
 

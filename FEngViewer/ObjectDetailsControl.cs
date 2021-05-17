@@ -1,5 +1,4 @@
 ﻿using System.Windows.Forms;
-using FEngRender;
 using FEngRender.Data;
 
 namespace FEngViewer

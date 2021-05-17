@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using FEngLib;
 using FEngLib.Packages;
 
 namespace FEngTestBench
@@ -17,7 +16,7 @@ namespace FEngTestBench
                 stopwatch.Restart();
                 var package = LoadPackageFromChunk(fngPath);
                 stopwatch.Stop();
-                Console.WriteLine("Loaded from {0} in {1}ms", fngPath, stopwatch.ElapsedMilliseconds);
+                Console.WriteLine("Loaded {2} (file: {0}) in {1}ms", fngPath, stopwatch.ElapsedMilliseconds, package.Name);
             }
         }
 

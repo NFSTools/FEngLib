@@ -1,6 +1,4 @@
-﻿using FEngLib.Objects;
-
-namespace FEngLib.Objects
+﻿namespace FEngLib.Objects
 {
     public class SimpleImage : BaseObject
     {

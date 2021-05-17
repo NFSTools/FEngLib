@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Numerics;
-using FEngLib;
 using FEngLib.Objects;
 using FEngLib.Scripts;
 using FEngLib.Structures;
 using FEngRender.Script;
-using FEngRender.Utils;
 
 namespace FEngRender.Data
 {

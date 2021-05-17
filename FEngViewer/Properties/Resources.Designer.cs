@@ -73,6 +73,26 @@ namespace FEngViewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap TreeItem_Font {
+            get {
+                object obj = ResourceManager.GetObject("TreeItem_Font", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap TreeItem_GenericResource {
+            get {
+                object obj = ResourceManager.GetObject("TreeItem_GenericResource", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap TreeItem_Group {
             get {
                 object obj = ResourceManager.GetObject("TreeItem_Group", resourceCulture);
@@ -86,6 +106,16 @@ namespace FEngViewer.Properties {
         internal static System.Drawing.Bitmap TreeItem_Image {
             get {
                 object obj = ResourceManager.GetObject("TreeItem_Image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap TreeItem_Keyframe {
+            get {
+                object obj = ResourceManager.GetObject("TreeItem_Keyframe", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -113,9 +143,29 @@ namespace FEngViewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap TreeItem_ObjectList {
+            get {
+                object obj = ResourceManager.GetObject("TreeItem_ObjectList", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap TreeItem_Package {
             get {
                 object obj = ResourceManager.GetObject("TreeItem_Package", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap TreeItem_ResourceList {
+            get {
+                object obj = ResourceManager.GetObject("TreeItem_ResourceList", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

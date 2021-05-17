@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Numerics;
-using FEngLib.Objects;
 using FEngLib.Utils;
 
 namespace FEngLib.Objects

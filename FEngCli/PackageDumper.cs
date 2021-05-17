@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using FEngLib;
 using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Scripts;
@@ -75,7 +72,7 @@ namespace FEngCli
                 Console.WriteLine("Name     : {0} ({1})", frontendObject.Name, frontendObject.Name.ToUpper());
             Console.WriteLine("Hash     : 0x{0:X8}", frontendObject.NameHash);
             Console.WriteLine("GUID     : 0x{0:X}", frontendObject.Guid);
-            Console.WriteLine("Flags    : {0}", frontendObject.Flags);
+            Console.WriteLine("Flags    : {0} (0x{0:X})", frontendObject.Flags);
             if (frontendObject.Parent != null)
                 Console.WriteLine("Parent   : 0x{0:X}", frontendObject.Parent.Guid);
             if (frontendObject.Data is { } data)

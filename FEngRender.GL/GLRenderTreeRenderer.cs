@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using FEngLib;
 using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Structures;
@@ -21,11 +19,7 @@ namespace FEngRender.GL
     /// </summary>
     public class GLRenderTreeRenderer
     {
-        private const int Width = 640;
-        private const int Height = 480;
-
         public RenderTreeNode SelectedNode { get; set; }
-        private (float width, float height, float x, float y) _boundingBox;
 
         private readonly Dictionary<string, Texture> _textures = new Dictionary<string, Texture>();
 
@@ -65,8 +59,6 @@ namespace FEngRender.GL
         public void Render(RenderTree tree)
         {
             _gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
-
-            _boundingBox = (0, 0, 0, 0);
             _gl.LoadIdentity();
 
             // disable depth
@@ -150,7 +142,7 @@ namespace FEngRender.GL
                     RenderImage(node, image, doBoundingBox);
                     break;
                 case Text str:
-                    RenderString(node, str, doBoundingBox);
+                    RenderString(node, str);
                     break;
                 default:
                     Debug.Assert(false, "Unsupported object", "Type: {0}", node.FrontendObject.GetType());
@@ -158,12 +150,8 @@ namespace FEngRender.GL
             }
         }
 
-        private void RenderString(RenderTreeNode node, Text str, bool doBoundingBox = false)
+        private void RenderString(RenderTreeNode node, Text str)
         {
-            var strMatrix = node.ObjectMatrix;
-            float posX = strMatrix.M41 + Width / 2f;
-            float posY = strMatrix.M42 + Height / 2f;
-            
             var font = TextHelpers.GetFont(18);
             var (_, _, width, height) = TextHelpers.MeasureText(str.Value, new RendererOptions(font)
             {

@@ -2,14 +2,10 @@
 using System.Diagnostics;
 using System.IO;
 using CommandLine;
-using FEngLib;
 using FEngLib.Packages;
 using FEngRender;
 using FEngRender.Data;
 using JetBrains.Annotations;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using SixLabors.ImageSharp;
 
 namespace FEngCli
@@ -87,13 +83,17 @@ namespace FEngCli
         private class Options
         {
             [Option('i', "input", Required = true)]
+            [UsedImplicitly]
             public string InputFile { get; set; }
 
+            [UsedImplicitly]
             [Option('o', "output")] public string OutputFile { get; set; }
 
+            [UsedImplicitly]
             [Option('t', "textures", Required = true)]
             public string TextureDir { get; set; }
 
+            [UsedImplicitly]
             [Option('q', "no-open")] public bool NoOpen { get; set; }
         }
     }

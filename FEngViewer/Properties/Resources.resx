@@ -154,4 +154,19 @@
   <data name="TreeItem_ScriptEvent" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\bolt-solid.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="TreeItem_Font" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\font-solid.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TreeItem_GenericResource" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\file-solid.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TreeItem_Keyframe" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\clock-solid.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TreeItem_ObjectList" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\layer-group-solid.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TreeItem_ResourceList" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\file-archive-solid.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

@@ -7,7 +7,7 @@ namespace FEngLib.Objects
     {
         Invisible = 0x1,
         PCOnly = 0x8,
-        ConsoleOnly = 0x10,
+        ConsoleOnly = 0x40,
         MouseObject = 0x20000,
         SaveStaticTracks = 0x40000,
         DontNavigate = 0x80000,

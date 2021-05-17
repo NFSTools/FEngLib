@@ -15,7 +15,7 @@ namespace FEngLib.Scripts.Tags
             ushort id,
             ushort length)
         {
-            var value = br.ReadUInt32();
+            br.ReadUInt32();
         }
     }
 }

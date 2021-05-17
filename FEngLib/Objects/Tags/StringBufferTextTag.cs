@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Text;
-using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Tags;
 
