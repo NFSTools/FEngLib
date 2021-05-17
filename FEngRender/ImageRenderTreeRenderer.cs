@@ -133,9 +133,9 @@ namespace FEngRender
                 {
                     WrappingWidth = str.MaxWidth
                 });
-                var xOffset = TextHelpers.CalculateXOffset((uint)str.Formatting,
+                var xOffset = TextHelpers.CalculateXOffset(str.Formatting,
                     width);
-                var yOffset = TextHelpers.CalculateYOffset((uint)str.Formatting,
+                var yOffset = TextHelpers.CalculateYOffset(str.Formatting,
                     height);
 
                 posX += xOffset;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FEngLib.Objects;
 using SixLabors.Fonts;
 
 namespace FEngRender.Utils
@@ -22,20 +23,23 @@ namespace FEngRender.Utils
         public static FontRectangle MeasureText(string text, RendererOptions rendererOptions) =>
             TextMeasurer.Measure(text, rendererOptions);
 
-        public static float CalculateXOffset(uint justification, float lineWidth)
+        public static float CalculateXOffset(TextFormat format, float lineWidth)
         {
-            if ((justification & 1) == 1) return lineWidth * -0.5f;
-
-            if ((justification & 2) == 2) return -lineWidth;
+            if ((format & TextFormat.JustifyHorizontalCenter) == TextFormat.JustifyHorizontalCenter)
+                return lineWidth * -0.5f;
+            if ((format & TextFormat.JustifyHorizontalRight) == TextFormat.JustifyHorizontalRight)
+                return -lineWidth;
 
             return 0;
         }
 
-        public static float CalculateYOffset(uint justification, float textHeight)
+        public static float CalculateYOffset(TextFormat format, float textHeight)
         {
-            if ((justification & 4) == 4) return textHeight * -0.5f;
+            if ((format & TextFormat.JustifyVerticalCenter) == TextFormat.JustifyVerticalCenter)
+                return textHeight * -0.5f;
 
-            if ((justification & 8) == 8) return -textHeight;
+            if ((format & TextFormat.JustifyVerticalBottom) == TextFormat.JustifyVerticalBottom)
+                return -textHeight;
 
             return 0;
         }
