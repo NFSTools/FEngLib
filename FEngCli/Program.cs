@@ -31,7 +31,7 @@ namespace FEngCli
             }
 
             var package = LoadPackageFromChunk(options.InputFile);
-            //PackageDumper.DumpPackage(package);
+            PackageDumper.DumpPackage(package);
 
             var outputFile = options.OutputFile;
             if (!string.IsNullOrWhiteSpace(outputFile))
@@ -45,15 +45,15 @@ namespace FEngCli
                 if (!options.NoOpen) Process.Start(new ProcessStartInfo(outputFile) { UseShellExecute = true });
             }
 
-            Console.WriteLine(JsonConvert.SerializeObject(package, Formatting.Indented, new JsonSerializerSettings()
-            {
-                TypeNameHandling = TypeNameHandling.Auto,
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-                Converters =
-                {
-                    new StringEnumConverter(new DefaultNamingStrategy())
-                }
-            }));
+            //Console.WriteLine(JsonConvert.SerializeObject(package, Formatting.Indented, new JsonSerializerSettings()
+            //{
+            //    TypeNameHandling = TypeNameHandling.Auto,
+            //    PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+            //    Converters =
+            //    {
+            //        new StringEnumConverter(new DefaultNamingStrategy())
+            //    }
+            //}));
 
             return 0;
         }
