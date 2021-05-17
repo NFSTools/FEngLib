@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using FEngLib.Object;
 using FEngLib.Objects;
 using FEngLib.Packages;
 

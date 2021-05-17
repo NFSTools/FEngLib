@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FEngLib.Object
+namespace FEngLib.Objects
 {
     [Flags]
     public enum ObjectFlags : uint

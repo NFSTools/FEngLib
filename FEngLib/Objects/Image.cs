@@ -3,7 +3,7 @@ using System.Numerics;
 using FEngLib.Objects;
 using FEngLib.Utils;
 
-namespace FEngLib.Object
+namespace FEngLib.Objects
 {
     public class ImageData : ObjectData
     {

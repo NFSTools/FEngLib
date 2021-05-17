@@ -6,7 +6,7 @@ using System.IO;
 using System.Windows.Forms;
 using CommandLine;
 using FEngLib;
-using FEngLib.Object;
+using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Scripts;
 using FEngRender.Data;

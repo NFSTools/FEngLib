@@ -1,7 +1,5 @@
 ﻿using System.IO;
 using FEngLib.Chunks;
-using FEngLib.Object;
-using FEngLib.Object.Tags;
 using FEngLib.Tags;
 
 namespace FEngLib.Objects.Tags

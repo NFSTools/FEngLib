@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using FEngLib.Object;
 using FEngLib.Objects;
 
 namespace FEngLib.Tags

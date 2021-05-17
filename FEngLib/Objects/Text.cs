@@ -1,7 +1,7 @@
 ﻿using System;
 using FEngLib.Objects;
 
-namespace FEngLib.Object
+namespace FEngLib.Objects
 {
     [Flags]
     public enum TextFormat : uint

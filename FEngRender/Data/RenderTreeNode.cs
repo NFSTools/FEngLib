@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Numerics;
 using FEngLib;
-using FEngLib.Object;
 using FEngLib.Objects;
 using FEngLib.Scripts;
 using FEngLib.Structures;

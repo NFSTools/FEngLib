@@ -1,5 +1,4 @@
-﻿using FEngLib.Object;
-using FEngLib.Objects;
+﻿using FEngLib.Objects;
 using FEngLib.Tags;
 
 namespace FEngLib.Scripts

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using FEngLib.Chunks;
-using FEngLib.Object;
 using FEngLib.Objects;
 using FEngLib.Packages;
 

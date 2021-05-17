@@ -2,7 +2,7 @@
 using FEngLib.Structures;
 using FEngLib.Utils;
 
-namespace FEngLib.Object
+namespace FEngLib.Objects
 {
     public class ColoredImageData : ImageData
     {

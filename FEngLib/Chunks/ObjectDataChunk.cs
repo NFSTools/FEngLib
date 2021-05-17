@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using FEngLib.Object;
-using FEngLib.Object.Tags;
-using FEngLib.Objects;
 using FEngLib.Objects.Tags;
+using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Tags;
 using FEngLib.Utils;

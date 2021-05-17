@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using FEngLib;
-using FEngLib.Object;
 using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngRender.Data;

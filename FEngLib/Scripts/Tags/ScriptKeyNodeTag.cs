@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using FEngLib.Chunks;
-using FEngLib.Object;
 using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Utils;

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
-using FEngLib.Object;
 using FEngLib.Packages;
 using FEngLib.Scripts;
 using FEngLib.Structures;

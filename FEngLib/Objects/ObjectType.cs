@@ -1,4 +1,4 @@
-﻿namespace FEngLib.Object
+﻿namespace FEngLib.Objects
 {
     public enum ObjectType
     {

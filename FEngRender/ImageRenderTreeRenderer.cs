@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using FEngLib;
-using FEngLib.Object;
+using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngRender.Data;
 using FEngRender.Utils;
@@ -14,7 +14,7 @@ using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using Image = FEngLib.Object.Image;
+using Image = FEngLib.Objects.Image;
 using Path = System.IO.Path;
 
 namespace FEngRender

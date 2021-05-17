@@ -4,7 +4,7 @@ using FEngLib.Packages;
 using FEngLib.Tags;
 using FEngLib.Utils;
 
-namespace FEngLib.Object.Tags
+namespace FEngLib.Objects.Tags
 {
     public class ObjectTypeTag : Tag
     {

@@ -2,7 +2,7 @@
 using System.Numerics;
 using FEngLib.Utils;
 
-namespace FEngLib.Object
+namespace FEngLib.Objects
 {
     public class MultiImageData : ImageData
     {

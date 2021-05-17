@@ -4,7 +4,7 @@ using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Tags;
 
-namespace FEngLib.Object.Tags
+namespace FEngLib.Objects.Tags
 {
     public class StringBufferTextTag : Tag
     {

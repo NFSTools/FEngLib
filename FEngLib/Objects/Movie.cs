@@ -1,6 +1,6 @@
 ﻿using FEngLib.Objects;
 
-namespace FEngLib.Object
+namespace FEngLib.Objects
 {
     public class Movie : BaseObject
     {
