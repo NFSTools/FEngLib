@@ -143,14 +143,14 @@ namespace FEngRender.GL
                 case Group _:
                 case Movie _:
                     break;
-                case Image image:
+                case SimpleImage _:
+                    RenderSimpleImage(node, doBoundingBox);
+                    break;
+                case IImage<ImageData> image:
                     RenderImage(node, image, doBoundingBox);
                     break;
                 case Text str:
                     RenderString(node, str, doBoundingBox);
-                    break;
-                case SimpleImage _:
-                    RenderSimpleImage(node, doBoundingBox);
                     break;
                 default:
                     Debug.Assert(false, "Unsupported object", "Type: {0}", node.FrontendObject.GetType());
