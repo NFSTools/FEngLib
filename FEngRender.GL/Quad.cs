@@ -65,7 +65,7 @@ namespace FEngRender.GL
         {
             gl.Disable(OpenGL.GL_BLEND);
             gl.Begin(BeginMode.LineLoop);
-            
+            gl.BindTexture(OpenGL.GL_TEXTURE_2D, 0);
             gl.Color(1.0f, 0, 0, 1.0f);
             foreach (var vertex in _vertices)
             {
