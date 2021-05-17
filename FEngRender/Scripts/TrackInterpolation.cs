@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Numerics;
 using FEngLib.Scripts;
 using FEngLib.Structures;
-using FEngRender.Utils;
 
-namespace FEngRender.Script
+namespace FEngRender.Scripts
 {
     /// <summary>
     /// Implements interpolation of keys in <see cref="Track"/> objects

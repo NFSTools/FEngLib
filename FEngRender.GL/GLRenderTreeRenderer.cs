@@ -90,7 +90,7 @@ namespace FEngRender.GL
         {
             var nodeList = nodes.ToList();
 
-            nodeList.ForEach(r => r.PrepareForRender(viewMatrix, parent, (int) _stopwatch.ElapsedMilliseconds, true));
+            nodeList.ForEach(r => r.PrepareForRender(viewMatrix, parent, (int)_stopwatch.ElapsedMilliseconds, true));
             foreach (var renderTreeGroup in nodeList.OfType<RenderTreeGroup>())
             {
                 PrepareNodes(renderTreeGroup, renderTreeGroup.ObjectMatrix, renderTreeGroup);
@@ -102,7 +102,7 @@ namespace FEngRender.GL
             foreach (var node in nodes)
             {
                 if (node.Hidden) continue;
-                
+
                 if ((node.FrontendObject.Flags & ObjectFlags.Invisible) != 0 ||
                     (node.FrontendObject.Flags & ObjectFlags.HideInEdit) != 0)
                 {
@@ -153,30 +153,56 @@ namespace FEngRender.GL
 
         private void RenderString(RenderTreeNode node, Text str, bool doBoundingBox = false)
         {
-            var strMatrix = node.ObjectMatrix;
-            float posX = strMatrix.M41 + Width / 2f;
-            float posY = strMatrix.M42 + Height / 2f;
-            
             var font = TextHelpers.GetFont(18);
-            var (_, _, width, height) = TextHelpers.MeasureText(str.Value, new RendererOptions(font)
+            HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left;
+            VerticalAlignment verticalAlignment = VerticalAlignment.Top;
+
+            if (str.Formatting.HasFlag(TextFormat.JustifyHorizontalCenter))
             {
-                WrappingWidth = str.MaxWidth
-            });
-            var xOffset = TextHelpers.CalculateXOffset((uint)str.Formatting,
-                width);
-            var yOffset = TextHelpers.CalculateYOffset((uint)str.Formatting,
-                height);
+                horizontalAlignment = HorizontalAlignment.Center;
+            } else if (str.Formatting.HasFlag(TextFormat.JustifyHorizontalRight))
+            {
+                horizontalAlignment = HorizontalAlignment.Right;
+            }
+
+            if (str.Formatting.HasFlag(TextFormat.JustifyVerticalCenter))
+            {
+                verticalAlignment = VerticalAlignment.Center;
+            } else if (str.Formatting.HasFlag(TextFormat.JustifyVerticalBottom))
+            {
+                verticalAlignment = VerticalAlignment.Bottom;
+            }
+
+            bool applyWrapping = str.Formatting.HasFlag(TextFormat.WordWrap);
+
+            var rendererOptions = new RendererOptions(font)
+            {
+                WrappingWidth = applyWrapping ? str.MaxWidth : 0,
+                HorizontalAlignment = horizontalAlignment,
+                VerticalAlignment = verticalAlignment,
+            };
+            var (_, _, width, height) = TextHelpers.MeasureText(str.Value, rendererOptions);
 
             _glyphRenderer.Transform = node.ObjectMatrix * Matrix4x4.CreateTranslation(320, 240, 0);
             _glyphRenderer.Color = node.ObjectColor;
             _glyphRenderer.Formatting = str.Formatting;
-            
-            TextRenderer.RenderTextTo(_glyphRenderer, str.Value,
-                new RendererOptions(font, new Vector2(xOffset, yOffset))
-                {
-                    WrappingWidth = str.MaxWidth,
-                }
-            );
+
+            if (doBoundingBox)
+            {
+                var offsetWidth = width;
+                var offsetHeight = height;
+                var q = new Quad(-offsetWidth, -offsetHeight, offsetWidth, offsetHeight,
+                    1.0f,
+                    _glyphRenderer.Transform,
+                    Vector2.Zero,
+                    Vector2.Zero,
+                    new Vector4[4]);
+                q.DrawBoundingBox(_gl);
+            }
+            else
+            {
+                TextRenderer.RenderTextTo(_glyphRenderer, str.Value, rendererOptions);
+            }
         }
 
         private void RenderSimpleImage(RenderTreeNode node, bool doBoundingBox = false)
@@ -214,7 +240,7 @@ namespace FEngRender.GL
             {
                 if (texture.Width == 0) return 0;
 
-                var v10 = (uint) (value - 1) >> 1;
+                var v10 = (uint)(value - 1) >> 1;
                 uint divisor;
                 for (divisor = 2; v10 != 0; divisor *= 2)
                 {
@@ -224,8 +250,8 @@ namespace FEngRender.GL
                 return divisor;
             }
 
-            var widthDivide = (float) CalculateDivisor(texture.Width);
-            var heightDivide = (float) CalculateDivisor(texture.Height);
+            var widthDivide = (float)CalculateDivisor(texture.Width);
+            var heightDivide = (float)CalculateDivisor(texture.Height);
 
             var texUpLeft = new Vector2(
                 texture.Width / widthDivide * node.UpperLeft.X,

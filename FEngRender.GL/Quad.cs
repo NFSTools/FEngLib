@@ -64,8 +64,8 @@ namespace FEngRender.GL
         public void DrawBoundingBox(OpenGL gl)
         {
             gl.Disable(OpenGL.GL_BLEND);
+            gl.BindTexture(OpenGL.GL_TEXTURE_2D, 0);
             gl.Begin(BeginMode.LineLoop);
-            
             gl.Color(1.0f, 0, 0, 1.0f);
             foreach (var vertex in _vertices)
             {
