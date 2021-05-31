@@ -59,8 +59,7 @@ namespace FEngViewer
             // 
             // splitContainer1
             // 
-            this.splitContainer1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
+            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.splitContainer1.Location = new System.Drawing.Point(0, 27);
             this.splitContainer1.Name = "splitContainer1";
             // 
