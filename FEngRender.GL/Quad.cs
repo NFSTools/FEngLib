@@ -44,7 +44,7 @@ namespace FEngRender.GL
 
         public void Render(OpenGL gl, Texture tex = null)
         {
-            tex?.GLTexture.Bind(gl);
+            tex?.GLTexture.Push(gl);
             gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
             gl.Enable(OpenGL.GL_BLEND);
 
@@ -59,6 +59,7 @@ namespace FEngRender.GL
             }
 
             gl.End();
+            tex?.GLTexture.Pop(gl);
         }
 
         public void DrawBoundingBox(OpenGL gl)
