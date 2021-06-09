@@ -98,28 +98,52 @@ namespace FEngRender.Data
                     }
                 }
 
-                var colorTrack = GetKeyTrack(CurrentScript, KeyTrackType.Color);
-                var posTrack = GetKeyTrack(CurrentScript, KeyTrackType.Position);
-                var sizeTrack = GetKeyTrack(CurrentScript, KeyTrackType.Size);
-                var rotTrack = GetKeyTrack(CurrentScript, KeyTrackType.Rotation);
-                if (colorTrack != null)
-                    color = TrackInterpolation.Interpolate<Color4>(colorTrack, CurrentScriptTime);
-                if (posTrack != null)
-                    position = TrackInterpolation.Interpolate<Vector3>(posTrack, CurrentScriptTime);
-                if (sizeTrack != null)
-                    size = TrackInterpolation.Interpolate<Vector3>(sizeTrack, CurrentScriptTime);
-                if (rotTrack != null)
-                    rotation = TrackInterpolation.Interpolate<Quaternion>(rotTrack, CurrentScriptTime);
-
-                if (FrontendObject is Image)
+                foreach (var track in CurrentScript.Tracks)
                 {
-                    var upperLeftTrack = GetKeyTrack(CurrentScript, KeyTrackType.UpperLeft);
-                    var lowerRightTrack = GetKeyTrack(CurrentScript, KeyTrackType.LowerRight);
+                    switch (track.Offset)
+                    {
+                        case 0: // Color
+                            color = TrackInterpolation.Interpolate<Color4>(track, CurrentScriptTime);
+                            break;
+                        case 7: // Position
+                            position = TrackInterpolation.Interpolate<Vector3>(track, CurrentScriptTime);
+                            break;
+                        case 10: // Rotation
+                            rotation = TrackInterpolation.Interpolate<Quaternion>(track, CurrentScriptTime);
+                            break;
+                        case 14: // Size
+                            size = TrackInterpolation.Interpolate<Vector3>(track, CurrentScriptTime);
+                            break;
+                        case 17: // UpperLeft
+                        {
+                            if (FrontendObject is IImage<ImageData>)
+                            {
+                                UpperLeft = TrackInterpolation.Interpolate<Vector2>(track, CurrentScriptTime);
+                            }
+                            else
+                            {
+                                throw new Exception("Encountered UpperLeft track for a non-image");
+                            }
 
-                    if (upperLeftTrack != null)
-                        UpperLeft = TrackInterpolation.Interpolate<Vector2>(upperLeftTrack, CurrentScriptTime);
-                    if (lowerRightTrack != null)
-                        LowerRight = TrackInterpolation.Interpolate<Vector2>(lowerRightTrack, CurrentScriptTime);
+                            break;
+                        }
+                        case 19: // LowerRight
+                        {
+                            if (FrontendObject is IImage<ImageData>)
+                            {
+                                LowerRight = TrackInterpolation.Interpolate<Vector2>(track, CurrentScriptTime);
+                            }
+                            else
+                            {
+                                throw new Exception("Encountered LowerRight track for a non-image");
+                            }
+
+                            break;
+                        }
+                        default:
+                            throw new IndexOutOfRangeException(
+                                $"object {FrontendObject.NameHash:X} script {CurrentScript.Id:X} has unsupported track with offset {track.Offset}");
+                    }
                 }
 
                 CurrentScriptTime += deltaTime;
