@@ -49,5 +49,10 @@ namespace FEngViewer
             if (_renderTree != null)
                 _renderer.Render(_renderTree);
         }
+
+        private void openglControl1_MouseMove(object sender, MouseEventArgs e)
+        {
+            OnMouseMove(e);
+        }
     }
 }

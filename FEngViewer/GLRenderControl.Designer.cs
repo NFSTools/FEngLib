@@ -49,6 +49,7 @@ namespace FEngViewer
             this.openglControl1.TabIndex = 0;
             this.openglControl1.OpenGLInitialized += new System.EventHandler(this.openglControl1_OpenGLInitialized);
             this.openglControl1.OpenGLDraw += new SharpGL.RenderEventHandler(this.openglControl1_OpenGLDraw);
+            this.openglControl1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.openglControl1_MouseMove);
             // 
             // GLRenderControl
             // 
