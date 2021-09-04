@@ -8,6 +8,11 @@ using FEngLib.Utils;
 
 namespace FEngLib.Objects
 {
+    /// <summary>
+    /// This represents all common data found in an object's 'ObjD' chunk.
+    /// For objects where the ObjD chunk contains extra data (e.g. images),
+    /// inherit from this class to represent the extra values in that chunk. 
+    /// </summary>
     public class ObjectData : IBinaryAccess
     {
         public Color4 Color { get; set; }
@@ -35,6 +40,15 @@ namespace FEngLib.Objects
         }
     }
 
+    /// <summary>
+    /// Common interface for all object types and their properties.
+    /// Extend this if your object type has extra ObjD attributes,
+    /// and if there are other object types that inherit from your object type (to ensure type safety).
+    /// </summary>
+    /// <typeparam name="TData">
+    /// A type inheriting from ObjectData,
+    /// representing the contents of an ObjD chunk for this object.
+    /// </typeparam>
     public interface IObject<out TData> where TData : ObjectData
     {
         TData Data { get; }
@@ -51,6 +65,9 @@ namespace FEngLib.Objects
         void InitializeData();
     }
 
+    /// <summary>
+    /// All objects that don't have any extra attributes in their ObjD chunk should inherit from this.
+    /// </summary>
     public abstract class BaseObject : BaseObject<ObjectData>
     {
         protected BaseObject(ObjectData data) : base(data)
@@ -58,6 +75,12 @@ namespace FEngLib.Objects
         }
     }
 
+    /// <summary>
+    /// All objects that have extra data in their ObjD chunk should inherit from this base class.
+    /// </summary>
+    /// <typeparam name="TData">
+    /// A type inheriting from ObjectData that represents any additional attributes relevant for this object type.
+    /// </typeparam>
     public abstract class BaseObject<TData> : IObject<TData> where TData : ObjectData
     {
         protected BaseObject(TData data)
