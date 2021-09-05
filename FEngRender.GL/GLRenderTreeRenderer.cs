@@ -110,6 +110,8 @@ namespace FEngRender.GL
             {
                 // there are some things we just don't need to handle
                 case Group _:
+                    RenderGroupBB(node, doBoundingBox);
+                    break;
                 case Movie _:
                     break;
                 case SimpleImage _:
@@ -235,6 +237,21 @@ namespace FEngRender.GL
                 q.DrawBoundingBox(_gl);
             else
                 q.Render(_gl, texture);
+        }
+
+        private void RenderGroupBB(RenderTreeNode node, bool doBoundingBox = false)
+        {
+            var otkMat4 = node.ObjectMatrix * Matrix4x4.CreateTranslation(320, 240, 0);
+
+            var q = new Quad(-0.5f, -0.5f, 0.5f, 0.5f,
+                1.0f,
+                otkMat4,
+                Vector2.Zero,
+                Vector2.One,
+                new Vector4[4]);
+
+            if (doBoundingBox)
+                q.DrawBoundingBox(_gl);
         }
 
         private Texture GetTexture(ResourceRequest resource)
