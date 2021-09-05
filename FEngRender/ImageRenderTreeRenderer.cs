@@ -75,32 +75,9 @@ namespace FEngRender
             }
         }
 
-        private IEnumerable<RenderTreeNode> GetAllTreeNodes(IEnumerable<RenderTreeNode> nodes)
-        {
-            foreach (var node in nodes)
-            {
-                if (node.Hidden) continue;
-                
-                if ((node.FrontendObject.Flags & ObjectFlags.Invisible) != 0 ||
-                    (node.FrontendObject.Flags & ObjectFlags.HideInEdit) != 0)
-                {
-                    continue;
-                }
-
-                yield return node;
-
-                if (!(node is RenderTreeGroup grp)) continue;
-
-                foreach (var rtn in GetAllTreeNodes(grp))
-                {
-                    yield return rtn;
-                }
-            }
-        }
-
         private void RenderTree(SixLabors.ImageSharp.Image<Rgba32> surface, IEnumerable<RenderTreeNode> nodes)
         {
-            foreach (var renderTreeNode in GetAllTreeNodes(nodes).OrderByDescending(n => n.GetZ()))
+            foreach (var renderTreeNode in Data.RenderTree.GetAllTreeNodesForRendering(nodes).OrderByDescending(n => n.GetZ()))
             {
                 RenderNode(surface, renderTreeNode);
             }

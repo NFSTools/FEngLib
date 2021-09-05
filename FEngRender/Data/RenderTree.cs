@@ -33,6 +33,31 @@ namespace FEngRender.Data
         {
             return GetEnumerator();
         }
+        
+        public static IEnumerable<RenderTreeNode> GetAllTreeNodesForRendering(IEnumerable<RenderTreeNode> nodes)
+        {
+            foreach (var node in nodes)
+            {
+                // TODO should we maybe use HideInEdit instead of this separate attribute?
+                //  The games ignore it anyway, so there's no real problem with persisting that flag.
+                if (node.Hidden) continue;
+                
+                if ((node.FrontendObject.Flags & ObjectFlags.Invisible) != 0 ||
+                    (node.FrontendObject.Flags & ObjectFlags.HideInEdit) != 0)
+                {
+                    continue;
+                }
+
+                yield return node;
+
+                if (!(node is RenderTreeGroup grp)) continue;
+
+                foreach (var rtn in GetAllTreeNodesForRendering(grp))
+                {
+                    yield return rtn;
+                }
+            }
+        }
 
         /// <summary>
         /// Creates a new <see cref="RenderTree"/> from

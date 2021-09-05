@@ -96,32 +96,9 @@ namespace FEngRender.GL
             }
         }
 
-        private IEnumerable<RenderTreeNode> GetAllTreeNodes(IEnumerable<RenderTreeNode> nodes)
-        {
-            foreach (var node in nodes)
-            {
-                if (node.Hidden) continue;
-                
-                if ((node.FrontendObject.Flags & ObjectFlags.Invisible) != 0 ||
-                    (node.FrontendObject.Flags & ObjectFlags.HideInEdit) != 0)
-                {
-                    continue;
-                }
-
-                yield return node;
-
-                if (!(node is RenderTreeGroup grp)) continue;
-
-                foreach (var rtn in GetAllTreeNodes(grp))
-                {
-                    yield return rtn;
-                }
-            }
-        }
-
         private void RenderTree(IEnumerable<RenderTreeNode> nodes)
         {
-            foreach (var renderTreeNode in GetAllTreeNodes(nodes).OrderByDescending(n => n.GetZ()))
+            foreach (var renderTreeNode in Data.RenderTree.GetAllTreeNodesForRendering(nodes).OrderByDescending(n => n.GetZ()))
             {
                 RenderNode(renderTreeNode);
             }
