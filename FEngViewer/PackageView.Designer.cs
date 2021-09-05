@@ -99,7 +99,6 @@ namespace FEngViewer
             this.splitContainer2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.splitContainer2.Cursor = System.Windows.Forms.Cursors.VSplit;
             this.splitContainer2.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitContainer2.Location = new System.Drawing.Point(3, 3);
             this.splitContainer2.Name = "splitContainer2";
@@ -110,7 +109,6 @@ namespace FEngViewer
             this.splitContainer2.Panel1.Controls.Add(this.labelCoordDisplay);
             this.splitContainer2.Panel1.Controls.Add(this.objectDetailsView1);
             this.splitContainer2.Panel1.Controls.Add(this.groupBgColor);
-            this.splitContainer2.Panel1.Cursor = System.Windows.Forms.Cursors.Arrow;
             // 
             // splitContainer2.Panel2
             // 
