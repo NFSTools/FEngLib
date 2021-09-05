@@ -220,6 +220,7 @@ namespace FEngViewer
                 objectDetailsView1.Visible = true;
                 objectDetailsView1.UpdateObjectDetails(viewNode);
                 viewOutput.SelectedNode = viewNode;
+                objectPropertyGrid.SelectedObject = new ObjectViewWrapper(viewNode.FrontendObject);
                 Render();
             }
             else

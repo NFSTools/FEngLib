@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTK.WinForms", "OpenTK.G
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FEngRender.GL", "FEngRender.GL\FEngRender.GL.csproj", "{7A41DB9F-2F8C-4F8F-8296-814FCD953318}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ATFControls", "ATFControls\ATFControls.csproj", "{718584BC-94C6-4EC0-B6A5-22FE7AFC9158}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,14 @@ Global
 		{7A41DB9F-2F8C-4F8F-8296-814FCD953318}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7A41DB9F-2F8C-4F8F-8296-814FCD953318}.Release|x86.ActiveCfg = Release|Any CPU
 		{7A41DB9F-2F8C-4F8F-8296-814FCD953318}.Release|x86.Build.0 = Release|Any CPU
+		{718584BC-94C6-4EC0-B6A5-22FE7AFC9158}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{718584BC-94C6-4EC0-B6A5-22FE7AFC9158}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{718584BC-94C6-4EC0-B6A5-22FE7AFC9158}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{718584BC-94C6-4EC0-B6A5-22FE7AFC9158}.Debug|x86.Build.0 = Debug|Any CPU
+		{718584BC-94C6-4EC0-B6A5-22FE7AFC9158}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{718584BC-94C6-4EC0-B6A5-22FE7AFC9158}.Release|Any CPU.Build.0 = Release|Any CPU
+		{718584BC-94C6-4EC0-B6A5-22FE7AFC9158}.Release|x86.ActiveCfg = Release|Any CPU
+		{718584BC-94C6-4EC0-B6A5-22FE7AFC9158}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
