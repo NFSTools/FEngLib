@@ -294,7 +294,7 @@ namespace FEngViewer
         {
             if (treeView1.SelectedNode?.Tag is RenderTreeNode viewNode)
             {
-                viewNode.Hidden = !viewNode.Hidden;
+                viewNode.FrontendObject.Flags ^= ObjectFlags.HideInEdit;
 
                 Render();
             }
