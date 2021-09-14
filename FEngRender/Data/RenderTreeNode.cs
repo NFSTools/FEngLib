@@ -39,8 +39,6 @@ namespace FEngRender.Data
         /// </summary>
         public int CurrentScriptTime { get; private set; }
 
-        public bool Hidden { get; set; }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderTreeNode"/> class.
         /// </summary>
