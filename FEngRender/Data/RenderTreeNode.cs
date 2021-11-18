@@ -77,31 +77,9 @@ namespace FEngRender.Data
             }
 
             if (CurrentScript != null
-                && (CurrentScript.Length > 0 || CurrentScript.ChainedId != 0xFFFFFFFF)
                 && CurrentScriptTime >= 0)
             {
-                if (CurrentScriptTime >= CurrentScript.Length)
-                {
-                    if ((CurrentScript.Flags & 1) == 1)
-                    {
-                        Debug.WriteLine("looping script {0:X} for object {1:X}", CurrentScript.Id,
-                            FrontendObject.NameHash);
-                        CurrentScriptTime = 0;
-                    }
-                    else if (CurrentScript.ChainedId != 0xFFFFFFFF)
-                    {
-                        var nextScript = FrontendObject.Scripts.Find(s => s.Id == CurrentScript.ChainedId) ??
-                                         throw new Exception(
-                                             $"Cannot find chained script (object {FrontendObject.NameHash:X}, base script {CurrentScript.Id:X}): {CurrentScript.ChainedId:X}");
-                        Debug.WriteLine("activating chained script for object {1:X}: {0}",
-                            nextScript.Name ?? nextScript.Id.ToString("X"), FrontendObject.NameHash);
-
-                        SetScript(nextScript);
-                    }
-                }
-
                 foreach (var track in CurrentScript.Tracks)
-                {
                     switch (track.Offset)
                     {
                         case 0: // Color
@@ -122,32 +100,48 @@ namespace FEngRender.Data
                         case 17: // UpperLeft
                         {
                             if (FrontendObject is IImage<ImageData>)
-                            {
                                 UpperLeft = TrackInterpolation.Interpolate<Vector2>(track, CurrentScriptTime);
-                            }
                             else
-                            {
                                 throw new Exception("Encountered UpperLeft track for a non-image");
-                            }
 
                             break;
                         }
                         case 19: // LowerRight
                         {
                             if (FrontendObject is IImage<ImageData>)
-                            {
                                 LowerRight = TrackInterpolation.Interpolate<Vector2>(track, CurrentScriptTime);
-                            }
                             else
-                            {
                                 throw new Exception("Encountered LowerRight track for a non-image");
-                            }
 
                             break;
                         }
                         default:
                             throw new IndexOutOfRangeException(
                                 $"object {FrontendObject.NameHash:X} script {CurrentScript.Id:X} has unsupported track with offset {track.Offset}");
+                    }
+
+                if (CurrentScriptTime >= CurrentScript.Length)
+                {
+                    if ((CurrentScript.Flags & 1) == 1)
+                    {
+                        Debug.WriteLine("looping script {0:X} for object {1:X}", CurrentScript.Id,
+                            FrontendObject.NameHash);
+                        CurrentScriptTime = 0;
+                    }
+                    else if (CurrentScript.ChainedId != 0xFFFFFFFF)
+                    {
+                        var nextScript = FrontendObject.Scripts.Find(s => s.Id == CurrentScript.ChainedId) ??
+                                         throw new Exception(
+                                             $"Cannot find chained script (object {FrontendObject.NameHash:X}, base script {CurrentScript.Id:X}): {CurrentScript.ChainedId:X}");
+                        Debug.WriteLine("activating chained script for object {1:X}: {0}",
+                            nextScript.Name ?? nextScript.Id.ToString("X"), FrontendObject.NameHash);
+
+                        SetScript(nextScript);
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Current script for object {0:X} has ended", FrontendObject.NameHash);
+                        SetScript(null);
                     }
                 }
 
