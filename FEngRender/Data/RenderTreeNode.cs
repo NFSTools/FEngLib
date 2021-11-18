@@ -13,6 +13,18 @@ namespace FEngRender.Data
     /// </summary>
     public class RenderTreeNode
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RenderTreeNode"/> class.
+        /// </summary>
+        /// <param name="frontendObject">
+        ///   The <see cref="IObject{TData}"/> instance owned by the <see cref="RenderTreeNode"/> instance.
+        /// </param>
+        public RenderTreeNode(IObject<ObjectData> frontendObject)
+        {
+            FrontendObject = frontendObject;
+            SetScript(frontendObject.Scripts.Find(s => s.Id == 0x001744B3));
+        }
+
         public Matrix4x4 ObjectMatrix { get; private set; }
 
         public Quaternion ObjectRotation { get; private set; }
@@ -42,18 +54,6 @@ namespace FEngRender.Data
         public bool Hidden { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RenderTreeNode"/> class.
-        /// </summary>
-        /// <param name="frontendObject">
-        ///   The <see cref="IObject{TData}"/> instance owned by the <see cref="RenderTreeNode"/> instance.
-        /// </param>
-        public RenderTreeNode(IObject<ObjectData> frontendObject)
-        {
-            FrontendObject = frontendObject;
-            SetScript(frontendObject.Scripts.Find(s => s.Id == 0x001744B3));
-        }
-
-        /// <summary>
         /// Applies script state and computes transformations.
         /// </summary>
         /// <param name="viewMatrix"></param>
@@ -67,6 +67,7 @@ namespace FEngRender.Data
             var size = frontendObjectData.Size;
             var position = frontendObjectData.Position;
             var rotation = frontendObjectData.Rotation;
+            var pivot = frontendObjectData.Pivot;
             var color = frontendObjectData.Color;
 
             if (frontendObjectData is ImageData imageData)
@@ -83,7 +84,8 @@ namespace FEngRender.Data
                 {
                     if ((CurrentScript.Flags & 1) == 1)
                     {
-                        Debug.WriteLine("looping script {0:X} for object {1:X}", CurrentScript.Id, FrontendObject.NameHash);
+                        Debug.WriteLine("looping script {0:X} for object {1:X}", CurrentScript.Id,
+                            FrontendObject.NameHash);
                         CurrentScriptTime = 0;
                     }
                     else if (CurrentScript.ChainedId != 0xFFFFFFFF)
@@ -104,6 +106,9 @@ namespace FEngRender.Data
                     {
                         case 0: // Color
                             color = TrackInterpolation.Interpolate<Color4>(track, CurrentScriptTime);
+                            break;
+                        case 4: // Pivot
+                            pivot = TrackInterpolation.Interpolate<Vector3>(track, CurrentScriptTime);
                             break;
                         case 7: // Position
                             position = TrackInterpolation.Interpolate<Vector3>(track, CurrentScriptTime);
@@ -152,11 +157,22 @@ namespace FEngRender.Data
             var scaleMatrix = Matrix4x4.CreateScale(size.X, size.Y, size.Z);
             var rotateMatrix = Matrix4x4.CreateFromQuaternion(rotation);
             var transMatrix = Matrix4x4.CreateTranslation(position.X, position.Y, position.Z);
+            var outMatrix = Matrix4x4.Identity;
 
-            if (matrixRotate)
-                ObjectMatrix = scaleMatrix * rotateMatrix * transMatrix * viewMatrix;
-            else
-                ObjectMatrix = scaleMatrix * transMatrix * viewMatrix;
+            outMatrix *= scaleMatrix;
+
+            if (matrixRotate && rotation != Quaternion.Identity)
+            {
+                outMatrix *= Matrix4x4.CreateTranslation(-pivot);
+                outMatrix *= rotateMatrix;
+                outMatrix *= Matrix4x4.CreateTranslation(pivot);
+            }
+
+            outMatrix *= transMatrix;
+            outMatrix *= viewMatrix;
+
+            ObjectMatrix = outMatrix;
+
             ObjectRotation = rotation;
             ObjectColor = color;
 
