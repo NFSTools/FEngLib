@@ -54,5 +54,10 @@ namespace FEngViewer
         {
             OnMouseMove(e);
         }
+
+        private void openglControl1_MouseClick(object sender, MouseEventArgs e)
+        {
+            OnMouseClick(e);
+        }
     }
 }

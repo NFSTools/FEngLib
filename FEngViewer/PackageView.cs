@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using CommandLine;
 using FEngLib.Objects;
@@ -73,24 +74,14 @@ namespace FEngViewer
             {
                 var resourceRequestNode = resourceListNode.Nodes.Add(resourceRequest.Name);
 
-                switch (resourceRequest.Type)
+                resourceRequestNode.ImageKey = resourceRequestNode.SelectedImageKey = resourceRequest.Type switch
                 {
-                    case ResourceType.Image:
-                        resourceRequestNode.ImageKey = resourceRequestNode.SelectedImageKey = "TreeItem_Image";
-                        break;
-                    case ResourceType.MultiImage:
-                        resourceRequestNode.ImageKey = resourceRequestNode.SelectedImageKey = "TreeItem_MultiImage";
-                        break;
-                    case ResourceType.Movie:
-                        resourceRequestNode.ImageKey = resourceRequestNode.SelectedImageKey = "TreeItem_Movie";
-                        break;
-                    case ResourceType.Font:
-                        resourceRequestNode.ImageKey = resourceRequestNode.SelectedImageKey = "TreeItem_Font";
-                        break;
-                    default:
-                        resourceRequestNode.ImageKey = resourceRequestNode.SelectedImageKey = "TreeItem_GenericResource";
-                        break;
-                }
+                    ResourceType.Image => "TreeItem_Image",
+                    ResourceType.MultiImage => "TreeItem_MultiImage",
+                    ResourceType.Movie => "TreeItem_Movie",
+                    ResourceType.Font => "TreeItem_Font",
+                    _ => "TreeItem_GenericResource"
+                };
             }
 
             //var objectListNode = rootNode.Nodes.Add("Objects");
@@ -138,6 +129,7 @@ namespace FEngViewer
 
             var objTreeNode = collection.Add(nodeText);
             objTreeNode.Tag = viewNode;
+            objTreeNode.Name = nodeText;
             if (nodeImageKey != null) objTreeNode.ImageKey = objTreeNode.SelectedImageKey = nodeImageKey;
 
             // Create nodes for scripts
@@ -232,6 +224,45 @@ namespace FEngViewer
         private void viewOutput_MouseMove(object sender, MouseEventArgs e)
         {
             labelCoordDisplay.Text = $"FE: ({e.X - 320,4:D}, {e.Y - 240,4:D}) | Real: ({e.X,4:D}, {e.Y,4:D})";
+        }
+        
+        private void viewOutput_MouseClick(object sender, MouseEventArgs e)
+        {
+            bool WithinBounds(RenderTreeNode node, float x, float y)
+            {
+                var extents = node.Get2DExtents();
+
+                return extents.HasValue && extents.Value.Contains((int) x, (int) y);
+            }
+            var feX = e.X - 320;
+            var feY = e.Y - 240;
+            
+            // get highest Z rendertreenode with the click location in bounds
+            var renderTree = RenderTree.GetAllTreeNodesForRendering(_currentRenderTree);
+            try
+            {
+                var candidates = renderTree
+                    .Where(node => WithinBounds(node, feX, feY))
+                    //.OrderByDescending(n => n.GetZ());
+                    .OrderBy(node => // smallest area first => most "specific" candidate wins
+                    {
+                        var sz = node.Get2DExtents().Value.Size;
+                        return sz.Height * sz.Width; // area 
+                    });
+
+                var top = candidates.First();
+
+                var feObj = top.FrontendObject;
+                var key = $"{feObj.Name ?? feObj.NameHash.ToString("X")}";
+                var foundNodes = treeView1.Nodes.Find(key, true);
+                treeView1.SelectedNode = foundNodes[0];
+                treeView1.Focus();
+            }
+            catch (Exception)
+            {
+                // if linq stuff didn't find anything -
+                // ignored
+            }
         }
 
         [UsedImplicitly]
