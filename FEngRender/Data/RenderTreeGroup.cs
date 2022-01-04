@@ -1,5 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using FEngLib.Objects;
 
 namespace FEngRender.Data
@@ -32,6 +35,35 @@ namespace FEngRender.Data
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        // Groups extents are the smallest rectangle that contains all of its members' extents
+        public override Rectangle? Get2DExtents()
+        {
+            if (FrontendObject.Type != ObjectType.Group) // this should never be possible?
+                return base.Get2DExtents();
+
+            if (_children.Count == 0)
+                return null;
+            
+            var narrowestRectMaybe = _children.First().Get2DExtents();
+
+
+            if (!narrowestRectMaybe.HasValue)
+                return null;
+
+            var narrowestRect = (Rectangle)narrowestRectMaybe;
+            
+            foreach (var child in _children)
+            {
+                var childExtents = child.Get2DExtents();
+                if (childExtents.HasValue)
+                    narrowestRect = Rectangle.Union(narrowestRect, childExtents.Value);
+            }
+
+            narrowestRect.Location += new Size((int)FrontendObject.Data.Position.X, (int) FrontendObject.Data.Position.Y);
+            
+            return narrowestRect;
         }
     }
 }

@@ -133,6 +133,7 @@ namespace FEngViewer
             this.viewOutput.TabIndex = 0;
             this.viewOutput.TabStop = false;
             this.viewOutput.MouseMove += new System.Windows.Forms.MouseEventHandler(this.viewOutput_MouseMove);
+            this.viewOutput.MouseClick += new System.Windows.Forms.MouseEventHandler(this.viewOutput_MouseClick);
             // 
             // labelCoordDisplay
             // 

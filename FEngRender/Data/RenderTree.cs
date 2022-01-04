@@ -38,10 +38,7 @@ namespace FEngRender.Data
         {
             foreach (var node in nodes)
             {
-                // TODO should we maybe use HideInEdit instead of this separate attribute?
-                //  The games ignore it anyway, so there's no real problem with persisting that flag.
-                if (node.Hidden) continue;
-                
+                // TODO make this behavior controllable at runtime (i.e. "show all hidden", "show all invisible")
                 if ((node.FrontendObject.Flags & ObjectFlags.Invisible) != 0 ||
                     (node.FrontendObject.Flags & ObjectFlags.HideInEdit) != 0)
                 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Numerics;
 using FEngLib.Objects;
 using FEngLib.Scripts;
@@ -50,8 +51,6 @@ namespace FEngRender.Data
         /// The current time offset of the current script.
         /// </summary>
         public int CurrentScriptTime { get; private set; }
-
-        public bool Hidden { get; set; }
 
         /// <summary>
         /// Applies script state and computes transformations.
@@ -201,6 +200,35 @@ namespace FEngRender.Data
             uint offset = (uint)trackType;
 
             return script.Tracks.Find(e => e.Offset == offset);
+        }
+
+        public virtual Rectangle? Get2DExtents()
+        {
+            switch (FrontendObject.Type)
+            {
+                case ObjectType.Image:
+                case ObjectType.Movie:
+                case ObjectType.ColoredImage:
+                    var pos = FrontendObject.Data.Position;
+                    var objSize = new Size((int)FrontendObject.Data.Size.X, (int)FrontendObject.Data.Size.Y);
+                    var topLeft = new Point((int)(pos.X - objSize.Width * 0.5), (int)(pos.Y - objSize.Height * 0.5));
+                    return new Rectangle(topLeft, objSize);
+                case ObjectType.String:
+                    //todo
+                    return new Rectangle();
+                case ObjectType.Group:
+                    throw new Exception("This node should be a RenderTreeGroup!!!");
+                case ObjectType.Model:
+                case ObjectType.List:
+                case ObjectType.CodeList:
+                case ObjectType.Effect:
+                case ObjectType.AnimImage:
+                case ObjectType.SimpleImage:
+                case ObjectType.MultiImage:
+                    return new Rectangle();
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private enum KeyTrackType
