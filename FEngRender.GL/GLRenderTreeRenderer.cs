@@ -101,7 +101,7 @@ namespace FEngRender.GL
         private void RenderTree(IEnumerable<RenderTreeNode> nodes)
         {
             foreach (var renderTreeNode in Data.RenderTree.GetAllTreeNodesForRendering(nodes)
-                .OrderByDescending(n => n.GetZ()))
+                         .OrderByDescending(n => n.GetZ()))
             {
                 RenderNode(renderTreeNode);
             }
@@ -204,15 +204,15 @@ namespace FEngRender.GL
             var widthDivide = (float)CalculateDivisor(texture.Width);
             var heightDivide = (float)CalculateDivisor(texture.Height);
 
-            var texUpLeft = new Vector2(
-                texture.Width / widthDivide * node.UpperLeft.X,
-                texture.Height / heightDivide * node.UpperLeft.Y
-            );
-
-            var texLowRight = new Vector2(
-                texture.Width / widthDivide * node.LowerRight.X,
-                texture.Height / heightDivide * node.LowerRight.Y
-            );
+            // var texUpLeft = new Vector2(
+            //     texture.Width / widthDivide * node.UpperLeft.X,
+            //     texture.Height / heightDivide * node.UpperLeft.Y
+            // );
+            //
+            // var texLowRight = new Vector2(
+            //     texture.Width / widthDivide * node.LowerRight.X,
+            //     texture.Height / heightDivide * node.LowerRight.Y
+            // );
 
             // top left, top right, bottom right, bottom left
             Vector4[] colors = new Vector4[4];
@@ -232,8 +232,8 @@ namespace FEngRender.GL
             var q = new Quad(-0.5f, -0.5f, 0.5f, 0.5f,
                 1.0f,
                 otkMat4,
-                texUpLeft,
-                texLowRight,
+                node.UpperLeft,
+                node.LowerRight,
                 colors);
 
             if (doBoundingBox)

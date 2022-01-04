@@ -6,6 +6,8 @@ namespace FEngRender.GL
 {
     public class Quad
     {
+        public const float XScale = 1.0f / 320.0f;
+        private const float YScale = 1.0f / 240.0f;
         private readonly VertexDeclaration[] _vertices = new VertexDeclaration[4];
 
         public Quad(
@@ -39,27 +41,28 @@ namespace FEngRender.GL
             _vertices[3].Color = colors[3];
         }
 
-        public const float XScale = 1.0f / 320.0f;
-        private const float YScale = 1.0f / 240.0f;
-
         public void Render(OpenGL gl, Texture tex = null)
         {
+            gl.Enable(OpenGL.GL_TEXTURE_2D);
             tex?.GLTexture.Push(gl);
+            gl.TexParameter(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MAG_FILTER, (int)OpenGL.GL_NEAREST);
+            gl.TexParameter(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MIN_FILTER, (int)OpenGL.GL_NEAREST);
+
             gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
             gl.Enable(OpenGL.GL_BLEND);
 
-            gl.Begin(BeginMode.TriangleFan);
+            gl.Begin(BeginMode.Quads);
 
             foreach (var vertex in _vertices)
             {
                 gl.Color(vertex.Color.X, vertex.Color.Y, vertex.Color.Z, vertex.Color.W);
-                if (tex != null)
-                    gl.TexCoord(vertex.TexCoords.X, vertex.TexCoords.Y);
+                gl.TexCoord(vertex.TexCoords.X, vertex.TexCoords.Y);
                 gl.Vertex(vertex.Position.X * XScale - 1.0f, -(vertex.Position.Y * YScale - 1.0f), 0);
             }
 
             gl.End();
             tex?.GLTexture.Pop(gl);
+            gl.Disable(OpenGL.GL_TEXTURE_2D);
         }
 
         public void DrawBoundingBox(OpenGL gl)

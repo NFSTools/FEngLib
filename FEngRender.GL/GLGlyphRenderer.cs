@@ -10,23 +10,22 @@ namespace FEngRender.GL
 {
     public class GLGlyphRenderer : IGlyphRenderer
     {
-        public Matrix4x4 Transform;
-        public Color4 Color;
-        public TextFormat Formatting;
+        private const float XScale = 1.0f / 320.0f;
+        private const float YScale = 1.0f / 240.0f;
+        private const float Z = 0.0f;
 
         private readonly OpenGL _gl;
 
         private Vector2 _currentPoint;
+        public Color4 Color;
+        public TextFormat Formatting;
+        public Matrix4x4 Transform;
 
         public GLGlyphRenderer(OpenGL gl)
         {
             _gl = gl;
         }
 
-        private const float XScale = 1.0f / 320.0f;
-        private const float YScale = 1.0f / 240.0f;
-        private const float Z = 0.0f;
-        
         /// <summary>
         /// Called before any glyphs have been rendered.
         /// </summary>
@@ -38,8 +37,10 @@ namespace FEngRender.GL
             _gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
             _gl.Enable(OpenGL.GL_BLEND);
             _gl.BindTexture(OpenGL.GL_TEXTURE_2D, 0);
+            _gl.Disable(OpenGL.GL_TEXTURE_2D);
             Vector4 colorV = Color;
             _gl.Color(colorV.X, colorV.Y, colorV.Z, colorV.W);
+            _gl.Disable(OpenGL.GL_BLEND);
         }
 
         /// <summary>
@@ -56,7 +57,7 @@ namespace FEngRender.GL
             // be cached to reduce processing.
 
             // You can return false to skip all the figures within the glyph (if you return false EndGlyph will still be called)
-            
+
             return true;
         }
 
@@ -77,7 +78,7 @@ namespace FEngRender.GL
         void IGlyphRenderer.MoveTo(Vector2 point)
         {
             // move current point to location marked by point without describing a line;
-            
+
             _currentPoint = Vector2.Transform(point, Transform);
         }
 
@@ -91,9 +92,9 @@ namespace FEngRender.GL
             // describes Quadratic Bezier curve from the 'current point' using the 
             // 'second control point' and final 'point' leaving the 'current point'
             // at 'point'
-            
+
             // TODO actually implement proper bezier with Map1
-            
+
             var secondCpTransformed = Vector2.Transform(secondControlPoint, Transform);
             var nextPointTransformed = Vector2.Transform(point, Transform);
 
@@ -118,13 +119,13 @@ namespace FEngRender.GL
             // describes Cubic Bezier curve from the 'current point' using the 
             // 'second control point', 'third control point' and final 'point' 
             // leaving the 'current point' at 'point'
-            
+
             // TODO actually implement proper bezier with Map1
-            
+
             var secondCpTransformed = Vector2.Transform(secondControlPoint, Transform);
             var thirdCpTransformed = Vector2.Transform(thirdControlPoint, Transform);
             var nextPointTransformed = Vector2.Transform(point, Transform);
-            
+
             _gl.Begin(BeginMode.LineStrip);
             {
                 Vertex(_currentPoint);
@@ -146,7 +147,7 @@ namespace FEngRender.GL
             // leaving the 'current point' at 'point'
 
             var nextPointTransformed = Vector2.Transform(point, Transform);
-            
+
             _gl.Begin(BeginMode.Lines);
             {
                 Vertex(_currentPoint);
@@ -183,12 +184,12 @@ namespace FEngRender.GL
         {
             //once all glyphs/layers have been drawn this is called.
         }
-        
+
         private void Vertex(float x, float y)
         {
             _gl.Vertex(x * XScale - 1.0f, -(y * YScale - 1.0f), Z);
         }
-        
+
         private void Vertex(Vector2 v)
         {
             Vertex(v.X, v.Y);
