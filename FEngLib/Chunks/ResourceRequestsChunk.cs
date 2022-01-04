@@ -3,37 +3,36 @@ using System.Collections.Generic;
 using System.IO;
 using FEngLib.Packages;
 
-namespace FEngLib.Chunks
+namespace FEngLib.Chunks;
+
+public class ResourceRequestsChunk : FrontendChunk
 {
-    public class ResourceRequestsChunk : FrontendChunk
+    public List<ResourceRequest> ResourceRequests { get; set; }
+
+    public override void Read(Package package, FrontendChunkBlock chunkBlock,
+        FrontendChunkReader chunkReader, BinaryReader reader)
     {
-        public List<ResourceRequest> ResourceRequests { get; set; }
+        if ((chunkBlock.Size - 4) % 0x18 != 0) throw new ChunkReadingException("Malformed RsRq chunk");
 
-        public override void Read(Package package, FrontendChunkBlock chunkBlock,
-            FrontendChunkReader chunkReader, BinaryReader reader)
+        var numRequests = reader.ReadInt32();
+        ResourceRequests = new List<ResourceRequest>(numRequests);
+
+        for (var i = 0; i < numRequests; i++)
         {
-            if ((chunkBlock.Size - 4) % 0x18 != 0) throw new ChunkReadingException("Malformed RsRq chunk");
+            var resourceRequest = new ResourceRequest();
+            resourceRequest.ID = reader.ReadUInt32();
+            resourceRequest.NameOffset = reader.ReadUInt32();
+            resourceRequest.Type = (ResourceType) reader.ReadUInt32();
+            resourceRequest.Flags = reader.ReadUInt32();
+            resourceRequest.Handle = reader.ReadUInt32();
+            resourceRequest.UserParam = reader.ReadUInt32();
 
-            var numRequests = reader.ReadInt32();
-            ResourceRequests = new List<ResourceRequest>(numRequests);
-
-            for (var i = 0; i < numRequests; i++)
-            {
-                var resourceRequest = new ResourceRequest();
-                resourceRequest.ID = reader.ReadUInt32();
-                resourceRequest.NameOffset = reader.ReadUInt32();
-                resourceRequest.Type = (ResourceType) reader.ReadUInt32();
-                resourceRequest.Flags = reader.ReadUInt32();
-                resourceRequest.Handle = reader.ReadUInt32();
-                resourceRequest.UserParam = reader.ReadUInt32();
-
-                ResourceRequests.Add(resourceRequest);
-            }
+            ResourceRequests.Add(resourceRequest);
         }
+    }
 
-        public override FrontendChunkType GetChunkType()
-        {
-            throw new NotImplementedException();
-        }
+    public override FrontendChunkType GetChunkType()
+    {
+        throw new NotImplementedException();
     }
 }

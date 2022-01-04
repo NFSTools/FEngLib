@@ -1,21 +1,20 @@
 ﻿using System.IO;
 using FEngLib.Packages;
 
-namespace FEngLib.Chunks
+namespace FEngLib.Chunks;
+
+public class ButtonMapCountChunk : FrontendChunk
 {
-    public class ButtonMapCountChunk : FrontendChunk
+    public uint NumEntries { get; set; }
+
+    public override void Read(Package package, FrontendChunkBlock chunkBlock,
+        FrontendChunkReader chunkReader, BinaryReader reader)
     {
-        public uint NumEntries { get; set; }
+        NumEntries = reader.ReadUInt32();
+    }
 
-        public override void Read(Package package, FrontendChunkBlock chunkBlock,
-            FrontendChunkReader chunkReader, BinaryReader reader)
-        {
-            NumEntries = reader.ReadUInt32();
-        }
-
-        public override FrontendChunkType GetChunkType()
-        {
-            return FrontendChunkType.ButtonMapCount;
-        }
+    public override FrontendChunkType GetChunkType()
+    {
+        return FrontendChunkType.ButtonMapCount;
     }
 }

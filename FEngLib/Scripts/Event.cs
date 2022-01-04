@@ -1,9 +1,8 @@
-﻿namespace FEngLib.Scripts
+﻿namespace FEngLib.Scripts;
+
+public class Event
 {
-    public class Event
-    {
-        public uint EventId { get; set; }
-        public uint Target { get; set; }
-        public uint Time { get; set; }
-    }
+    public uint EventId { get; set; }
+    public uint Target { get; set; }
+    public uint Time { get; set; }
 }

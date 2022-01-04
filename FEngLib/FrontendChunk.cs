@@ -1,13 +1,12 @@
 ﻿using System.IO;
 using FEngLib.Packages;
 
-namespace FEngLib
-{
-    public abstract class FrontendChunk
-    {
-        public abstract void Read(Package package, FrontendChunkBlock chunkBlock,
-            FrontendChunkReader chunkReader, BinaryReader reader);
+namespace FEngLib;
 
-        public abstract FrontendChunkType GetChunkType();
-    }
+public abstract class FrontendChunk
+{
+    public abstract void Read(Package package, FrontendChunkBlock chunkBlock,
+        FrontendChunkReader chunkReader, BinaryReader reader);
+
+    public abstract FrontendChunkType GetChunkType();
 }

@@ -1,12 +1,11 @@
 ﻿using System.Linq;
 
-namespace FEngLib.Utils
+namespace FEngLib.Utils;
+
+public static class Hashing
 {
-    public static class Hashing
+    public static uint BinHash(string str)
     {
-        public static uint BinHash(string str)
-        {
-            return str.Aggregate(0xFFFFFFFFu, (h, c) => h * 33 + c);
-        }
+        return str.Aggregate(0xFFFFFFFFu, (h, c) => h * 33 + c);
     }
 }

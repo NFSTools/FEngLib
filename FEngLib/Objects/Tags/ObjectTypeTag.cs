@@ -3,21 +3,20 @@ using FEngLib.Packages;
 using FEngLib.Tags;
 using FEngLib.Utils;
 
-namespace FEngLib.Objects.Tags
+namespace FEngLib.Objects.Tags;
+
+public class ObjectTypeTag : Tag
 {
-    public class ObjectTypeTag : Tag
+    public ObjectTypeTag(IObject<ObjectData> frontendObject) : base(frontendObject)
     {
-        public ObjectTypeTag(IObject<ObjectData> frontendObject) : base(frontendObject)
-        {
-        }
+    }
 
-        public ObjectType Type { get; set; }
+    public ObjectType Type { get; set; }
 
-        public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, Package package,
-            ushort id,
-            ushort length)
-        {
-            Type = br.ReadEnum<ObjectType>();
-        }
+    public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, Package package,
+        ushort id,
+        ushort length)
+    {
+        Type = br.ReadEnum<ObjectType>();
     }
 }

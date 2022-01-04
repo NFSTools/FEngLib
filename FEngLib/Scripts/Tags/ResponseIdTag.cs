@@ -3,20 +3,19 @@ using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Tags;
 
-namespace FEngLib.Scripts.Tags
+namespace FEngLib.Scripts.Tags;
+
+public class ResponseIdTag : Tag
 {
-    public class ResponseIdTag : Tag
+    public ResponseIdTag(IObject<ObjectData> frontendObject) : base(frontendObject)
     {
-        public ResponseIdTag(IObject<ObjectData> frontendObject) : base(frontendObject)
-        {
-        }
+    }
 
-        public uint Id { get; set; }
+    public uint Id { get; set; }
 
-        public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, Package package, ushort id,
-            ushort length)
-        {
-            Id = br.ReadUInt32();
-        }
+    public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, Package package, ushort id,
+        ushort length)
+    {
+        Id = br.ReadUInt32();
     }
 }

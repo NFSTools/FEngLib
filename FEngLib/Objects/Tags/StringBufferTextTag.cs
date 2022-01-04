@@ -3,21 +3,20 @@ using System.Text;
 using FEngLib.Packages;
 using FEngLib.Tags;
 
-namespace FEngLib.Objects.Tags
+namespace FEngLib.Objects.Tags;
+
+public class StringBufferTextTag : Tag
 {
-    public class StringBufferTextTag : Tag
+    public StringBufferTextTag(IObject<ObjectData> frontendObject) : base(frontendObject)
     {
-        public StringBufferTextTag(IObject<ObjectData> frontendObject) : base(frontendObject)
-        {
-        }
+    }
 
-        public string Value { get; set; }
+    public string Value { get; set; }
 
-        public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, Package package,
-            ushort id,
-            ushort length)
-        {
-            Value = Encoding.Unicode.GetString(br.ReadBytes(length)).Trim('\0');
-        }
+    public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, Package package,
+        ushort id,
+        ushort length)
+    {
+        Value = Encoding.Unicode.GetString(br.ReadBytes(length)).Trim('\0');
     }
 }

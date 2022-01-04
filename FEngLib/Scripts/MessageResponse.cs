@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
 
-namespace FEngLib.Scripts
-{
-    public class MessageResponse
-    {
-        public uint Id { get; set; }
-        public List<Response> Responses { get; set; }
+namespace FEngLib.Scripts;
 
-        public MessageResponse()
-        {
-            Responses = new List<Response>();
-        }
+public class MessageResponse
+{
+    public uint Id { get; set; }
+    public List<Response> Responses { get; set; }
+
+    public MessageResponse()
+    {
+        Responses = new List<Response>();
     }
 }

@@ -2,57 +2,56 @@
 using FEngLib.Packages;
 using FEngLib.Utils;
 
-namespace FEngLib.Chunks
+namespace FEngLib.Chunks;
+
+public class PackageHeaderChunk : FrontendChunk
 {
-    public class PackageHeaderChunk : FrontendChunk
+    /// <summary>
+    ///     The number of entries in the RsNm chunk
+    /// </summary>
+    public int NumResourceNames { get; set; }
+
+    /// <summary>
+    ///     The name of the package
+    /// </summary>
+    public string Name { get; set; }
+
+    /// <summary>
+    ///     The filename of the package
+    /// </summary>
+    public string Filename { get; set; }
+
+    public override void Read(Package package, FrontendChunkBlock chunkBlock,
+        FrontendChunkReader chunkReader, BinaryReader reader)
     {
-        /// <summary>
-        ///     The number of entries in the RsNm chunk
-        /// </summary>
-        public int NumResourceNames { get; set; }
+        if (reader.ReadUInt32() != 0x20000) throw new InvalidDataException("Invalid header constant");
 
-        /// <summary>
-        ///     The name of the package
-        /// </summary>
-        public string Name { get; set; }
+        if (reader.ReadUInt32() != 0) throw new InvalidDataException("Expected null after constant");
 
-        /// <summary>
-        ///     The filename of the package
-        /// </summary>
-        public string Filename { get; set; }
+        NumResourceNames = reader.ReadInt32();
 
-        public override void Read(Package package, FrontendChunkBlock chunkBlock,
-            FrontendChunkReader chunkReader, BinaryReader reader)
-        {
-            if (reader.ReadUInt32() != 0x20000) throw new InvalidDataException("Invalid header constant");
+        reader.ReadUInt32();
+        //if (reader.ReadUInt32() != 3)
+        //{
+        //    throw new InvalidDataException("Invalid header version");
+        //}
 
-            if (reader.ReadUInt32() != 0) throw new InvalidDataException("Expected null after constant");
+        var nameLength = reader.ReadInt32();
 
-            NumResourceNames = reader.ReadInt32();
+        if (nameLength < 1) throw new InvalidDataException("Invalid name length");
 
-            reader.ReadUInt32();
-            //if (reader.ReadUInt32() != 3)
-            //{
-            //    throw new InvalidDataException("Invalid header version");
-            //}
+        var filenameLength = reader.ReadInt32();
 
-            var nameLength = reader.ReadInt32();
+        if (filenameLength < 1) throw new InvalidDataException("Invalid filename length");
 
-            if (nameLength < 1) throw new InvalidDataException("Invalid name length");
+        Name = new string(reader.ReadChars(nameLength)).Trim('\0');
+        Filename = new string(reader.ReadChars(filenameLength)).Trim('\0');
 
-            var filenameLength = reader.ReadInt32();
+        reader.AlignReader(4);
+    }
 
-            if (filenameLength < 1) throw new InvalidDataException("Invalid filename length");
-
-            Name = new string(reader.ReadChars(nameLength)).Trim('\0');
-            Filename = new string(reader.ReadChars(filenameLength)).Trim('\0');
-
-            reader.AlignReader(4);
-        }
-
-        public override FrontendChunkType GetChunkType()
-        {
-            return FrontendChunkType.PackageHeader;
-        }
+    public override FrontendChunkType GetChunkType()
+    {
+        return FrontendChunkType.PackageHeader;
     }
 }

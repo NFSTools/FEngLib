@@ -1,8 +1,7 @@
-﻿namespace FEngLib.Packages
+﻿namespace FEngLib.Packages;
+
+public class TypeSizeEntry
 {
-    public class TypeSizeEntry
-    {
-        public uint ID { get; set; }
-        public uint Size { get; set; }
-    }
+    public uint ID { get; set; }
+    public uint Size { get; set; }
 }

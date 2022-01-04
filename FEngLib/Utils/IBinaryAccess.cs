@@ -1,10 +1,9 @@
 ﻿using System.IO;
 
-namespace FEngLib.Utils
+namespace FEngLib.Utils;
+
+public interface IBinaryAccess
 {
-    public interface IBinaryAccess
-    {
-        void Read(BinaryReader br);
-        void Write(BinaryWriter bw);
-    }
+    void Read(BinaryReader br);
+    void Write(BinaryWriter bw);
 }
