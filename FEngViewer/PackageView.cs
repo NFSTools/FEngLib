@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using CommandLine;
+using FEngLib;
 using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Scripts;
@@ -204,6 +205,27 @@ public partial class PackageView : Form
         using var mr = new BinaryReader(ms);
         return new FrontendPackageLoader().Load(mr);
     }
+    
+    private void SavePackageToChunk(string path)
+    {
+        using var fs = new FileStream(path, FileMode.Create);
+        using var fw = new BinaryWriter(fs);
+
+        using var ms = new MemoryStream();
+        ms.Position = 0;
+
+        using var mr = new BinaryWriter(ms);
+        
+        fw.Write(0xE76E4546); // 'FEn\xE7'
+        fw.Write(ms.Length);
+        fs.Position = 8; // todo needed?
+
+        mr.Flush();
+        ms.Position = 0;
+        ms.CopyTo(fs);
+
+        fs.Flush();
+    }
 
     private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
     {
@@ -297,6 +319,25 @@ public partial class PackageView : Form
 
         Text = package.Name;
     }
+
+    private void SaveFileMenuItem_Click(object sender, EventArgs e)
+    {
+        var sfd = new SaveFileDialog();
+        sfd.Filter = "FNG Files (*.fng)|*.fng|All files (*.*)|*.*";
+        sfd.OverwritePrompt = true;
+        if (sfd.ShowDialog() == DialogResult.OK)
+        {
+            SaveFile(sfd.FileName);
+        }
+    }
+    
+    private void SaveFile(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return;
+        SavePackageToChunk(path);
+    }
+
 
     private void treeView1_MouseDown(object sender, MouseEventArgs e)
     {
