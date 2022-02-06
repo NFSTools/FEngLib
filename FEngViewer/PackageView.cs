@@ -215,6 +215,7 @@ public partial class PackageView : Form
         ms.Position = 0;
 
         using var mr = new BinaryWriter(ms);
+        new FrontendChunkWriter(_currentPackage, mr).Write();
         
         fw.Write(0xE76E4546); // 'FEn\xE7'
         fw.Write(ms.Length);
