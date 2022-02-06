@@ -45,6 +45,7 @@ namespace FEngViewer
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.OpenFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.SaveFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.objectContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toggleObjectVisibilityItem = new System.Windows.Forms.ToolStripMenuItem();
             this.changeObjectPositionItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -203,7 +204,7 @@ namespace FEngViewer
             // 
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.OpenFileMenuItem});
+            this.OpenFileMenuItem, this.SaveFileMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1499, 28);
@@ -216,6 +217,13 @@ namespace FEngViewer
             this.OpenFileMenuItem.Size = new System.Drawing.Size(59, 24);
             this.OpenFileMenuItem.Text = "Open";
             this.OpenFileMenuItem.Click += new System.EventHandler(this.OpenFileMenuItem_Click);
+            // 
+            // SaveFileMenuItem
+            // 
+            this.SaveFileMenuItem.Name = "SaveFileMenuItem";
+            this.SaveFileMenuItem.Size = new System.Drawing.Size(59, 24);
+            this.SaveFileMenuItem.Text = "Save";
+            this.SaveFileMenuItem.Click += new System.EventHandler(this.SaveFileMenuItem_Click);
             // 
             // objectContextMenu
             // 
@@ -299,6 +307,7 @@ namespace FEngViewer
         private System.Windows.Forms.Label labelCoordDisplay;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem OpenFileMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem SaveFileMenuItem;
         private System.Windows.Forms.TreeView treeView1;
         private System.Windows.Forms.ContextMenuStrip objectContextMenu;
         private System.Windows.Forms.ToolStripMenuItem toggleObjectVisibilityItem;
