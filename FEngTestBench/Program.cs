@@ -116,9 +116,9 @@ internal static class Program
         new FrontendChunkWriter(pkg).Write(bw);
         
         fw.Write(0x30203);
-        fw.Write(ms.Length + 8);
+        fw.Write((uint) ms.Length + 8);
         fw.Write(0xE76E4546); // 'FEn\xE7'
-        fw.Write(ms.Length);
+        fw.Write((uint) ms.Length);
         fs.Position = 16; // todo needed?
 
         bw.Flush();
