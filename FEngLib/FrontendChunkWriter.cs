@@ -61,7 +61,7 @@ public class FrontendChunkWriter
         {
             // TODO these are from UG2 UI_QRTrackSelect.fng.
             //  they should be the same, at the very least per game.
-            // TODO: check if these are always the same in every fng, or if the type sizes present vary.
+            // TODO: The type sizes present vary. how do they vary? by objects that are present?
             var sizes = new Dictionary<int, int>
             {
                 { 5, 0x44 },
@@ -252,15 +252,40 @@ public class FrontendChunkWriter
                                     }
                                 });
                             }
-                            // TODO ScriptEvents, ScriptName (optionally)
+
+                            if (script.Events.Count != 0)
+                            {
+                                bw.WriteTag(ScriptEvents, bw =>
+                                {
+                                    foreach (var @event in script.Events)
+                                    {
+                                        bw.Write(@event.EventId);
+                                        bw.Write(@event.Target);
+                                        bw.Write(@event.Time);
+                                    }
+                                });
+                            }
+
+                            if (script.Name != null)
+                            {
+                                bw.WriteTag(ScriptName, bw =>
+                                {
+                                    bw.Write(script.Name.ToCharArray());
+                                    bw.Write('\0');
+                                    bw.AlignWriter(4);
+                                });
+                            }
                         });
                     }
 
-                    foreach (var msgr in obj.MessageResponses)
+                    if (obj.MessageResponses.Count != 0)
                     {
                         bw.WriteChunk(MessageResponses, bw =>
                         {
-                            // TODO
+                            foreach (var msgr in obj.MessageResponses)
+                            {
+                                WriteMessageResponse(msgr, bw);
+                            }
                         });
                     }
                 });
@@ -276,31 +301,8 @@ public class FrontendChunkWriter
             {
                 foreach (var response in Package.MessageResponses)
                 {
-                    bw.WriteTag(MessageResponseInfo, bw => bw.Write(response.Id));
-                    bw.WriteTag(MessageResponseCount, bw => bw.Write(response.Responses.Count));
-                    foreach (var resp in response.Responses)
-                    {
-                        bw.WriteTag(ResponseId, bw => bw.Write(resp.Id));
-                        switch (resp.Param)
-                        {
-                            case string str:
-                                //throw new NotImplementedException();
-                                bw.WriteTag(ResponseStringParam, bw =>
-                                {
-                                    bw.Write(str.ToCharArray());
-                                    bw.Write('\0');
-                                    bw.AlignWriter(4);
-                                });
-                                break;
-                            case uint ui:
-                                bw.WriteTag(ResponseIntParam, bw => bw.Write(ui));
-                                break;
-                        }
-                        bw.WriteTag(ResponseTarget, bw => bw.Write(resp.Target));
-                    }
+                    WriteMessageResponse(response, bw);
                 }
-                
-                // TODO
             });
         }
 
@@ -319,5 +321,31 @@ public class FrontendChunkWriter
                 });
             }
         });
+    }
+
+    private void WriteMessageResponse(MessageResponse msgr, BinaryWriter bw)
+    {
+        bw.WriteTag(MessageResponseInfo, bw => bw.Write(msgr.Id));
+        bw.WriteTag(MessageResponseCount, bw => bw.Write(msgr.Responses.Count));
+        foreach (var resp in msgr.Responses)
+        {
+            bw.WriteTag(ResponseId, bw => bw.Write(resp.Id));
+            switch (resp.Param)
+            {
+                case string str:
+                    bw.WriteTag(ResponseStringParam, bw =>
+                    {
+                        bw.Write(str.ToCharArray());
+                        bw.Write('\0');
+                        bw.AlignWriter(4);
+                    });
+                    break;
+                case uint ui:
+                    bw.WriteTag(ResponseIntParam, bw => bw.Write(ui));
+                    break;
+            }
+
+            bw.WriteTag(ResponseTarget, bw => bw.Write(resp.Target));
+        }
     }
 }
