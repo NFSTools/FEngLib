@@ -59,19 +59,28 @@ public class FrontendChunkWriter
     {
         writer.WriteChunk(TypeList, bw =>
         {
-            // TODO these are from UG2 UI_QRTrackSelect.fng.
-            //  they should be the same, at the very least per game.
-            // TODO: The type sizes present vary. how do they vary? by objects that are present?
-            var sizes = new Dictionary<int, int>
+            var allSizes = new Dictionary<ObjectType, int>
             {
-                { 5, 0x44 },
-                { 2, 0x44 },
-                //{ 1, 0x54 }
+                { ObjectType.Image, 0x54 },
+                { ObjectType.String, 0x44 },
+                { ObjectType.Group, 0x44 },
+                { ObjectType.Movie, 0x44 },
+                { ObjectType.ColoredImage, 0x94 },
+                { ObjectType.SimpleImage, 0x44 },
+                { ObjectType.MultiImage, 0x90 },
             };
-            foreach (var (key, value) in sizes)
+
+            var usedTypes = new List<ObjectType>();
+            Package.Objects.ForEach(o =>
             {
-                bw.Write(key);
-                bw.Write(value);
+                if (!usedTypes.Contains(o.Type))
+                    usedTypes.Add(o.Type);
+            });
+
+            foreach (var type in usedTypes)
+            {
+                bw.Write((int) type);
+                bw.Write(allSizes[type]);
             }
         });
     }
@@ -239,7 +248,9 @@ public class FrontendChunkWriter
                                     bw.Write(track.ParamSize);
                                     bw.WriteEnum(track.InterpType);
                                     bw.Write(track.InterpAction);
-                                    bw.Write((track.Length & 0xffffff) | (track.Offset << 24));
+                                    // TODO inconsistent-ish. TrackOffset is actually different from this value.
+                                    // UG2 at least does not use this offset thing at all...?
+                                    bw.Write((track.Length & 0xffffff) /*| (track.Offset << 24)*/);
                                 });
                                 
                                 bw.WriteTag(ScriptTrackOffset, bw => bw.Write(track.Offset));
