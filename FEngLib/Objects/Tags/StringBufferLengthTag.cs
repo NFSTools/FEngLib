@@ -10,10 +10,12 @@ public class StringBufferLengthTag : Tag
     {
     }
 
+    public uint BufferLength { get; set; }
+    
     public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, Package package,
         ushort id,
         ushort length)
     {
-        br.ReadUInt32();
+        BufferLength = br.ReadUInt32();
     }
 }
