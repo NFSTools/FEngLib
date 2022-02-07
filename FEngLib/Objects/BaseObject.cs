@@ -66,7 +66,7 @@ public interface IObject<out TData> where TData : ObjectData
 }
 
 /// <summary>
-/// All objects that don't have any extra attributes in their ObjD chunk should inherit from this.
+/// All objects that don't have any extra attributes in their ObjD chunk's SA tag should inherit from this.
 /// </summary>
 public abstract class BaseObject : BaseObject<ObjectData>
 {
@@ -76,7 +76,7 @@ public abstract class BaseObject : BaseObject<ObjectData>
 }
 
 /// <summary>
-/// All objects that have extra data in their ObjD chunk should inherit from this base class.
+/// All objects that have extra data in their ObjD chunk's SA tag should inherit from this base class.
 /// </summary>
 /// <typeparam name="TData">
 /// A type inheriting from ObjectData that represents any additional attributes relevant for this object type.

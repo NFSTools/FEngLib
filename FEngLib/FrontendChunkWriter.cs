@@ -2,8 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Utils;
+using static FEngLib.FrontendChunkType;
+using static FEngLib.FrontendTagType;
+using ObjectType = FEngLib.Objects.ObjectType;
+
+// to prevent writing to the wrong stream in the nested WriteChunk/etc calls, we intentionally hide any outer writers.
+// ReSharper disable VariableHidesOuterVariable
 
 namespace FEngLib;
 
@@ -22,11 +30,13 @@ public class FrontendChunkWriter
         WriteTypS(writer);
         WriteResCc(writer);
         WriteObjCc(writer);
+        // PkgR
+        // Targ
     }
 
     private void WritePkHd(BinaryWriter writer)
     {
-        WriteChunk(FrontendChunkType.PackageHeader,bw =>
+        writer.WriteChunk(PackageHeader,bw =>
         {
             bw.Write(0x20000);
             bw.Write(0);
@@ -40,12 +50,12 @@ public class FrontendChunkWriter
             bw.Write(Package.Filename.ToCharArray());
             bw.Write('\0');
             bw.AlignWriter(4);
-        }, writer);
+        });
     }
 
     private void WriteTypS(BinaryWriter writer)
     {
-        WriteChunk(FrontendChunkType.TypeList, bw =>
+        writer.WriteChunk(TypeList, bw =>
         {
             // TODO these are from UG2 UI_QRTrackSelect.fng.
             //  they should be the same, at the very least per game.
@@ -61,64 +71,139 @@ public class FrontendChunkWriter
                 bw.Write(key);
                 bw.Write(value);
             }
-        }, writer);
+        });
     }
 
     private void WriteResCc(BinaryWriter writer)
     {
-        WriteChunk(FrontendChunkType.ResourcesContainer, resbw =>
+        writer.WriteChunk(ResourcesContainer, bw =>
         {
-            WriteChunk(FrontendChunkType.ResourceNames, nmbw =>
+            bw.WriteChunk(ResourceNames, bw =>
             {
                 foreach (var resrq in Package.ResourceRequests)
                 {
-                    nmbw.Write(resrq.Name.ToCharArray());
-                    nmbw.Write('\0');
+                    bw.Write(resrq.Name.ToCharArray());
+                    bw.Write('\0');
                 }
-                nmbw.AlignWriter(4);
-            }, resbw);
+                bw.AlignWriter(4);
+            });
             
-            WriteChunk(FrontendChunkType.ResourceRequests, rqbw =>
+            bw.WriteChunk(ResourceRequests, bw =>
             {
-                rqbw.Write(Package.ResourceRequests.Count);
+                bw.Write(Package.ResourceRequests.Count);
                 foreach (var resrq in Package.ResourceRequests)
                 {
-                    rqbw.Write(resrq.ID);
-                    rqbw.Write(resrq.NameOffset);
-                    rqbw.WriteEnum(resrq.Type);
-                    rqbw.Write(resrq.Flags);
-                    rqbw.Write(resrq.Handle);
-                    rqbw.Write(resrq.UserParam);
+                    bw.Write(resrq.ID);
+                    bw.Write(resrq.NameOffset);
+                    bw.WriteEnum(resrq.Type);
+                    bw.Write(resrq.Flags);
+                    bw.Write(resrq.Handle);
+                    bw.Write(resrq.UserParam);
                 }
-                rqbw.AlignWriter(4);
-            }, resbw);
-        }, writer);
+                bw.AlignWriter(4);
+            });
+        });
     }
 
     private void WriteObjCc(BinaryWriter writer)
     {
-        WriteChunk(FrontendChunkType.ObjectContainer, bw =>
+        writer.WriteChunk(ObjectContainer, bw =>
         {
-            var buttonCount = Package.ButtonCount;
-            if (buttonCount != 0)
+            bw.WriteChunk(ButtonMapCount, bw =>
             {
-                WriteChunk(FrontendChunkType.ButtonMapCount, butnBw =>
+                bw.Write(Package.ButtonCount);
+            });
+
+            foreach (var obj in Package.Objects)
+            {
+                bw.WriteChunk(FrontendObjectContainer, bw =>
                 {
-                    butnBw.Write(buttonCount);
-                }, bw);
+                    bw.WriteChunk(FrontendChunkType.ObjectData, bw =>
+                    {
+                        bw.WriteTag(FrontendTagType.ObjectType, bw => bw.WriteEnum(obj.Type));
+                        bw.WriteTag(ObjectHash, bw => bw.Write(obj.NameHash));
+                        bw.WriteTag(ObjectReference, bw =>
+                        {
+                            bw.Write(obj.Guid);
+                            bw.Write(obj.NameHash);
+                            bw.WriteEnum(obj.Flags);
+                            if (obj.ResourceRequest != null)
+                            {
+                                // TODO get the index back from the package
+                                // or, make them up anew?
+                                bw.Write(0);
+                            }
+                            else
+                            {
+                                bw.Write(-1);
+                            }
+                        });
+
+                        if (obj.Parent != null)
+                        {
+                            bw.WriteTag(ObjectParent, bw => bw.Write(obj.Parent.NameHash));
+                        }
+
+                        switch (obj.Type)
+                        {
+                            case ObjectType.Image:
+                                var img = (IImage<ImageData>)obj;
+                                bw.WriteTag(ImageInfo, bw => bw.Write(img.ImageFlags));
+                                break;
+                            case ObjectType.String:
+                                // TODO incomplete, all of this
+                                var str = (Text)obj;
+                                // TODO we don't actually read/use this value yet (:
+                                bw.WriteTag(StringBufferLength, bw => bw.Write(0));
+                                bw.WriteTag(StringBufferText, bw =>
+                                {
+                                    bw.Write(Encoding.Unicode.GetBytes(str.Value));
+                                    bw.Write((short) 0);
+                                    bw.AlignWriter(4);
+                                });
+                                break;
+                            case ObjectType.Group:
+                            case ObjectType.Movie:
+                            case ObjectType.ColoredImage:
+                            case ObjectType.SimpleImage:
+                                // nothing special
+                                break;
+                            case ObjectType.MultiImage:
+                                var mImg = (MultiImage)obj;
+                                bw.WriteTag(ImageInfo, bw => bw.Write(mImg.ImageFlags));
+                                bw.WriteTag(MultiImageTexture1, bw => bw.Write(mImg.Texture1));
+                                bw.WriteTag(MultiImageTexture2, bw => bw.Write(mImg.Texture2));
+                                bw.WriteTag(MultiImageTexture3, bw => bw.Write(mImg.Texture3));
+                                bw.WriteTag(MultiImageTextureFlags1, bw => bw.Write(mImg.TextureFlags1));
+                                bw.WriteTag(MultiImageTextureFlags2, bw => bw.Write(mImg.TextureFlags2));
+                                bw.WriteTag(MultiImageTextureFlags3, bw => bw.Write(mImg.TextureFlags3));
+                                break;
+                            default:
+                                Console.WriteLine($"!!!!!! idk whether/how to write a {obj.Type}'s specific tags!");
+                                throw new NotImplementedException();
+                        }
+
+                        if (obj.Data != null)
+                            bw.WriteTag(FrontendTagType.ObjectData, bw => obj.Data.Write(bw));
+                    });
+
+                    foreach (var script in obj.Scripts)
+                    {
+                        bw.WriteChunk(ScriptData, bw =>
+                        {
+                        
+                        });
+                    }
+
+                    foreach (var msgr in obj.MessageResponses)
+                    {
+                        bw.WriteChunk(MessageResponses, bw =>
+                        {
+                        
+                        });
+                    }
+                });
             }
-        }, writer);
-    }
-
-    private static void WriteChunk(FrontendChunkType id, Action<BinaryWriter> chunkWriter, BinaryWriter target)
-    {
-        using var ms = new MemoryStream();
-        using var bw = new BinaryWriter(ms);
-        
-        chunkWriter(bw);
-
-        target.WriteEnum(id);
-        target.Write((int) ms.Length);
-        ms.WriteTo(target.BaseStream);
+        });
     }
 }
