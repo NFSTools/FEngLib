@@ -14,6 +14,7 @@ public enum TextFormat : uint
 
 public class Text : BaseObject
 {
+    public uint BufferLength { get; set; }
     public string Value { get; set; }
     public string Label { get; set; }
     public uint Hash { get; set; }

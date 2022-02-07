@@ -154,7 +154,7 @@ public class FrontendChunkWriter
                                 var str = (Text)obj;
                                 // TODO we don't actually read/use this value yet (:
                                 //  either find out if we can deduce this automatically, or make it editable...
-                                bw.WriteTag(StringBufferLength, bw => bw.Write(0x18C));
+                                bw.WriteTag(StringBufferLength, bw => bw.Write(str.BufferLength));
                                 bw.WriteTag(StringBufferText, bw =>
                                 {
                                     bw.Write(Encoding.Unicode.GetBytes(str.Value));

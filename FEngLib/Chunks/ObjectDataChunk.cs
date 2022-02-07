@@ -35,6 +35,8 @@ public class ObjectDataChunk : FrontendObjectChunk
         {
             case ObjectTypeTag objectTypeTag:
                 return ProcessObjectTypeTag(objectTypeTag);
+            case StringBufferLengthTag stringBufferLengthTag when frontendObject is Text frontendString:
+                return ProcessStringBufferLengthTag(frontendString, stringBufferLengthTag);
             case StringBufferTextTag stringBufferTextTag when frontendObject is Text frontendString:
                 return ProcessStringBufferTextTag(frontendString, stringBufferTextTag);
             case StringBufferFormattingTag stringBufferFormattingTag
@@ -119,6 +121,13 @@ public class ObjectDataChunk : FrontendObjectChunk
         StringBufferTextTag stringBufferTextTag)
     {
         frontendString.Value = stringBufferTextTag.Value;
+        return frontendString;
+    }
+
+    private BaseObject ProcessStringBufferLengthTag(Text frontendString,
+        StringBufferLengthTag stringBufferLengthTag)
+    {
+        frontendString.BufferLength = stringBufferLengthTag.BufferLength;
         return frontendString;
     }
 
