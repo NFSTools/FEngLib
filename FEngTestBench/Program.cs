@@ -19,7 +19,6 @@ internal static class Program
         var paths = Directory.GetFiles(args[0], "*.fng", SearchOption.AllDirectories);
         var relpathsMap = new Dictionary<Package, string>();
 
-        var relativePaths = new List<string>();
         var outdir = indir + "_rewrite";
         foreach (var fngPath in paths)
         {
@@ -28,16 +27,14 @@ internal static class Program
             stopwatch.Stop();
 
             Console.WriteLine("Loaded {2} (file: {0}) in {1}ms", fngPath, stopwatch.ElapsedMilliseconds, package.Name);
-            
+
             packages.Add(package);
             var relpath = Path.GetRelativePath(indir, fngPath);
-            relativePaths.Add(relpath);
             relpathsMap.Add(package, relpath);
         }
 
         var matching = 0;
         var total = 0;
-        var mismatches = new List<string>();
         foreach (var package in packages)
         {
             var relpath = relpathsMap[package];
@@ -50,28 +47,29 @@ internal static class Program
             SavePackageToChunk(package, rewrittenPath);
             stopwatch.Stop();
 
-            Console.WriteLine("Wrote {2} (file: {0}) in {1}ms", rewrittenPath, stopwatch.ElapsedMilliseconds, package.Name);
-            
+            Console.WriteLine("Wrote {2} (file: {0}) in {1}ms", rewrittenPath, stopwatch.ElapsedMilliseconds,
+                package.Name);
+
             var orig = new FileInfo(origPath);
             var rewrite = new FileInfo(rewrittenPath);
 
             Console.Write($"{relpath,-50} ...");
             if (!FilesAreEqual_Hash(orig, rewrite))
             {
-                mismatches.Add(relpath);
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.Write("FAIL");
             }
             else
             {
                 matching++;
-                
+
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write("PASS");
             }
+
             Console.ResetColor();
             Console.WriteLine();
-            
+
             total++;
         }
 
@@ -114,11 +112,11 @@ internal static class Program
 
         using var bw = new BinaryWriter(ms);
         new FrontendChunkWriter(pkg).Write(bw);
-        
+
         fw.Write(0x30203);
-        fw.Write((uint) ms.Length + 8);
+        fw.Write((uint)ms.Length + 8);
         fw.Write(0xE76E4546); // 'FEn\xE7'
-        fw.Write((uint) ms.Length);
+        fw.Write((uint)ms.Length);
         fs.Position = 16; // todo needed?
 
         bw.Flush();
@@ -127,17 +125,18 @@ internal static class Program
 
         fs.Flush();
     }
-    
-    static bool FilesAreEqual_Hash(FileInfo first, FileInfo second)
+
+    private static bool FilesAreEqual_Hash(FileInfo first, FileInfo second)
     {
         var firstHash = SHA256.Create().ComputeHash(first.OpenRead());
         var secondHash = SHA256.Create().ComputeHash(second.OpenRead());
 
-        for (var i=0; i<firstHash.Length; i++)
+        for (var i = 0; i < firstHash.Length; i++)
         {
             if (firstHash[i] != secondHash[i])
                 return false;
         }
+
         return true;
     }
 }
