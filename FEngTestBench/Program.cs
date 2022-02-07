@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Security.Cryptography;
+using FEngLib;
 using FEngLib.Packages;
 
 namespace FEngTestBench;
@@ -10,14 +13,69 @@ internal static class Program
     private static void Main(string[] args)
     {
         var stopwatch = Stopwatch.StartNew();
-        Console.WriteLine("Running test bench on directory {0}", args[0]);
-        foreach (var fngPath in Directory.GetFiles(args[0], "*.fng", SearchOption.AllDirectories))
+        var indir = args[0];
+        Console.WriteLine("Running test bench on directory {0}", indir);
+        var packages = new List<Package>();
+        var paths = Directory.GetFiles(args[0], "*.fng", SearchOption.AllDirectories);
+        var relpathsMap = new Dictionary<Package, string>();
+
+        var relativePaths = new List<string>();
+        var outdir = indir + "_rewrite";
+        foreach (var fngPath in paths)
         {
             stopwatch.Restart();
             var package = LoadPackageFromChunk(fngPath);
             stopwatch.Stop();
+
             Console.WriteLine("Loaded {2} (file: {0}) in {1}ms", fngPath, stopwatch.ElapsedMilliseconds, package.Name);
+            
+            packages.Add(package);
+            var relpath = Path.GetRelativePath(indir, fngPath);
+            relativePaths.Add(relpath);
+            relpathsMap.Add(package, relpath);
         }
+
+        var matching = 0;
+        var total = 0;
+        var mismatches = new List<string>();
+        foreach (var package in packages)
+        {
+            var relpath = relpathsMap[package];
+            var origPath = indir + Path.DirectorySeparatorChar + relpath;
+            var rewrittenPath = outdir + Path.DirectorySeparatorChar + relpath;
+
+            Directory.CreateDirectory(Path.GetDirectoryName(rewrittenPath) ?? throw new InvalidOperationException());
+
+            stopwatch.Restart();
+            SavePackageToChunk(package, rewrittenPath);
+            stopwatch.Stop();
+
+            Console.WriteLine("Wrote {2} (file: {0}) in {1}ms", rewrittenPath, stopwatch.ElapsedMilliseconds, package.Name);
+            
+            var orig = new FileInfo(origPath);
+            var rewrite = new FileInfo(rewrittenPath);
+
+            Console.Write($"{relpath,-50} ...");
+            if (!FilesAreEqual_Hash(orig, rewrite))
+            {
+                mismatches.Add(relpath);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("FAIL");
+            }
+            else
+            {
+                matching++;
+                
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("PASS");
+            }
+            Console.ResetColor();
+            Console.WriteLine();
+            
+            total++;
+        }
+
+        Console.WriteLine("PASSED: {0}/{1} ({2}%)", matching, total, matching / total);
     }
 
     private static Package LoadPackageFromChunk(string path)
@@ -25,9 +83,18 @@ internal static class Program
         using var fs = new FileStream(path, FileMode.Open);
         using var fr = new BinaryReader(fs);
 
-        if (fr.ReadUInt32() != 197123) throw new InvalidDataException($"Invalid FEng chunk file: {path}");
-
-        fs.Seek(0x10, SeekOrigin.Begin);
+        var marker = fr.ReadUInt32();
+        switch (marker)
+        {
+            case 0x30203:
+                fs.Seek(0x10, SeekOrigin.Begin);
+                break;
+            case 0xE76E4546:
+                fs.Seek(0x8, SeekOrigin.Begin);
+                break;
+            default:
+                throw new InvalidDataException($"Invalid FEng chunk file: {path}");
+        }
 
         using var ms = new MemoryStream();
         fs.CopyTo(ms);
@@ -35,5 +102,42 @@ internal static class Program
 
         using var mr = new BinaryReader(ms);
         return new FrontendPackageLoader().Load(mr);
+    }
+
+    private static void SavePackageToChunk(Package pkg, string path)
+    {
+        using var fs = new FileStream(path, FileMode.Create);
+        using var fw = new BinaryWriter(fs);
+
+        using var ms = new MemoryStream();
+        ms.Position = 0;
+
+        using var bw = new BinaryWriter(ms);
+        new FrontendChunkWriter(pkg).Write(bw);
+        
+        fw.Write(0x30203);
+        fw.Write(ms.Length + 8);
+        fw.Write(0xE76E4546); // 'FEn\xE7'
+        fw.Write(ms.Length);
+        fs.Position = 16; // todo needed?
+
+        bw.Flush();
+        ms.Position = 0;
+        ms.CopyTo(fs);
+
+        fs.Flush();
+    }
+    
+    static bool FilesAreEqual_Hash(FileInfo first, FileInfo second)
+    {
+        var firstHash = SHA256.Create().ComputeHash(first.OpenRead());
+        var secondHash = SHA256.Create().ComputeHash(second.OpenRead());
+
+        for (var i=0; i<firstHash.Length; i++)
+        {
+            if (firstHash[i] != secondHash[i])
+                return false;
+        }
+        return true;
     }
 }
