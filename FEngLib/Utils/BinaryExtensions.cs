@@ -75,6 +75,12 @@ public static class BinaryExtensions
         return bw.BaseStream.Position - 4;
     }
 
+    public static void WriteCString(this BinaryWriter bw, string str)
+    {
+        bw.Write(str.ToCharArray());
+        bw.Write('\0');
+    }
+
     public static void AlignReader(this BinaryReader br, int boundary)
     {
         if (br.BaseStream.Position % boundary != 0)

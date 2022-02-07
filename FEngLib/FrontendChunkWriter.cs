@@ -93,8 +93,7 @@ public class FrontendChunkWriter
             {
                 foreach (var resrq in Package.ResourceRequests)
                 {
-                    bw.Write(resrq.Name.ToCharArray());
-                    bw.Write('\0');
+                    bw.WriteCString(resrq.Name);
                 }
                 bw.AlignWriter(4);
             });
@@ -136,8 +135,7 @@ public class FrontendChunkWriter
                         {
                             bw.WriteTag(ObjectName, bw =>
                             {
-                                bw.Write(obj.Name.ToCharArray());
-                                bw.Write('\0');
+                                bw.WriteCString(obj.Name);
                                 bw.AlignWriter(4);
                             });
                         }
@@ -221,8 +219,7 @@ public class FrontendChunkWriter
                             {
                                 bw.WriteTag(ScriptName, bw =>
                                 {
-                                    bw.Write(script.Name.ToCharArray());
-                                    bw.Write('\0');
+                                    bw.WriteCString(script.Name);
                                     bw.AlignWriter(4);
                                 });
                             }
@@ -358,8 +355,7 @@ public class FrontendChunkWriter
                 case string str:
                     bw.WriteTag(ResponseStringParam, bw =>
                     {
-                        bw.Write(str.ToCharArray());
-                        bw.Write('\0');
+                        bw.WriteCString(str);
                         bw.AlignWriter(4);
                     });
                     break;
