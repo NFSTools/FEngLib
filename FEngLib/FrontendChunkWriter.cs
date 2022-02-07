@@ -33,8 +33,7 @@ public class FrontendChunkWriter
         WriteTypS(writer);
         WriteResCc(writer);
         WriteObjCc(writer);
-        // PkgR
-        // Targ
+        WriteMsgChunks(writer);
     }
 
     private void WritePkHd(BinaryWriter writer)
@@ -67,7 +66,7 @@ public class FrontendChunkWriter
             {
                 { 5, 0x44 },
                 { 2, 0x44 },
-                { 1, 0x54 }
+                //{ 1, 0x54 }
             };
             foreach (var (key, value) in sizes)
             {
@@ -132,9 +131,7 @@ public class FrontendChunkWriter
                             bw.WriteEnum(obj.Flags);
                             if (obj.ResourceRequest != null)
                             {
-                                // TODO get the index back from the package
-                                // or, make them up anew?
-                                bw.Write(0);
+                                bw.Write(Package.ResourceRequests.IndexOf(obj.ResourceRequest));
                             }
                             else
                             {
@@ -144,7 +141,7 @@ public class FrontendChunkWriter
 
                         if (obj.Parent != null)
                         {
-                            bw.WriteTag(ObjectParent, bw => bw.Write(obj.Parent.NameHash));
+                            bw.WriteTag(ObjectParent, bw => bw.Write(obj.Parent.Guid));
                         }
 
                         switch (obj.Type)
@@ -154,7 +151,6 @@ public class FrontendChunkWriter
                                 bw.WriteTag(ImageInfo, bw => bw.Write(img.ImageFlags));
                                 break;
                             case ObjectType.String:
-                                // TODO incomplete, all of this
                                 var str = (Text)obj;
                                 // TODO we don't actually read/use this value yet (:
                                 //  either find out if we can deduce this automatically, or make it editable...
@@ -266,6 +262,59 @@ public class FrontendChunkWriter
                         {
                             // TODO
                         });
+                    }
+                });
+            }
+        });
+    }
+
+    private void WriteMsgChunks(BinaryWriter writer)
+    {
+        if (Package.MessageResponses.Count != 0)
+        {
+            writer.WriteChunk(PackageResponses, bw =>
+            {
+                foreach (var response in Package.MessageResponses)
+                {
+                    bw.WriteTag(MessageResponseInfo, bw => bw.Write(response.Id));
+                    bw.WriteTag(MessageResponseCount, bw => bw.Write(response.Responses.Count));
+                    foreach (var resp in response.Responses)
+                    {
+                        bw.WriteTag(ResponseId, bw => bw.Write(resp.Id));
+                        switch (resp.Param)
+                        {
+                            case string str:
+                                //throw new NotImplementedException();
+                                bw.WriteTag(ResponseStringParam, bw =>
+                                {
+                                    bw.Write(str.ToCharArray());
+                                    bw.Write('\0');
+                                    bw.AlignWriter(4);
+                                });
+                                break;
+                            case uint ui:
+                                bw.WriteTag(ResponseIntParam, bw => bw.Write(ui));
+                                break;
+                        }
+                        bw.WriteTag(ResponseTarget, bw => bw.Write(resp.Target));
+                    }
+                }
+                
+                // TODO
+            });
+        }
+
+        writer.WriteChunk(Targets, bw =>
+        {
+            bw.WriteTag(MessageTargetCount, bw => bw.Write(Package.MessageTargetLists.Count));
+            foreach (var targetList in Package.MessageTargetLists)
+            {
+                bw.WriteTag(FrontendTagType.MessageTargetList, bw =>
+                {
+                    bw.Write(targetList.MsgId);
+                    foreach (var target in targetList.Targets)
+                    {
+                        bw.Write(target);
                     }
                 });
             }
