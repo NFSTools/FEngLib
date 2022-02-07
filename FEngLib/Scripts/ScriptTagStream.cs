@@ -4,6 +4,7 @@ using FEngLib.Chunks;
 using FEngLib.Objects;
 using FEngLib.Scripts.Tags;
 using FEngLib.Tags;
+using static FEngLib.FrontendTagType;
 
 namespace FEngLib.Scripts;
 
@@ -23,15 +24,15 @@ public class ScriptTagStream : TagStream
     {
         var (id, size) = (Reader.ReadUInt16(), Reader.ReadUInt16());
         var pos = Reader.BaseStream.Position;
-        Tag tag = id switch
+        Tag tag = (FrontendTagType)id switch
         {
-            0x6853 => new ScriptHeaderTag(frontendObject, script),
-            0x6353 => new ScriptChainTag(frontendObject, script),
-            0x4946 => new ScriptKeyTrackTag(frontendObject, script),
-            0x6F54 => new ScriptTrackOffsetTag(frontendObject, script),
-            0x644B => new ScriptKeyNodeTag(frontendObject, script),
-            0x5645 => new ScriptEventsTag(frontendObject, script),
-            0x6E53 => new ScriptNameTag(frontendObject, script),
+            ScriptHeader => new ScriptHeaderTag(frontendObject, script),
+            ScriptChain => new ScriptChainTag(frontendObject, script),
+            ScriptKeyTrack => new ScriptKeyTrackTag(frontendObject, script),
+            ScriptTrackOffset => new ScriptTrackOffsetTag(frontendObject, script),
+            ScriptKeyNode => new ScriptKeyNodeTag(frontendObject, script),
+            ScriptEvents => new ScriptEventsTag(frontendObject, script),
+            ScriptName => new ScriptNameTag(frontendObject, script),
             _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
         };
 

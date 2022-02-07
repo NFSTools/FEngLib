@@ -5,6 +5,7 @@ using FEngLib.Packages;
 using FEngLib.Packages.Tags;
 using FEngLib.Scripts.Tags;
 using FEngLib.Tags;
+using static FEngLib.FrontendTagType;
 
 namespace FEngLib.Scripts;
 
@@ -23,16 +24,16 @@ public class MessageTagStream : TagStream
     {
         var (id, size) = (Reader.ReadUInt16(), Reader.ReadUInt16());
         var pos = Reader.BaseStream.Position;
-        Tag tag = id switch
+        Tag tag = (FrontendTagType)id switch
         {
-            0x694D => new MessageResponseInfoTag(frontendObject),
-            0x434D => new MessageResponseCountTag(frontendObject),
-            0x6952 => new ResponseIdTag(frontendObject),
-            0x7552 => new ResponseIntParamTag(frontendObject),
-            0x7352 => new ResponseStringParamTag(frontendObject),
-            0x7452 => new ResponseTargetTag(frontendObject),
-            0x6354 => new MessageTargetCountTag(frontendObject),
-            0x744D => new MessageTargetListTag(frontendObject),
+            MessageResponseInfo => new MessageResponseInfoTag(frontendObject),
+            MessageResponseCount => new MessageResponseCountTag(frontendObject),
+            ResponseId => new ResponseIdTag(frontendObject),
+            ResponseIntParam => new ResponseIntParamTag(frontendObject),
+            ResponseStringParam => new ResponseStringParamTag(frontendObject),
+            ResponseTarget => new ResponseTargetTag(frontendObject),
+            MessageTargetCount => new MessageTargetCountTag(frontendObject),
+            FrontendTagType.MessageTargetList => new MessageTargetListTag(frontendObject),
             _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
         };
 

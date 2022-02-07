@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using FEngLib.Chunks;
 using FEngLib.Tags;
+using static FEngLib.FrontendTagType;
 
 namespace FEngLib.Objects.Tags;
 
@@ -15,28 +16,28 @@ public class ObjectTagStream : TagStream
     {
         var (id, size) = (Reader.ReadUInt16(), Reader.ReadUInt16());
         var pos = Reader.BaseStream.Position;
-        Tag tag = id switch
+        Tag tag = (FrontendTagType)id switch
         {
-            0x744F => new ObjectTypeTag(frontendObject),
-            0x684F => new ObjectHashTag(frontendObject),
-            0x504F => new ObjectReferenceTag(frontendObject),
-            0x6649 => new ImageInfoTag(frontendObject),
-            0x4153 => new ObjectDataTag(frontendObject),
-            0x4150 => new ObjectParentTag(frontendObject),
-            0x6253 => new StringBufferLengthTag(frontendObject),
-            0x7453 => new StringBufferTextTag(frontendObject),
-            0x6A53 => new StringBufferFormattingTag(frontendObject),
-            0x6C53 => new StringBufferLeadingTag(frontendObject),
-            0x7753 => new StringBufferMaxWidthTag(frontendObject),
-            0x4853 => new StringBufferLabelHashTag(frontendObject),
-            0x314D => new MultiImageTextureTag(frontendObject),
-            0x324D => new MultiImageTextureTag(frontendObject),
-            0x334D => new MultiImageTextureTag(frontendObject),
-            0x614D => new MultiImageTextureFlagsTag(frontendObject),
-            0x624D => new MultiImageTextureFlagsTag(frontendObject),
-            0x634D => new MultiImageTextureFlagsTag(frontendObject),
-            0x6E4F => new ObjectNameTag(frontendObject),
-            0x4C53 => new StringBufferLabelTag(frontendObject),
+            FrontendTagType.ObjectType => new ObjectTypeTag(frontendObject),
+            ObjectHash => new ObjectHashTag(frontendObject),
+            ObjectReference => new ObjectReferenceTag(frontendObject),
+            ImageInfo => new ImageInfoTag(frontendObject),
+            FrontendTagType.ObjectData => new ObjectDataTag(frontendObject),
+            ObjectParent => new ObjectParentTag(frontendObject),
+            StringBufferLength => new StringBufferLengthTag(frontendObject),
+            StringBufferText => new StringBufferTextTag(frontendObject),
+            StringBufferFormatting => new StringBufferFormattingTag(frontendObject),
+            StringBufferLeading => new StringBufferLeadingTag(frontendObject),
+            StringBufferMaxWidth => new StringBufferMaxWidthTag(frontendObject),
+            StringBufferLabelHash => new StringBufferLabelHashTag(frontendObject),
+            MultiImageTexture1 => new MultiImageTextureTag(frontendObject),
+            MultiImageTexture2 => new MultiImageTextureTag(frontendObject),
+            MultiImageTexture3 => new MultiImageTextureTag(frontendObject),
+            MultiImageTextureFlags1 => new MultiImageTextureFlagsTag(frontendObject),
+            MultiImageTextureFlags2 => new MultiImageTextureFlagsTag(frontendObject),
+            MultiImageTextureFlags3 => new MultiImageTextureFlagsTag(frontendObject),
+            ObjectName => new ObjectNameTag(frontendObject),
+            StringBufferLabel => new StringBufferLabelTag(frontendObject),
             _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
         };
 
