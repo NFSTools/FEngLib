@@ -25,7 +25,7 @@ public enum FrontendTagType : ushort
     StringBufferLabel = 0x4C53, // SL
 
     // part of Scrp
-    ScriptHeader = 0x6853, // SD
+    ScriptHeader = 0x6853, // Sh
     ScriptChain = 0x6353, // Sc
     ScriptKeyTrack = 0x4946, // FI
     ScriptTrackOffset = 0x6F54, // To
