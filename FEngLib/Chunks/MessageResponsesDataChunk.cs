@@ -41,7 +41,10 @@ public class MessageResponsesDataChunk : FrontendObjectChunk
                 ProcessResponseIdTag(frontendObject, responseIdTag);
                 break;
             case ResponseIntParamTag responseParamTag:
-                ProcessResponseParamTag(frontendObject, responseParamTag);
+                ProcessResponseIntParamTag(frontendObject, responseParamTag);
+                break;
+            case ResponseStringParamTag responseParamTag:
+                ProcessResponseStringParamTag(frontendObject, responseParamTag);
                 break;
             case ResponseTargetTag responseTargetTag:
                 ProcessResponseTargetTag(frontendObject, responseTargetTag);
@@ -51,10 +54,16 @@ public class MessageResponsesDataChunk : FrontendObjectChunk
         return frontendObject;
     }
 
-    private void ProcessResponseParamTag(IObject<ObjectData> frontendObject,
+    private void ProcessResponseIntParamTag(IObject<ObjectData> frontendObject,
         ResponseIntParamTag responseIntParamTag)
     {
         frontendObject.MessageResponses[^1].Responses[^1].Param = responseIntParamTag.Param;
+    }
+
+    private void ProcessResponseStringParamTag(IObject<ObjectData> frontendObject,
+        ResponseStringParamTag responseStringParamTag)
+    {
+        frontendObject.MessageResponses[^1].Responses[^1].Param = responseStringParamTag.Param;
     }
 
     private void ProcessResponseTargetTag(IObject<ObjectData> frontendObject,
