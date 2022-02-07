@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using FEngLib.Objects;
 using FEngLib.Packages;
+using FEngLib.Scripts;
+using FEngLib.Structures;
 using FEngLib.Utils;
 using static FEngLib.FrontendChunkType;
 using static FEngLib.FrontendTagType;
@@ -154,13 +157,19 @@ public class FrontendChunkWriter
                                 // TODO incomplete, all of this
                                 var str = (Text)obj;
                                 // TODO we don't actually read/use this value yet (:
-                                bw.WriteTag(StringBufferLength, bw => bw.Write(0));
+                                //  either find out if we can deduce this automatically, or make it editable...
+                                bw.WriteTag(StringBufferLength, bw => bw.Write(0x18C));
                                 bw.WriteTag(StringBufferText, bw =>
                                 {
                                     bw.Write(Encoding.Unicode.GetBytes(str.Value));
                                     bw.Write((short) 0);
                                     bw.AlignWriter(4);
                                 });
+                                // TODO do we always write these tags? or are they left out for default values?
+                                bw.WriteTag(StringBufferFormatting, bw => bw.WriteEnum(str.Formatting));
+                                bw.WriteTag(StringBufferLeading, bw => bw.Write(str.Leading));
+                                bw.WriteTag(StringBufferMaxWidth, bw => bw.Write(str.MaxWidth));
+                                bw.WriteTag(StringBufferLabelHash, bw => bw.Write(str.Hash));
                                 break;
                             case ObjectType.Group:
                             case ObjectType.Movie:
@@ -191,7 +200,63 @@ public class FrontendChunkWriter
                     {
                         bw.WriteChunk(ScriptData, bw =>
                         {
-                        
+                            bw.WriteTag(ScriptHeader, bw =>
+                            {
+                                bw.Write(script.Id);
+                                bw.Write(script.Length);
+                                bw.Write(script.Flags);
+                                bw.Write(script.Tracks.Count);
+                            });
+
+                            if (script.ChainedId != 0xFFFFFFFF)
+                            {
+                                bw.WriteTag(ScriptChain, bw => bw.Write(script.ChainedId));
+                            }
+
+                            foreach (var track in script.Tracks)
+                            {
+                                bw.WriteTag(ScriptKeyTrack, bw =>
+                                {
+                                    bw.WriteEnum(track.ParamType);
+                                    bw.Write(track.ParamSize);
+                                    bw.WriteEnum(track.InterpType);
+                                    bw.Write(track.InterpAction);
+                                    bw.Write((track.Length & 0xffffff) | (track.Offset << 24));
+                                });
+                                
+                                bw.WriteTag(ScriptTrackOffset, bw => bw.Write(track.Offset));
+                                bw.WriteTag(ScriptKeyNode, bw =>
+                                {
+                                    void WriteNode(TrackNode node, BinaryWriter w)
+                                    {
+                                        w.Write(node.Time);
+                                        switch (track.ParamType)
+                                        {
+                                            case TrackParamType.Vector2:
+                                                w.Write((Vector2)node.Val);
+                                                break;
+                                            case TrackParamType.Vector3:
+                                                w.Write((Vector3)node.Val);
+                                                break;
+                                            case TrackParamType.Quaternion:
+                                                w.Write((Quaternion)node.Val);
+                                                break;
+                                            case TrackParamType.Color:
+                                                w.Write((Color4)node.Val);
+                                                break;
+                                            default:
+                                                throw new NotImplementedException("unhandled ParamType: " + track.ParamType);
+                                        }
+                                    }
+
+                                    WriteNode(track.BaseKey, bw);
+                                    foreach (var deltaKey in track.DeltaKeys)
+                                    {
+                                        WriteNode(deltaKey, bw);
+                                    }
+                                });
+                            }
+                            // TODO ScriptEvents, ScriptName (optionally)
                         });
                     }
 
@@ -199,7 +264,7 @@ public class FrontendChunkWriter
                     {
                         bw.WriteChunk(MessageResponses, bw =>
                         {
-                        
+                            // TODO
                         });
                     }
                 });
