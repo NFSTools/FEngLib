@@ -73,7 +73,7 @@ internal static class Program
             total++;
         }
 
-        Console.WriteLine("PASSED: {0}/{1} ({2}%)", matching, total, matching / total);
+        Console.WriteLine("PASSED: {0}/{1} ({2}%)", matching, total, ((float)matching / total) * 100f);
     }
 
     private static Package LoadPackageFromChunk(string path)
@@ -128,8 +128,12 @@ internal static class Program
 
     private static bool FilesAreEqual_Hash(FileInfo first, FileInfo second)
     {
-        var firstHash = SHA256.Create().ComputeHash(first.OpenRead());
-        var secondHash = SHA256.Create().ComputeHash(second.OpenRead());
+        var firstStream = first.OpenRead();
+        ValidateAndPrepareFngStream(firstStream);
+        var secondStream = second.OpenRead();
+        ValidateAndPrepareFngStream(secondStream);
+        var firstHash = SHA256.Create().ComputeHash(firstStream);
+        var secondHash = SHA256.Create().ComputeHash(secondStream);
 
         for (var i = 0; i < firstHash.Length; i++)
         {
@@ -138,5 +142,23 @@ internal static class Program
         }
 
         return true;
+    }
+
+    private static void ValidateAndPrepareFngStream(FileStream fs)
+    {
+        var fr = new BinaryReader(fs);
+
+        var marker = fr.ReadUInt32();
+        switch (marker)
+        {
+            case 0x30203:
+                fs.Seek(0x10, SeekOrigin.Begin);
+                break;
+            case 0xE76E4546:
+                fs.Seek(0x8, SeekOrigin.Begin);
+                break;
+            default:
+                throw new InvalidDataException($"Invalid FEng chunk file.");
+        }
     }
 }
