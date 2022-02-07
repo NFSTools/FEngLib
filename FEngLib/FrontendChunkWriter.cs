@@ -123,7 +123,19 @@ public class FrontendChunkWriter
                     bw.WriteChunk(FrontendChunkType.ObjectData, bw =>
                     {
                         bw.WriteTag(FrontendTagType.ObjectType, bw => bw.WriteEnum(obj.Type));
-                        bw.WriteTag(ObjectHash, bw => bw.Write(obj.NameHash));
+                        if (obj.Name != null)
+                        {
+                            bw.WriteTag(ObjectName, bw =>
+                            {
+                                bw.Write(obj.Name.ToCharArray());
+                                bw.Write('\0');
+                                bw.AlignWriter(4);
+                            });
+                        }
+                        else
+                        {
+                            bw.WriteTag(ObjectHash, bw => bw.Write(obj.NameHash));
+                        }
                         bw.WriteTag(ObjectReference, bw =>
                         {
                             bw.Write(obj.Guid);
@@ -196,6 +208,16 @@ public class FrontendChunkWriter
                     {
                         bw.WriteChunk(ScriptData, bw =>
                         {
+                            if (script.Name != null)
+                            {
+                                bw.WriteTag(ScriptName, bw =>
+                                {
+                                    bw.Write(script.Name.ToCharArray());
+                                    bw.Write('\0');
+                                    bw.AlignWriter(4);
+                                });
+                            }
+                            
                             bw.WriteTag(ScriptHeader, bw =>
                             {
                                 bw.Write(script.Id);
@@ -263,16 +285,6 @@ public class FrontendChunkWriter
                                         bw.Write(@event.Target);
                                         bw.Write(@event.Time);
                                     }
-                                });
-                            }
-
-                            if (script.Name != null)
-                            {
-                                bw.WriteTag(ScriptName, bw =>
-                                {
-                                    bw.Write(script.Name.ToCharArray());
-                                    bw.Write('\0');
-                                    bw.AlignWriter(4);
                                 });
                             }
                         });
