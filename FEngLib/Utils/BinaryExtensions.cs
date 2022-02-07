@@ -60,6 +60,10 @@ public static class BinaryExtensions
             case short ui:
                 binaryWriter.Write(ui);
                 break;
+            
+            case byte ui:
+                binaryWriter.Write(ui);
+                break;
             default:
                 throw new Exception();
         }
