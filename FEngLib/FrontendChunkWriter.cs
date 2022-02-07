@@ -188,9 +188,12 @@ public class FrontendChunkWriter
                                 break;
                             case ObjectType.Group:
                             case ObjectType.Movie:
-                            case ObjectType.ColoredImage:
                             case ObjectType.SimpleImage:
                                 // nothing special
+                                break;
+                            case ObjectType.ColoredImage:
+                                var cImg = (ColoredImage)obj;
+                                bw.WriteTag(ImageInfo, bw => bw.Write(cImg.ImageFlags));
                                 break;
                             case ObjectType.MultiImage:
                                 var mImg = (MultiImage)obj;
