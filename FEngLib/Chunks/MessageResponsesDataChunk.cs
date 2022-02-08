@@ -57,13 +57,13 @@ public class MessageResponsesDataChunk : FrontendObjectChunk
     private void ProcessResponseIntParamTag(IObject<ObjectData> frontendObject,
         ResponseIntParamTag responseIntParamTag)
     {
-        frontendObject.MessageResponses[^1].Responses[^1].Param = responseIntParamTag.Param;
+        frontendObject.MessageResponses[^1].Responses[^1].IntParam = responseIntParamTag.Param;
     }
 
     private void ProcessResponseStringParamTag(IObject<ObjectData> frontendObject,
         ResponseStringParamTag responseStringParamTag)
     {
-        frontendObject.MessageResponses[^1].Responses[^1].Param = responseStringParamTag.Param;
+        frontendObject.MessageResponses[^1].Responses[^1].StringParam = responseStringParamTag.Param;
     }
 
     private void ProcessResponseTargetTag(IObject<ObjectData> frontendObject,
@@ -75,7 +75,7 @@ public class MessageResponsesDataChunk : FrontendObjectChunk
     private void ProcessResponseIdTag(IObject<ObjectData> frontendObject,
         ResponseIdTag responseIdTag)
     {
-        var response = new Response {Id = responseIdTag.Id};
+        var response = new Response { Id = responseIdTag.Id };
         frontendObject.MessageResponses[^1].Responses.Add(response);
     }
 
@@ -84,10 +84,11 @@ public class MessageResponsesDataChunk : FrontendObjectChunk
     {
         if (frontendObject.MessageResponses.Find(r => r.Id == tag.Hash) != null)
         {
-            throw new ChunkReadingException($"Encountered a duplicate MessageResponse with ID 0x{tag.Hash:X}. This should not be possible.");
+            throw new ChunkReadingException(
+                $"Encountered a duplicate MessageResponse with ID 0x{tag.Hash:X}. This should not be possible.");
         }
 
-        var response = new MessageResponse {Id = tag.Hash};
+        var response = new MessageResponse { Id = tag.Hash };
 
         frontendObject.MessageResponses.Add(response);
     }

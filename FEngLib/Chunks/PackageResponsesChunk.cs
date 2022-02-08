@@ -50,13 +50,13 @@ public class PackageResponsesChunk : FrontendChunk
     private void ProcessResponseIntParamTag(Package package,
         ResponseIntParamTag responseIntParamTag)
     {
-        package.MessageResponses[^1].Responses[^1].Param = responseIntParamTag.Param;
+        package.MessageResponses[^1].Responses[^1].IntParam = responseIntParamTag.Param;
     }
 
     private void ProcessResponseStringParamTag(Package package,
         ResponseStringParamTag responseStringParamTag)
     {
-        package.MessageResponses[^1].Responses[^1].Param = responseStringParamTag.Param;
+        package.MessageResponses[^1].Responses[^1].StringParam = responseStringParamTag.Param;
     }
 
     private void ProcessResponseTargetTag(Package package,
@@ -68,7 +68,7 @@ public class PackageResponsesChunk : FrontendChunk
     private void ProcessResponseIdTag(Package package,
         ResponseIdTag responseIdTag)
     {
-        var response = new Response {Id = responseIdTag.Id};
+        var response = new Response { Id = responseIdTag.Id };
         package.MessageResponses[^1].Responses.Add(response);
     }
 
@@ -79,7 +79,7 @@ public class PackageResponsesChunk : FrontendChunk
             throw new Exception(
                 $"This is supposed to be impossible! Duplicate MessageResponse (0x{tag.Hash:X}) in package {package.Name}");
 
-        var response = new MessageResponse {Id = tag.Hash};
+        var response = new MessageResponse { Id = tag.Hash };
 
         package.MessageResponses.Add(response);
     }
