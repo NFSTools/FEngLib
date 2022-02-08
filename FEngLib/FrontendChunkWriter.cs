@@ -24,7 +24,7 @@ public class FrontendChunkWriter
     {
         Package = package;
     }
-    
+
     public Package Package { get; }
 
     public void Write(BinaryWriter writer)
@@ -38,7 +38,7 @@ public class FrontendChunkWriter
 
     private void WritePkHd(BinaryWriter writer)
     {
-        writer.WriteChunk(PackageHeader,bw =>
+        writer.WriteChunk(PackageHeader, bw =>
         {
             bw.Write(0x20000);
             bw.Write(0);
@@ -79,7 +79,7 @@ public class FrontendChunkWriter
 
             foreach (var type in usedTypes)
             {
-                bw.Write((int) type);
+                bw.Write((int)type);
                 bw.Write(allSizes[type]);
             }
         });
@@ -95,9 +95,10 @@ public class FrontendChunkWriter
                 {
                     bw.WriteCString(resrq.Name);
                 }
+
                 bw.AlignWriter(4);
             });
-            
+
             bw.WriteChunk(ResourceRequests, bw =>
             {
                 bw.Write(Package.ResourceRequests.Count);
@@ -110,6 +111,7 @@ public class FrontendChunkWriter
                     bw.Write(resrq.Handle);
                     bw.Write(resrq.UserParam);
                 }
+
                 bw.AlignWriter(4);
             });
         });
@@ -119,10 +121,7 @@ public class FrontendChunkWriter
     {
         writer.WriteChunk(ObjectContainer, bw =>
         {
-            bw.WriteChunk(ButtonMapCount, bw =>
-            {
-                bw.Write(Package.ButtonCount);
-            });
+            bw.WriteChunk(ButtonMapCount, bw => { bw.Write(Package.ButtonCount); });
 
             foreach (var obj in Package.Objects)
             {
@@ -143,6 +142,7 @@ public class FrontendChunkWriter
                         {
                             bw.WriteTag(ObjectHash, bw => bw.Write(obj.NameHash));
                         }
+
                         bw.WriteTag(ObjectReference, bw =>
                         {
                             bw.Write(obj.Guid);
@@ -177,7 +177,7 @@ public class FrontendChunkWriter
                                 bw.WriteTag(StringBufferText, bw =>
                                 {
                                     bw.Write(Encoding.Unicode.GetBytes(str.Value));
-                                    bw.Write((short) 0);
+                                    bw.Write((short)0);
                                     bw.AlignWriter(4);
                                 });
                                 // TODO do we always write these tags? or are they left out for default values?
@@ -226,7 +226,7 @@ public class FrontendChunkWriter
                                     bw.AlignWriter(4);
                                 });
                             }
-                            
+
                             bw.WriteTag(ScriptHeader, bw =>
                             {
                                 bw.Write(script.Id);
@@ -252,7 +252,7 @@ public class FrontendChunkWriter
                                     // UG2 at least does not use this offset thing at all...?
                                     bw.Write((track.Length & 0xffffff) /*| (track.Offset << 24)*/);
                                 });
-                                
+
                                 bw.WriteTag(ScriptTrackOffset, bw => bw.Write(track.Offset));
                                 bw.WriteTag(ScriptKeyNode, bw =>
                                 {
@@ -274,7 +274,8 @@ public class FrontendChunkWriter
                                                 w.Write((Color4)node.Val);
                                                 break;
                                             default:
-                                                throw new NotImplementedException("unhandled ParamType: " + track.ParamType);
+                                                throw new NotImplementedException("unhandled ParamType: " +
+                                                    track.ParamType);
                                         }
                                     }
 
@@ -353,19 +354,15 @@ public class FrontendChunkWriter
         foreach (var resp in msgr.Responses)
         {
             bw.WriteTag(ResponseId, bw => bw.Write(resp.Id));
-            switch (resp.Param)
-            {
-                case string str:
-                    bw.WriteTag(ResponseStringParam, bw =>
-                    {
-                        bw.WriteCString(str);
-                        bw.AlignWriter(4);
-                    });
-                    break;
-                case uint ui:
-                    bw.WriteTag(ResponseIntParam, bw => bw.Write(ui));
-                    break;
-            }
+
+            if (resp.IntParam != null)
+                bw.WriteTag(ResponseIntParam, bw => bw.Write(resp.IntParam.Value));
+            else if (resp.StringParam != null)
+                bw.WriteTag(ResponseStringParam, bw =>
+                {
+                    bw.WriteCString(resp.StringParam);
+                    bw.AlignWriter(4);
+                });
 
             bw.WriteTag(ResponseTarget, bw => bw.Write(resp.Target));
         }
