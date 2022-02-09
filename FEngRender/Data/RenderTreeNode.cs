@@ -23,7 +23,7 @@ public class RenderTreeNode
     public RenderTreeNode(IObject<ObjectData> frontendObject)
     {
         FrontendObject = frontendObject;
-        SetScript(frontendObject.Scripts.Find(s => s.Id == 0x001744B3));
+        SetScript(frontendObject.FindScript(0x1744B3)); // INIT
     }
 
     public Matrix4x4 ObjectMatrix { get; private set; }
@@ -78,46 +78,29 @@ public class RenderTreeNode
         if (CurrentScript != null
             && CurrentScriptTime >= 0)
         {
-            foreach (var track in CurrentScript.Tracks)
-                switch (track.Offset)
-                {
-                    case 0: // Color
-                        color = TrackInterpolation.Interpolate<Color4>(track, CurrentScriptTime);
-                        break;
-                    case 4: // Pivot
-                        pivot = TrackInterpolation.Interpolate<Vector3>(track, CurrentScriptTime);
-                        break;
-                    case 7: // Position
-                        position = TrackInterpolation.Interpolate<Vector3>(track, CurrentScriptTime);
-                        break;
-                    case 10: // Rotation
-                        rotation = TrackInterpolation.Interpolate<Quaternion>(track, CurrentScriptTime);
-                        break;
-                    case 14: // Size
-                        size = TrackInterpolation.Interpolate<Vector3>(track, CurrentScriptTime);
-                        break;
-                    case 17: // UpperLeft
-                    {
-                        if (FrontendObject is IImage<ImageData>)
-                            UpperLeft = TrackInterpolation.Interpolate<Vector2>(track, CurrentScriptTime);
-                        else
-                            throw new Exception("Encountered UpperLeft track for a non-image");
+            var scriptTracks = CurrentScript.GetTracks();
 
-                        break;
-                    }
-                    case 19: // LowerRight
-                    {
-                        if (FrontendObject is IImage<ImageData>)
-                            LowerRight = TrackInterpolation.Interpolate<Vector2>(track, CurrentScriptTime);
-                        else
-                            throw new Exception("Encountered LowerRight track for a non-image");
+            if (scriptTracks.Color is { } colorTrack)
+                color = TrackInterpolation.Interpolate(colorTrack, CurrentScriptTime);
 
-                        break;
-                    }
-                    default:
-                        throw new IndexOutOfRangeException(
-                            $"object {FrontendObject.NameHash:X} script {CurrentScript.Id:X} has unsupported track with offset {track.Offset}");
-                }
+            if (scriptTracks.Pivot is { } pivotTrack)
+                pivot = TrackInterpolation.Interpolate(pivotTrack, CurrentScriptTime);
+
+            if (scriptTracks.Position is { } positionTrack)
+                position = TrackInterpolation.Interpolate(positionTrack, CurrentScriptTime);
+
+            if (scriptTracks.Rotation is { } rotationTrack)
+                rotation = TrackInterpolation.Interpolate(rotationTrack, CurrentScriptTime);
+
+            if (scriptTracks.Size is { } sizeTrack) size = TrackInterpolation.Interpolate(sizeTrack, CurrentScriptTime);
+
+            if (scriptTracks is ImageScriptTracks imageScriptTracks)
+            {
+                if (imageScriptTracks.LowerRight is { } lowerRightTrack)
+                    LowerRight = TrackInterpolation.Interpolate(lowerRightTrack, CurrentScriptTime);
+                if (imageScriptTracks.UpperLeft is { } upperLeftTrack)
+                    UpperLeft = TrackInterpolation.Interpolate(upperLeftTrack, CurrentScriptTime);
+            }
 
             if (CurrentScriptTime >= CurrentScript.Length)
             {
@@ -129,7 +112,7 @@ public class RenderTreeNode
                 }
                 else if (CurrentScript.ChainedId != 0xFFFFFFFF)
                 {
-                    var nextScript = FrontendObject.Scripts.Find(s => s.Id == CurrentScript.ChainedId) ??
+                    var nextScript = FrontendObject.FindScript(CurrentScript.ChainedId) ??
                                      throw new Exception(
                                          $"Cannot find chained script (object {FrontendObject.NameHash:X}, base script {CurrentScript.Id:X}): {CurrentScript.ChainedId:X}");
                     Debug.WriteLine("activating chained script for object {1:X}: {0}",
@@ -195,12 +178,12 @@ public class RenderTreeNode
         return ObjectMatrix.M43;
     }
 
-    private Track GetKeyTrack(FEngLib.Scripts.Script script, KeyTrackType trackType)
-    {
-        uint offset = (uint)trackType;
-
-        return script.Tracks.Find(e => e.Offset == offset);
-    }
+    // private Track GetKeyTrack(FEngLib.Scripts.Script script, KeyTrackType trackType)
+    // {
+    //     uint offset = (uint)trackType;
+    //
+    //     return script.Tracks.Find(e => e.Offset == offset);
+    // }
 
     public virtual Rectangle? Get2DExtents()
     {

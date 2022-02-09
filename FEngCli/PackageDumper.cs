@@ -2,7 +2,6 @@
 using System.Linq;
 using FEngLib.Objects;
 using FEngLib.Packages;
-using FEngLib.Scripts;
 
 namespace FEngCli;
 
@@ -88,11 +87,12 @@ public static class PackageDumper
         if (frontendObject.ResourceRequest is { } resourceRequest)
             Console.WriteLine("Resource : {0}", resourceRequest.Name);
 
-        if (frontendObject.Scripts.Count > 0)
+        var scripts = frontendObject.GetScripts().ToList();
+        if (scripts.Count > 0)
         {
-            Console.WriteLine("Scripts ({0}):", frontendObject.Scripts.Count);
+            Console.WriteLine("Scripts ({0}):", scripts.Count);
 
-            foreach (var frontendScript in frontendObject.Scripts)
+            foreach (var frontendScript in scripts)
             {
                 Console.WriteLine("\t----------");
                 Console.WriteLine("\tID     : 0x{0:X}", frontendScript.Id);
@@ -110,31 +110,32 @@ public static class PackageDumper
                             scriptEvent.Time, scriptEvent.EventId);
                 }
 
-                if (frontendScript.Tracks.Count > 0)
-                {
-                    Console.WriteLine("\tTracks ({0}):", frontendScript.Tracks.Count);
-
-                    foreach (var track in frontendScript.Tracks)
-                    {
-                        Console.WriteLine("\t\t---------- TRACK:");
-                        Console.WriteLine("\t\tLength       : {0}", track.Length);
-                        Console.WriteLine("\t\tOffset       : {0}", track.Offset);
-                        Console.WriteLine("\t\tParamType    : {0}", track.ParamType);
-                        Console.WriteLine("\t\tParamSize    : {0}", track.ParamSize);
-                        Console.WriteLine("\t\tInterpAction : {0}", track.InterpAction);
-                        Console.WriteLine("\t\tInterpType   : {0}", track.InterpType);
-                        Console.WriteLine("\t\tBaseKey      : {0}", DumpKey(track.BaseKey));
-
-                        var deltaKeys = track.DeltaKeys.ToList();
-                        for (var i = 0; i < deltaKeys.Count; i++)
-                            Console.WriteLine("\t\tDeltaKeys[{0:D2}]: {1}", i, DumpKey(deltaKeys[i]));
-
-                        static string DumpKey(TrackNode keyNode)
-                        {
-                            return $"T={keyNode.Time} V={keyNode.Val}";
-                        }
-                    }
-                }
+                // TODO: update track dumping
+                // if (frontendScript.Tracks.Count > 0)
+                // {
+                //     Console.WriteLine("\tTracks ({0}):", frontendScript.Tracks.Count);
+                //
+                //     foreach (var track in frontendScript.Tracks)
+                //     {
+                //         Console.WriteLine("\t\t---------- TRACK:");
+                //         Console.WriteLine("\t\tLength       : {0}", track.Length);
+                //         Console.WriteLine("\t\tOffset       : {0}", track.Offset);
+                //         Console.WriteLine("\t\tParamType    : {0}", track.ParamType);
+                //         Console.WriteLine("\t\tParamSize    : {0}", track.ParamSize);
+                //         Console.WriteLine("\t\tInterpAction : {0}", track.InterpAction);
+                //         Console.WriteLine("\t\tInterpType   : {0}", track.InterpType);
+                //         Console.WriteLine("\t\tBaseKey      : {0}", DumpKey(track.BaseKey));
+                //
+                //         var deltaKeys = track.DeltaKeys.ToList();
+                //         for (var i = 0; i < deltaKeys.Count; i++)
+                //             Console.WriteLine("\t\tDeltaKeys[{0:D2}]: {1}", i, DumpKey(deltaKeys[i]));
+                //
+                //         static string DumpKey(TrackNode keyNode)
+                //         {
+                //             return $"T={keyNode.Time} V={keyNode.Val}";
+                //         }
+                //     }
+                // }
             }
         }
 

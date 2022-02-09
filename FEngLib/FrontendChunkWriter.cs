@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Scripts;
-using FEngLib.Structures;
 using FEngLib.Utils;
 using static FEngLib.FrontendChunkType;
 using static FEngLib.FrontendTagType;
@@ -219,7 +217,7 @@ public class FrontendChunkWriter
                             bw.WriteTag(FrontendTagType.ObjectData, bw => obj.Data.Write(bw));
                     });
 
-                    foreach (var script in obj.Scripts)
+                    foreach (var script in obj.GetScripts())
                     {
                         bw.WriteChunk(ScriptData, bw =>
                         {
@@ -232,12 +230,14 @@ public class FrontendChunkWriter
                                 });
                             }
 
+                            var tracks = GetScriptTracks(script);
+
                             bw.WriteTag(ScriptHeader, bw =>
                             {
                                 bw.Write(script.Id);
                                 bw.Write(script.Length);
                                 bw.Write(script.Flags);
-                                bw.Write(script.Tracks.Count);
+                                bw.Write(tracks.Count);
                             });
 
                             if (script.ChainedId != 0xFFFFFFFF)
@@ -245,12 +245,12 @@ public class FrontendChunkWriter
                                 bw.WriteTag(ScriptChain, bw => bw.Write(script.ChainedId));
                             }
 
-                            foreach (var track in script.Tracks)
+                            foreach (var (track, offset) in tracks)
                             {
                                 bw.WriteTag(ScriptKeyTrack, bw =>
                                 {
-                                    bw.WriteEnum(track.ParamType);
-                                    bw.Write(track.ParamSize);
+                                    bw.WriteEnum(track.GetParamType());
+                                    bw.Write(track.GetParamSize());
                                     bw.WriteEnum(track.InterpType);
                                     bw.Write(track.InterpAction);
                                     // TODO inconsistent-ish. TrackOffset is actually different from this value.
@@ -258,38 +258,8 @@ public class FrontendChunkWriter
                                     bw.Write((track.Length & 0xffffff) /*| (track.Offset << 24)*/);
                                 });
 
-                                bw.WriteTag(ScriptTrackOffset, bw => bw.Write(track.Offset));
-                                bw.WriteTag(ScriptKeyNode, bw =>
-                                {
-                                    void WriteNode(TrackNode node, BinaryWriter w)
-                                    {
-                                        w.Write(node.Time);
-                                        switch (track.ParamType)
-                                        {
-                                            case TrackParamType.Vector2:
-                                                w.Write((Vector2)node.Val);
-                                                break;
-                                            case TrackParamType.Vector3:
-                                                w.Write((Vector3)node.Val);
-                                                break;
-                                            case TrackParamType.Quaternion:
-                                                w.Write((Quaternion)node.Val);
-                                                break;
-                                            case TrackParamType.Color:
-                                                w.Write((Color4)node.Val);
-                                                break;
-                                            default:
-                                                throw new NotImplementedException("unhandled ParamType: " +
-                                                    track.ParamType);
-                                        }
-                                    }
-
-                                    WriteNode(track.BaseKey, bw);
-                                    foreach (var deltaKey in track.DeltaKeys)
-                                    {
-                                        WriteNode(deltaKey, bw);
-                                    }
-                                });
+                                bw.WriteTag(ScriptTrackOffset, bw => bw.Write(offset));
+                                bw.WriteTag(ScriptKeyNode, track.WriteKeys);
                             }
 
                             if (script.Events.Count != 0)
@@ -320,6 +290,61 @@ public class FrontendChunkWriter
                 });
             }
         });
+    }
+
+    private List<(Track track, uint offset)> GetScriptTracks(Script script)
+    {
+        var scriptTracks = script.GetTracks();
+        var tracks = new List<(Track track, uint offset)>();
+
+        if (scriptTracks.Color is { } colorTrack)
+            tracks.Add((colorTrack, 0));
+        if (scriptTracks.Pivot is { } pivotTrack)
+            tracks.Add((pivotTrack, 4));
+        if (scriptTracks.Position is { } positionTrack)
+            tracks.Add((positionTrack, 7));
+        if (scriptTracks.Rotation is { } rotationTrack)
+            tracks.Add((rotationTrack, 10));
+        if (scriptTracks.Size is { } sizeTrack)
+            tracks.Add((sizeTrack, 14));
+
+        if (scriptTracks is ImageScriptTracks imageScriptTracks)
+        {
+            if (imageScriptTracks.UpperLeft is { } upperLeft)
+                tracks.Add((upperLeft, 17));
+            if (imageScriptTracks.LowerRight is { } lowerRight)
+                tracks.Add((lowerRight, 19));
+            if (imageScriptTracks is MultiImageScriptTracks multiImageScriptTracks)
+            {
+                if (multiImageScriptTracks.TopLeft1 is { } topLeft1)
+                    tracks.Add((topLeft1, 21));
+                if (multiImageScriptTracks.TopLeft2 is { } topLeft2)
+                    tracks.Add((topLeft2, 23));
+                if (multiImageScriptTracks.TopLeft3 is { } topLeft3)
+                    tracks.Add((topLeft3, 25));
+                if (multiImageScriptTracks.BottomRight1 is { } bottomRight1)
+                    tracks.Add((bottomRight1, 27));
+                if (multiImageScriptTracks.BottomRight2 is { } bottomRight2)
+                    tracks.Add((bottomRight2, 29));
+                if (multiImageScriptTracks.BottomRight3 is { } bottomRight3)
+                    tracks.Add((bottomRight3, 31));
+                if (multiImageScriptTracks.PivotRotation is { } pivotRotation)
+                    tracks.Add((pivotRotation, 33));
+            }
+            else if (imageScriptTracks is ColoredImageScriptTracks coloredImageScriptTracks)
+            {
+                if (coloredImageScriptTracks.TopLeft is { } topLeft)
+                    tracks.Add((topLeft, 21));
+                if (coloredImageScriptTracks.TopRight is { } topRight)
+                    tracks.Add((topRight, 25));
+                if (coloredImageScriptTracks.BottomRight is { } bottomRight)
+                    tracks.Add((bottomRight, 29));
+                if (coloredImageScriptTracks.BottomLeft is { } bottomLeft)
+                    tracks.Add((bottomLeft, 33));
+            }
+        }
+
+        return tracks;
     }
 
     private void WriteMsgChunks(BinaryWriter writer)

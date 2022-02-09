@@ -5,10 +5,12 @@ namespace FEngLib.Scripts;
 
 public abstract class ScriptTag : Tag
 {
-    protected Script Script { get; }
-
-    protected ScriptTag(IObject<ObjectData> frontendObject, Script script) : base(frontendObject)
+    protected ScriptTag(IObject<ObjectData> frontendObject, ScriptProcessingContext scriptProcessingContext) : base(
+        frontendObject)
     {
-        Script = script;
+        ScriptProcessingContext = scriptProcessingContext;
     }
+
+    protected Script Script => ScriptProcessingContext.Script;
+    protected ScriptProcessingContext ScriptProcessingContext { get; }
 }

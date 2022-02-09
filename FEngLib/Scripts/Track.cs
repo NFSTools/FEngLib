@@ -1,4 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using FEngLib.Structures;
+using FEngLib.Utils;
 
 namespace FEngLib.Scripts;
 
@@ -22,25 +28,46 @@ public enum TrackInterpolationMethod : byte
     MoveToSpline = 0x4,
 }
 
-public class Track
+public interface ITrack
 {
-    public Track()
-    {
-        DeltaKeys = new LinkedList<TrackNode>();
-    }
-
-    public TrackParamType ParamType { get; set; }
-    public byte ParamSize { get; set; }
     public TrackInterpolationMethod InterpType { get; set; }
     public byte InterpAction { get; set; }
     public uint Length { get; set; }
-    public uint Offset { get; set; }
-    public TrackNode BaseKey { get; set; }
-    public LinkedList<TrackNode> DeltaKeys { get; set; }
+}
 
-    public LinkedListNode<TrackNode> GetDeltaKeyAt(int time)
+public interface ITrack<TValue> : ITrack where TValue : struct
+{
+    TValue BaseKey { get; set; }
+    LinkedList<TrackNode<TValue>> DeltaKeys { get; set; }
+
+    LinkedListNode<TrackNode<TValue>> GetDeltaKeyAt(int time);
+}
+
+public abstract class Track : ITrack
+{
+    public TrackInterpolationMethod InterpType { get; set; }
+    public byte InterpAction { get; set; }
+    public uint Length { get; set; }
+
+    public abstract TrackParamType GetParamType();
+    public abstract byte GetParamSize();
+    public abstract void ReadKeys(BinaryReader binaryReader, uint numKeys);
+    public abstract void WriteKeys(BinaryWriter binaryWriter);
+}
+
+public abstract class Track<TValue> : Track, ITrack<TValue> where TValue : struct
+{
+    protected Track()
     {
-        LinkedListNode<TrackNode> node;
+        DeltaKeys = new LinkedList<TrackNode<TValue>>();
+    }
+
+    public TValue BaseKey { get; set; }
+    public LinkedList<TrackNode<TValue>> DeltaKeys { get; set; }
+
+    public LinkedListNode<TrackNode<TValue>> GetDeltaKeyAt(int time)
+    {
+        LinkedListNode<TrackNode<TValue>> node;
         for (node = DeltaKeys.First;
              node?.Next != null && node.Value.Time < time;
              node = node.Next)
@@ -49,5 +76,137 @@ public class Track
         }
 
         return node;
+    }
+
+    public override void ReadKeys(BinaryReader binaryReader, uint numKeys)
+    {
+        for (var i = 0; i < numKeys; i++)
+        {
+            var time = binaryReader.ReadInt32();
+
+            if (i == 0)
+            {
+                Debug.Assert(time == -1, "time == -1");
+                BaseKey = ReadKey(binaryReader);
+            }
+            else
+            {
+                Debug.Assert(time >= 0, "time >= 0");
+                DeltaKeys.AddLast(new TrackNode<TValue>
+                {
+                    Time = time,
+                    Val = ReadKey(binaryReader)
+                });
+            }
+        }
+    }
+
+    public override void WriteKeys(BinaryWriter binaryWriter)
+    {
+        // Write base key
+        binaryWriter.Write(-1);
+        WriteKey(binaryWriter, BaseKey);
+
+        // Write delta keys
+        foreach (var deltaKey in DeltaKeys.OrderBy(k => k.Time))
+        {
+            binaryWriter.Write(deltaKey.Time);
+            WriteKey(binaryWriter, deltaKey.Val);
+        }
+    }
+
+    protected abstract TValue ReadKey(BinaryReader binaryReader);
+    protected abstract void WriteKey(BinaryWriter binaryWriter, TValue value);
+}
+
+public class Vector2Track : Track<Vector2>
+{
+    public override TrackParamType GetParamType()
+    {
+        return TrackParamType.Vector2;
+    }
+
+    public override byte GetParamSize()
+    {
+        return 8;
+    }
+
+    protected override Vector2 ReadKey(BinaryReader binaryReader)
+    {
+        return binaryReader.ReadVector2();
+    }
+
+    protected override void WriteKey(BinaryWriter binaryWriter, Vector2 value)
+    {
+        binaryWriter.Write(value);
+    }
+}
+
+public class Vector3Track : Track<Vector3>
+{
+    public override TrackParamType GetParamType()
+    {
+        return TrackParamType.Vector3;
+    }
+
+    public override byte GetParamSize()
+    {
+        return 12;
+    }
+
+    protected override Vector3 ReadKey(BinaryReader binaryReader)
+    {
+        return binaryReader.ReadVector3();
+    }
+
+    protected override void WriteKey(BinaryWriter binaryWriter, Vector3 value)
+    {
+        binaryWriter.Write(value);
+    }
+}
+
+public class QuaternionTrack : Track<Quaternion>
+{
+    public override TrackParamType GetParamType()
+    {
+        return TrackParamType.Quaternion;
+    }
+
+    public override byte GetParamSize()
+    {
+        return 16;
+    }
+
+    protected override Quaternion ReadKey(BinaryReader binaryReader)
+    {
+        return binaryReader.ReadQuaternion();
+    }
+
+    protected override void WriteKey(BinaryWriter binaryWriter, Quaternion value)
+    {
+        binaryWriter.Write(value);
+    }
+}
+
+public class ColorTrack : Track<Color4>
+{
+    public override TrackParamType GetParamType()
+    {
+        return TrackParamType.Color;
+    }
+
+    public override byte GetParamSize()
+    {
+        return 16;
+    }
+
+    protected override Color4 ReadKey(BinaryReader binaryReader)
+    {
+        return binaryReader.ReadColor();
+    }
+
+    protected override void WriteKey(BinaryWriter binaryWriter, Color4 value)
+    {
+        binaryWriter.Write(value);
     }
 }
