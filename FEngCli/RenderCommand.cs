@@ -30,7 +30,7 @@ public class RenderCommand : BaseCommand
     public override int Execute()
     {
         var package = PackageLoader.Load(InputFile);
-        // PackageDumper.DumpPackage(package);
+        PackageDumper.DumpPackage(package);
 
         var outputFile = OutputFile;
         if (!string.IsNullOrWhiteSpace(outputFile))
