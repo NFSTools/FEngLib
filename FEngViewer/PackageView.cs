@@ -18,8 +18,8 @@ namespace FEngViewer;
 
 public partial class PackageView : Form
 {
-    private RenderTree _currentRenderTree;
     private Package _currentPackage;
+    private RenderTree _currentRenderTree;
 
     public PackageView()
     {
@@ -133,8 +133,7 @@ public partial class PackageView : Form
         objTreeNode.Name = nodeText;
         if (nodeImageKey != null) objTreeNode.ImageKey = objTreeNode.SelectedImageKey = nodeImageKey;
 
-        // Create nodes for scripts
-        feObj.Scripts.ForEach(scr => CreateScriptTreeNode(objTreeNode.Nodes, scr));
+        foreach (var script in feObj.GetScripts()) CreateScriptTreeNode(objTreeNode.Nodes, script);
 
         return objTreeNode;
     }
@@ -148,36 +147,68 @@ public partial class PackageView : Form
 
         foreach (var scriptEvent in script.Events)
         {
-            var eventNode = node.Nodes.Add($"0x{scriptEvent.EventId:X} -> {scriptEvent.Target:X} @ T={scriptEvent.Time}");
+            var eventNode =
+                node.Nodes.Add($"0x{scriptEvent.EventId:X} -> {scriptEvent.Target:X} @ T={scriptEvent.Time}");
             eventNode.ImageKey = eventNode.SelectedImageKey = "TreeItem_ScriptEvent";
         }
 
-        foreach (var track in script.Tracks)
+        var scriptTracks = script.GetTracks();
+
+        CreateTrackNode(node, scriptTracks.Color, "Color");
+        CreateTrackNode(node, scriptTracks.Pivot, "Pivot");
+        CreateTrackNode(node, scriptTracks.Position, "Position");
+        CreateTrackNode(node, scriptTracks.Rotation, "Rotation");
+        CreateTrackNode(node, scriptTracks.Size, "Size");
+
+        if (scriptTracks is ImageScriptTracks imageScriptTracks)
         {
-            var trackName = track.Offset switch
-            {
-                0 => "Color",
-                4 => "Pivot",
-                7 => "Position",
-                10 => "Rotation",
-                14 => "Size",
-                17 => "UpperLeft",
-                19 => "UpperRight",
-                21 => "FrameNumber/Color1",
-                25 => "Color2",
-                29 => "Color3",
-                33 => "Color4",
-                _ => $"track-{track.Offset}"
-            };
+            CreateTrackNode(node, imageScriptTracks.UpperLeft, "UpperLeft");
+            CreateTrackNode(node, imageScriptTracks.LowerRight, "LowerRight");
 
-            var trackNode = node.Nodes.Add(trackName);
-            trackNode.ImageKey = trackNode.SelectedImageKey = "TreeItem_ScriptTrack";
-
-            foreach (var key in track.DeltaKeys)
+            if (imageScriptTracks is MultiImageScriptTracks multiImageScriptTracks)
             {
-                var keyNode = trackNode.Nodes.Add($"{key.Val} @ T={key.Time}");
-                keyNode.ImageKey = keyNode.SelectedImageKey = "TreeItem_Keyframe";
+                CreateTrackNode(node, multiImageScriptTracks.TopLeft1, "TopLeft1");
+                CreateTrackNode(node, multiImageScriptTracks.TopLeft2, "TopLeft2");
+                CreateTrackNode(node, multiImageScriptTracks.TopLeft3, "TopLeft3");
+                CreateTrackNode(node, multiImageScriptTracks.BottomRight1, "BottomRight1");
+                CreateTrackNode(node, multiImageScriptTracks.BottomRight2, "BottomRight2");
+                CreateTrackNode(node, multiImageScriptTracks.BottomRight3, "BottomRight3");
+                CreateTrackNode(node, multiImageScriptTracks.PivotRotation, "PivotRotation");
             }
+        }
+    }
+
+    private static void CreateTrackNode(TreeNode scriptNode, Track track, string name)
+    {
+        if (track == null)
+            return;
+
+        var trackNode = scriptNode.Nodes.Add(name);
+        trackNode.ImageKey = trackNode.SelectedImageKey = "TreeItem_ScriptTrack";
+
+        void AddNodeKey(int time, object value)
+        {
+            var node = trackNode.Nodes.Add($"T={time}: {value}");
+            node.ImageKey = node.SelectedImageKey = "TreeItem_Keyframe";
+            ;
+        }
+
+        switch (track)
+        {
+            case Vector2Track vector2Track:
+                foreach (var deltaKey in vector2Track.DeltaKeys) AddNodeKey(deltaKey.Time, deltaKey.Val);
+                break;
+            case Vector3Track vector3Track:
+                foreach (var deltaKey in vector3Track.DeltaKeys) AddNodeKey(deltaKey.Time, deltaKey.Val);
+                break;
+            case QuaternionTrack quaternionTrack:
+                foreach (var deltaKey in quaternionTrack.DeltaKeys) AddNodeKey(deltaKey.Time, deltaKey.Val);
+                break;
+            case ColorTrack colorTrack:
+                foreach (var deltaKey in colorTrack.DeltaKeys) AddNodeKey(deltaKey.Time, deltaKey.Val);
+                break;
+            default:
+                throw new NotImplementedException($"Unsupported: {track.GetType()}");
         }
     }
 
@@ -205,7 +236,7 @@ public partial class PackageView : Form
         using var mr = new BinaryReader(ms);
         return new FrontendPackageLoader().Load(mr);
     }
-    
+
     private void SavePackageToChunk(string path)
     {
         using var fs = new FileStream(path, FileMode.Create);
@@ -216,7 +247,7 @@ public partial class PackageView : Form
 
         using var bw = new BinaryWriter(ms);
         new FrontendChunkWriter(_currentPackage).Write(bw);
-        
+
         fw.Write(0xE76E4546); // 'FEn\xE7'
         fw.Write(ms.Length);
         fs.Position = 8; // todo needed?
@@ -248,18 +279,19 @@ public partial class PackageView : Form
     {
         labelCoordDisplay.Text = $"FE: ({e.X - 320,4:D}, {e.Y - 240,4:D}) | Real: ({e.X,4:D}, {e.Y,4:D})";
     }
-        
+
     private void viewOutput_MouseClick(object sender, MouseEventArgs e)
     {
         bool WithinBounds(RenderTreeNode node, float x, float y)
         {
             var extents = node.Get2DExtents();
 
-            return extents.HasValue && extents.Value.Contains((int) x, (int) y);
+            return extents.HasValue && extents.Value.Contains((int)x, (int)y);
         }
+
         var feX = e.X - 320;
         var feY = e.Y - 240;
-            
+
         // get highest Z rendertreenode with the click location in bounds
         var renderTree = RenderTree.GetAllTreeNodesForRendering(_currentRenderTree);
         try
@@ -286,13 +318,6 @@ public partial class PackageView : Form
             // if linq stuff didn't find anything -
             // ignored
         }
-    }
-
-    [UsedImplicitly]
-    private class Options
-    {
-        [Option('i', "input")]
-        public string InputFile { get; [UsedImplicitly] set; }
     }
 
     private void OpenFileMenuItem_Click(object sender, EventArgs e)
@@ -331,7 +356,7 @@ public partial class PackageView : Form
             SaveFile(sfd.FileName);
         }
     }
-    
+
     private void SaveFile(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -394,5 +419,11 @@ public partial class PackageView : Form
         }
 
         Render();
+    }
+
+    [UsedImplicitly]
+    private class Options
+    {
+        [Option('i', "input")] public string InputFile { get; [UsedImplicitly] set; }
     }
 }

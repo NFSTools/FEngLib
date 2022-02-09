@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Numerics;
+using FEngLib.Scripts;
 using FEngLib.Utils;
 
 namespace FEngLib.Objects;
@@ -41,19 +42,30 @@ public class MultiImageData : ImageData
     }
 }
 
-public class MultiImage : Image<MultiImageData>
+public class MultiImageScriptTracks : ImageScriptTracks
 {
+    public Vector2Track TopLeft1 { get; set; }
+    public Vector2Track TopLeft2 { get; set; }
+    public Vector2Track TopLeft3 { get; set; }
+    public Vector2Track BottomRight1 { get; set; }
+    public Vector2Track BottomRight2 { get; set; }
+    public Vector2Track BottomRight3 { get; set; }
+    public Vector3Track PivotRotation { get; set; }
+}
+
+public class MultiImage : Image<MultiImageData, ImageScript<MultiImageScriptTracks>>
+{
+    public MultiImage(MultiImageData data) : base(data)
+    {
+        Data = data;
+    }
+
     public uint Texture1 { get; set; }
     public uint TextureFlags1 { get; set; }
     public uint Texture2 { get; set; }
     public uint TextureFlags2 { get; set; }
     public uint Texture3 { get; set; }
     public uint TextureFlags3 { get; set; }
-
-    public MultiImage(MultiImageData data) : base(data)
-    {
-        Data = data;
-    }
 
     public override void InitializeData()
     {

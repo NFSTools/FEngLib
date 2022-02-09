@@ -26,7 +26,8 @@ public class CompileCommand : BaseCommand
             },
             TypeNameHandling = TypeNameHandling.Auto,
             ReferenceLoopHandling = ReferenceLoopHandling.Error,
-            PreserveReferencesHandling = PreserveReferencesHandling.Objects
+            PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+            NullValueHandling = NullValueHandling.Ignore
         });
         using var bw = new BinaryWriter(File.OpenWrite(OutputPath));
         new FrontendChunkWriter(package).Write(bw);

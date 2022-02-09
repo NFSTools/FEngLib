@@ -20,19 +20,19 @@ public class ScriptTagStream : TagStream
         throw new NotImplementedException("Use NextTag(FrontendObject, Script) instead");
     }
 
-    public Tag NextTag(IObject<ObjectData> frontendObject, Script script)
+    public Tag NextTag(IObject<ObjectData> frontendObject, ScriptProcessingContext scriptProcessingContext)
     {
         var (id, size) = (Reader.ReadUInt16(), Reader.ReadUInt16());
         var pos = Reader.BaseStream.Position;
         Tag tag = (FrontendTagType)id switch
         {
-            ScriptHeader => new ScriptHeaderTag(frontendObject, script),
-            ScriptChain => new ScriptChainTag(frontendObject, script),
-            ScriptKeyTrack => new ScriptKeyTrackTag(frontendObject, script),
-            ScriptTrackOffset => new ScriptTrackOffsetTag(frontendObject, script),
-            ScriptKeyNode => new ScriptKeyNodeTag(frontendObject, script),
-            ScriptEvents => new ScriptEventsTag(frontendObject, script),
-            ScriptName => new ScriptNameTag(frontendObject, script),
+            ScriptHeader => new ScriptHeaderTag(frontendObject, scriptProcessingContext),
+            ScriptChain => new ScriptChainTag(frontendObject, scriptProcessingContext),
+            ScriptKeyTrack => new ScriptKeyTrackTag(frontendObject, scriptProcessingContext),
+            ScriptTrackOffset => new ScriptTrackOffsetTag(frontendObject, scriptProcessingContext),
+            ScriptKeyNode => new ScriptKeyNodeTag(frontendObject, scriptProcessingContext),
+            ScriptEvents => new ScriptEventsTag(frontendObject, scriptProcessingContext),
+            ScriptName => new ScriptNameTag(frontendObject, scriptProcessingContext),
             _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
         };
 

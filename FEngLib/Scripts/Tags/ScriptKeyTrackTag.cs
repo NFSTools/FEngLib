@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using FEngLib.Objects;
 using FEngLib.Packages;
 
@@ -6,8 +8,9 @@ namespace FEngLib.Scripts.Tags;
 
 public class ScriptKeyTrackTag : ScriptTag
 {
-    public ScriptKeyTrackTag(IObject<ObjectData> frontendObject, Script script) : base(frontendObject,
-        script)
+    public ScriptKeyTrackTag(IObject<ObjectData> frontendObject, ScriptProcessingContext scriptProcessingContext) :
+        base(frontendObject,
+            scriptProcessingContext)
     {
     }
 
@@ -24,20 +27,37 @@ public class ScriptKeyTrackTag : ScriptTag
         ParamSize = br.ReadByte();
         InterpType = br.ReadByte();
         InterpAction = br.ReadByte();
-        var value = br.ReadUInt32();
-        var trackLength = value & 0xffffff;
-        var trackOffset = (value >> 24) & 0xff;
+        var propBits = br.ReadUInt32();
+        var trackLength = propBits & 0xffffff;
+        var trackOffset = (propBits >> 24) & 0xff;
 
-        var keyTrack = new Track
+        Debug.Assert(trackOffset == 0, "trackOffset == 0");
+
+        Track newTrack = (TrackParamType)ParamType switch
         {
-            ParamSize = ParamSize,
-            ParamType = (TrackParamType) ParamType,
-            InterpType = (TrackInterpolationMethod) InterpType,
-            InterpAction = InterpAction,
-            Length = trackLength,
-            Offset = trackOffset
+            TrackParamType.Vector2 => new Vector2Track(),
+            TrackParamType.Vector3 => new Vector3Track(),
+            TrackParamType.Quaternion => new QuaternionTrack(),
+            TrackParamType.Color => new ColorTrack(),
+            _ => throw new ArgumentOutOfRangeException($"Unsupported parameter type: {ParamType}")
         };
 
-        Script.Tracks.Add(keyTrack);
+        newTrack.Length = trackLength;
+        newTrack.InterpType = (TrackInterpolationMethod)InterpType;
+        newTrack.InterpAction = InterpAction;
+
+        ScriptProcessingContext.CurrentTrack = newTrack;
+
+        // var keyTrack = new Track
+        // {
+        //     ParamSize = ParamSize,
+        //     ParamType = (TrackParamType) ParamType,
+        //     InterpType = (TrackInterpolationMethod) InterpType,
+        //     InterpAction = InterpAction,
+        //     Length = trackLength,
+        //     Offset = trackOffset
+        // };
+        //
+        // Script.Tracks.Add(keyTrack);
     }
 }

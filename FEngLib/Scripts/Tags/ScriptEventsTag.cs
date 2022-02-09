@@ -7,7 +7,8 @@ namespace FEngLib.Scripts.Tags;
 
 public class ScriptEventsTag : ScriptTag
 {
-    public ScriptEventsTag(IObject<ObjectData> frontendObject, Script script) : base(frontendObject, script)
+    public ScriptEventsTag(IObject<ObjectData> frontendObject, ScriptProcessingContext scriptProcessingContext) : base(
+        frontendObject, scriptProcessingContext)
     {
     }
 

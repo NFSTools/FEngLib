@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Numerics;
+using FEngLib.Scripts;
 using FEngLib.Utils;
 
 namespace FEngLib.Objects;
@@ -26,7 +27,17 @@ public class ImageData : ObjectData
     }
 }
 
-public class Image : Image<ImageData>
+public class ImageScriptTracks : ScriptTracks
+{
+    public Vector2Track UpperLeft { get; set; }
+    public Vector2Track LowerRight { get; set; }
+}
+
+public class ImageScript<TTracks> : Script<TTracks> where TTracks : ImageScriptTracks, new()
+{
+}
+
+public class Image : Image<ImageData, ImageScript<ImageScriptTracks>>
 {
     public Image(ImageData data) : base(data)
     {
@@ -38,7 +49,8 @@ public interface IImage<out TData> : IObject<TData> where TData : ImageData
     uint ImageFlags { get; set; }
 }
 
-public class Image<TData> : BaseObject<TData>, IImage<TData> where TData : ImageData, new()
+public class Image<TData, TScript> : BaseObject<TData, TScript>, IImage<TData>
+    where TData : ImageData, new() where TScript : Script, new()
 {
     protected Image(TData data) : base(data)
     {

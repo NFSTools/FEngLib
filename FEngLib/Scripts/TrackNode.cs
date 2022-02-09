@@ -1,15 +1,23 @@
 ﻿namespace FEngLib.Scripts;
 
-public class TrackNode
+public abstract class TrackNode
+{
+    public int Time { get; set; }
+
+    public abstract object GetValue();
+}
+
+public class TrackNode<TValue> : TrackNode where TValue : struct
 {
     public TrackNode()
     {
         Val = default;
     }
 
-    public int Time { get; set; }
+    public TValue Val { get; set; }
 
-    public object Val { get; set; }
-
-    public T GetValue<T>() => (T) Val;
+    public override object GetValue()
+    {
+        return Val;
+    }
 }

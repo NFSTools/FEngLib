@@ -15,17 +15,17 @@ public class ScriptDataChunk : FrontendObjectChunk
 
     public override IObject<ObjectData> Read(Package package, ObjectReaderState readerState, BinaryReader reader)
     {
+        var ctx = new ScriptProcessingContext(FrontendObject.CreateScript());
         var tagStream = new ScriptTagStream(reader, readerState.CurrentChunkBlock,
             readerState.CurrentChunkBlock.Size);
-        var script = new Script();
 
         while (tagStream.HasTag())
         {
-            var tag = tagStream.NextTag(FrontendObject, script);
-            ProcessTag(script, tag);
+            var tag = tagStream.NextTag(FrontendObject, ctx);
+            ProcessTag(ctx.Script, tag);
         }
 
-        FrontendObject.Scripts.Add(script);
+        // FrontendObject.Scripts.Add(script);
 
         return FrontendObject;
     }

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using FEngLib.Scripts;
 using FEngLib.Structures;
 using FEngLib.Utils;
 
@@ -30,7 +31,15 @@ public class ColoredImageData : ImageData
     }
 }
 
-public class ColoredImage : Image<ColoredImageData>
+public class ColoredImageScriptTracks : ImageScriptTracks
+{
+    public ColorTrack TopLeft { get; set; }
+    public ColorTrack TopRight { get; set; }
+    public ColorTrack BottomRight { get; set; }
+    public ColorTrack BottomLeft { get; set; }
+}
+
+public class ColoredImage : Image<ColoredImageData, ImageScript<ColoredImageScriptTracks>>
 {
     public ColoredImage(ColoredImageData data) : base(data)
     {
