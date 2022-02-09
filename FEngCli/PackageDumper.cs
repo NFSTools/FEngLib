@@ -98,8 +98,8 @@ public static class PackageDumper
                 Console.WriteLine("\tID     : 0x{0:X}", frontendScript.Id);
                 if (!string.IsNullOrEmpty(frontendScript.Name))
                     Console.WriteLine("\tName   : {0} ({1})", frontendScript.Name, frontendScript.Name.ToUpper());
-                if (frontendScript.ChainedId != 0xFFFFFFFF)
-                    Console.WriteLine("\tChained to: 0x{0:X}", frontendScript.ChainedId);
+                if (frontendScript.ChainedId is { } chainedId)
+                    Console.WriteLine("\tChained to: 0x{0:X}", chainedId);
                 Console.WriteLine("\tFlags  : 0x{0:X}", frontendScript.Flags);
                 Console.WriteLine("\tLength : {0}", frontendScript.Length);
                 if (frontendScript.Events.Count > 0)
