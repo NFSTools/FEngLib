@@ -89,11 +89,15 @@ public class FrontendChunkWriter
     {
         writer.WriteChunk(ResourcesContainer, bw =>
         {
+            var nameOffsets = new uint[Package.ResourceRequests.Count];
+
             bw.WriteChunk(ResourceNames, bw =>
             {
-                foreach (var resrq in Package.ResourceRequests)
+                for (var index = 0; index < Package.ResourceRequests.Count; index++)
                 {
-                    bw.WriteCString(resrq.Name);
+                    var resourceRequest = Package.ResourceRequests[index];
+                    nameOffsets[index] = (uint)bw.BaseStream.Position;
+                    bw.WriteCString(resourceRequest.Name);
                 }
 
                 bw.AlignWriter(4);
@@ -102,14 +106,15 @@ public class FrontendChunkWriter
             bw.WriteChunk(ResourceRequests, bw =>
             {
                 bw.Write(Package.ResourceRequests.Count);
-                foreach (var resrq in Package.ResourceRequests)
+
+                foreach (var (resourceRequest, nameOffset) in Package.ResourceRequests.Zip(nameOffsets))
                 {
-                    bw.Write(resrq.ID);
-                    bw.Write(resrq.NameOffset);
-                    bw.WriteEnum(resrq.Type);
-                    bw.Write(resrq.Flags);
-                    bw.Write(resrq.Handle);
-                    bw.Write(resrq.UserParam);
+                    bw.Write(resourceRequest.ID);
+                    bw.Write(nameOffset);
+                    bw.WriteEnum(resourceRequest.Type);
+                    bw.Write(resourceRequest.Flags);
+                    bw.Write(0u);
+                    bw.Write(resourceRequest.UserParam);
                 }
 
                 bw.AlignWriter(4);

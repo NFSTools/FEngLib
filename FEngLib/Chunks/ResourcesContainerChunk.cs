@@ -21,9 +21,11 @@ public class ResourcesContainerChunk : FrontendChunk
                     throw new ChunkReadingException("RsRq came before RsNm?!");
                 case ResourceRequestsChunk rrc:
                 {
-                    foreach (var resourceRequest in rrc.ResourceRequests)
+                    for (var index = 0; index < rrc.ResourceRequests.Count; index++)
                     {
-                        resourceRequest.Name = resourceNamesChunk.Names[resourceRequest.NameOffset];
+                        var resourceRequest = rrc.ResourceRequests[index];
+                        var nameOffset = rrc.GetNameOffset(index);
+                        resourceRequest.Name = resourceNamesChunk.Names[nameOffset];
                     }
 
                     package.ResourceRequests.AddRange(rrc.ResourceRequests);
