@@ -50,6 +50,8 @@ internal static class Program
             Console.WriteLine("Wrote {2} (file: {0}) in {1}ms", rewrittenPath, stopwatch.ElapsedMilliseconds,
                 package.Name);
 
+            LoadPackageFromChunk(rewrittenPath);
+
             var orig = new FileInfo(origPath);
             var rewrite = new FileInfo(rewrittenPath);
 
