@@ -7,6 +7,8 @@ namespace FEngLib.Chunks;
 
 public class ResourceRequestsChunk : FrontendChunk
 {
+    private uint[] _nameOffsets;
+
     public List<ResourceRequest> ResourceRequests { get; set; }
 
     public override void Read(Package package, FrontendChunkBlock chunkBlock,
@@ -17,14 +19,16 @@ public class ResourceRequestsChunk : FrontendChunk
         var numRequests = reader.ReadInt32();
         ResourceRequests = new List<ResourceRequest>(numRequests);
 
+        _nameOffsets = new uint[numRequests];
+
         for (var i = 0; i < numRequests; i++)
         {
             var resourceRequest = new ResourceRequest();
             resourceRequest.ID = reader.ReadUInt32();
-            resourceRequest.NameOffset = reader.ReadUInt32();
-            resourceRequest.Type = (ResourceType) reader.ReadUInt32();
+            _nameOffsets[i] = reader.ReadUInt32();
+            resourceRequest.Type = (ResourceType)reader.ReadUInt32();
             resourceRequest.Flags = reader.ReadUInt32();
-            resourceRequest.Handle = reader.ReadUInt32();
+            reader.ReadUInt32();
             resourceRequest.UserParam = reader.ReadUInt32();
 
             ResourceRequests.Add(resourceRequest);
@@ -34,5 +38,10 @@ public class ResourceRequestsChunk : FrontendChunk
     public override FrontendChunkType GetChunkType()
     {
         throw new NotImplementedException();
+    }
+
+    public uint GetNameOffset(int i)
+    {
+        return _nameOffsets[i];
     }
 }

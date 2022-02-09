@@ -17,8 +17,6 @@ public class ResourceRequest
     public uint ID { get; set; }
     public ResourceType Type { get; set; }
     public string Name { get; set; }
-    public uint NameOffset { get; set; }
     public uint Flags { get; set; }
-    public uint Handle { get; set; }
     public uint UserParam { get; set; }
 }

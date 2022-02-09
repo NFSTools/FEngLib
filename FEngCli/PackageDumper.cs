@@ -17,8 +17,8 @@ public static class PackageDumper
             DumpResourceRequest(index, resourceRequest);
         }
 
-        // foreach (var frontendObject in package.Objects.OrderBy())
-        //     DumpObject(frontendObject, package);
+        foreach (var frontendObject in package.Objects.OrderBy(o => o.Guid).ThenBy(o => o.Parent?.Guid))
+            DumpObject(frontendObject, package);
 
         foreach (var messageDefinition in package.MessageDefinitions)
         {
@@ -60,7 +60,6 @@ public static class PackageDumper
         Console.WriteLine("Name   : {0}", resourceRequest.Name);
         Console.WriteLine("Type   : {0}", resourceRequest.Type);
         Console.WriteLine("Flags  : {0}", resourceRequest.Flags);
-        Console.WriteLine("Handle : {0}", resourceRequest.Handle);
         Console.WriteLine("ID     : 0x{0:X8}", resourceRequest.ID);
     }
 
