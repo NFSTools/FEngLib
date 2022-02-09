@@ -240,10 +240,7 @@ public class FrontendChunkWriter
                                 bw.Write(tracks.Count);
                             });
 
-                            if (script.ChainedId != 0xFFFFFFFF)
-                            {
-                                bw.WriteTag(ScriptChain, bw => bw.Write(script.ChainedId));
-                            }
+                            if (script.ChainedId is { } chainedId) bw.WriteTag(ScriptChain, bw => bw.Write(chainedId));
 
                             foreach (var (track, offset) in tracks)
                             {

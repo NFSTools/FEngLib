@@ -110,11 +110,11 @@ public class RenderTreeNode
                         FrontendObject.NameHash);
                     CurrentScriptTime = 0;
                 }
-                else if (CurrentScript.ChainedId != 0xFFFFFFFF)
+                else if (CurrentScript.ChainedId is { } currentScriptChainedId)
                 {
-                    var nextScript = FrontendObject.FindScript(CurrentScript.ChainedId) ??
+                    var nextScript = FrontendObject.FindScript(currentScriptChainedId) ??
                                      throw new Exception(
-                                         $"Cannot find chained script (object {FrontendObject.NameHash:X}, base script {CurrentScript.Id:X}): {CurrentScript.ChainedId:X}");
+                                         $"Cannot find chained script (object {FrontendObject.NameHash:X}, base script {CurrentScript.Id:X}): {currentScriptChainedId:X}");
                     Debug.WriteLine("activating chained script for object {1:X}: {0}",
                         nextScript.Name ?? nextScript.Id.ToString("X"), FrontendObject.NameHash);
 
