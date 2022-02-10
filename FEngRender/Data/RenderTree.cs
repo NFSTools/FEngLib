@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FEngLib.Objects;
@@ -39,8 +40,7 @@ public class RenderTree : IEnumerable<RenderTreeNode>
         foreach (var node in nodes)
         {
             // TODO make this behavior controllable at runtime (i.e. "show all hidden", "show all invisible")
-            if ((node.FrontendObject.Flags & ObjectFlags.Invisible) != 0 ||
-                (node.FrontendObject.Flags & ObjectFlags.HideInEdit) != 0)
+            if (node.IsHidden())
             {
                 continue;
             }
@@ -82,16 +82,24 @@ public class RenderTree : IEnumerable<RenderTreeNode>
         {
             foreach (var frontendObject in frontendObjects)
             {
-                if (frontendObject is Group grp)
+                RenderTreeGroup GroupToRenderTreeNode(Group group)
                 {
                     var subNodes = new List<RenderTreeNode>();
-                    GenerateNodes(childrenDict[grp.Guid], subNodes);
-                    nodeList.Add(new RenderTreeGroup(grp, subNodes));
+                    GenerateNodes(childrenDict[group.Guid], subNodes);
+                    return new RenderTreeGroup(group, subNodes);
                 }
-                else
+
+                nodeList.Add(frontendObject switch
                 {
-                    nodeList.Add(new RenderTreeNode(frontendObject));
-                }
+                    ColoredImage ci => new RenderTreeColoredImage(ci),
+                    Group grp => GroupToRenderTreeNode(grp),
+                    Image img => new RenderTreeImage(img),
+                    MultiImage mi => new RenderTreeMultiImage(mi),
+                    SimpleImage si => new RenderTreeSimpleImage(si),
+                    Movie movie => new RenderTreeMovie(movie),
+                    Text text => new RenderTreeText(text),
+                    _ => throw new NotImplementedException($"Unsupported object type: {frontendObject.GetType()}")
+                });
             }
         }
 

@@ -5,102 +5,117 @@ using System.Numerics;
 using FEngLib.Objects;
 using FEngLib.Scripts;
 using FEngLib.Structures;
-using FEngRender.Script;
+using FEngRender.Scripts;
 
 namespace FEngRender.Data;
 
 /// <summary>
 /// Base class for representing an item in a <see cref="RenderTree"/>.
 /// </summary>
-public class RenderTreeNode
+public abstract class RenderTreeNode
 {
+    public Matrix4x4 Transform { get; protected set; }
+
+    public Color4 BlendedColor { get; protected set; }
+
+    public Quaternion ObjectRotation { get; protected set; }
+
     /// <summary>
-    /// Initializes a new instance of the <see cref="RenderTreeNode"/> class.
+    /// Updates the state of the render node.
     /// </summary>
-    /// <param name="frontendObject">
-    ///   The <see cref="IObject{TData}"/> instance owned by the <see cref="RenderTreeNode"/> instance.
-    /// </param>
-    public RenderTreeNode(IObject<ObjectData> frontendObject)
+    /// <param name="context">The current rendering context.</param>
+    /// <param name="deltaMs">The time (in milliseconds) that has passed since the last frame render.</param>
+    public abstract void Update(RenderContext context, int deltaMs);
+
+    public abstract IObject<ObjectData> GetObject();
+
+    public abstract Script GetCurrentScript();
+
+    public abstract void SetCurrentScript(uint? id);
+
+    public abstract bool IsHidden();
+
+    /// <summary>
+    /// Gets the object's Z-coordinate.
+    /// </summary>
+    /// <returns></returns>
+    public float GetZ()
     {
-        FrontendObject = frontendObject;
-        SetScript(frontendObject.FindScript(0x1744B3)); // INIT
+        return Transform.M43;
     }
 
-    public Matrix4x4 ObjectMatrix { get; private set; }
+    public virtual Rectangle? Get2DExtents()
+    {
+        // TODO
+        return Rectangle.Empty;
+        //switch (FrontendObject.Type)
+        //{
+        //    case ObjectType.Image:
+        //    case ObjectType.Movie:
+        //    case ObjectType.ColoredImage:
+        //        var pos = FrontendObject.Data.Position;
+        //        var objSize = new Size((int)FrontendObject.Data.Size.X, (int)FrontendObject.Data.Size.Y);
+        //        var topLeft = new Point((int)(pos.X - objSize.Width * 0.5), (int)(pos.Y - objSize.Height * 0.5));
+        //        return new Rectangle(topLeft, objSize);
+        //    case ObjectType.String:
+        //        //todo
+        //        return new Rectangle();
+        //    case ObjectType.Group:
+        //        throw new Exception("This node should be a RenderTreeGroup!!!");
+        //    case ObjectType.Model:
+        //    case ObjectType.List:
+        //    case ObjectType.CodeList:
+        //    case ObjectType.Effect:
+        //    case ObjectType.AnimImage:
+        //    case ObjectType.SimpleImage:
+        //    case ObjectType.MultiImage:
+        //        return new Rectangle();
+        //    default:
+        //        throw new ArgumentOutOfRangeException();
+        //}
+    }
+}
 
-    public Quaternion ObjectRotation { get; private set; }
-
-    public Color4 ObjectColor { get; private set; }
-
-    // TODO: THESE SHOULD *NOT* BE HERE!!!
-    // TODO cont: REFACTORING IS NECESSARY!!!!!!!!!!!
-    public Vector2 UpperLeft { get; private set; }
-    public Vector2 LowerRight { get; private set; }
-
+public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTreeNode
+    where TObject : IObject<ObjectData>, IScriptedObject<TScript>
+    where TScript : Script<TScriptTracks>
+    where TScriptTracks : ScriptTracks, new()
+{
     /// <summary>
     /// The <see cref="IObject{TData}"/> instance owned by the node.
     /// </summary>
-    public IObject<ObjectData> FrontendObject { get; }
+    public TObject FrontendObject { get; }
 
     /// <summary>
     /// The <see cref="Script"/> that is currently running.
     /// </summary>
-    public FEngLib.Scripts.Script CurrentScript { get; private set; }
+    public TScript CurrentScript { get; private set; }
 
     /// <summary>
     /// The current time offset of the current script.
     /// </summary>
     public int CurrentScriptTime { get; private set; }
 
-    /// <summary>
-    /// Applies script state and computes transformations.
-    /// </summary>
-    /// <param name="viewMatrix"></param>
-    /// <param name="parentNode"></param>
-    /// <param name="deltaTime"></param>
-    /// <param name="matrixRotate"></param>
-    public void PrepareForRender(Matrix4x4 viewMatrix, RenderTreeNode parentNode, int deltaTime,
-        bool matrixRotate = false)
+    public Vector3 Position { get; private set; }
+    public Vector3 Size { get; private set; }
+    public Quaternion Rotation { get; private set; }
+    public Vector3 Pivot { get; private set; }
+    public Color4 Color { get; private set; }
+
+    protected RenderTreeNode(TObject frontendObject)
     {
-        var frontendObjectData = FrontendObject.Data;
-        var size = frontendObjectData.Size;
-        var position = frontendObjectData.Position;
-        var rotation = frontendObjectData.Rotation;
-        var pivot = frontendObjectData.Pivot;
-        var color = frontendObjectData.Color;
+        this.FrontendObject = frontendObject;
+        this.SetCurrentScript(0x1744B3);
+    }
 
-        if (frontendObjectData is ImageData imageData)
-        {
-            UpperLeft = imageData.UpperLeft;
-            LowerRight = imageData.LowerRight;
-        }
+    public override void Update(RenderContext context, int deltaMs)
+    {
+        LoadProperties();
 
-        if (CurrentScript != null
+        if (CurrentScript is { } currentScript
             && CurrentScriptTime >= 0)
         {
-            var scriptTracks = CurrentScript.GetTracks();
-
-            if (scriptTracks.Color is { } colorTrack)
-                color = TrackInterpolation.Interpolate(colorTrack, CurrentScriptTime);
-
-            if (scriptTracks.Pivot is { } pivotTrack)
-                pivot = TrackInterpolation.Interpolate(pivotTrack, CurrentScriptTime);
-
-            if (scriptTracks.Position is { } positionTrack)
-                position = TrackInterpolation.Interpolate(positionTrack, CurrentScriptTime);
-
-            if (scriptTracks.Rotation is { } rotationTrack)
-                rotation = TrackInterpolation.Interpolate(rotationTrack, CurrentScriptTime);
-
-            if (scriptTracks.Size is { } sizeTrack) size = TrackInterpolation.Interpolate(sizeTrack, CurrentScriptTime);
-
-            if (scriptTracks is ImageScriptTracks imageScriptTracks)
-            {
-                if (imageScriptTracks.LowerRight is { } lowerRightTrack)
-                    LowerRight = TrackInterpolation.Interpolate(lowerRightTrack, CurrentScriptTime);
-                if (imageScriptTracks.UpperLeft is { } upperLeftTrack)
-                    UpperLeft = TrackInterpolation.Interpolate(upperLeftTrack, CurrentScriptTime);
-            }
+            ApplyScript(currentScript, currentScript.Tracks);
 
             if (CurrentScriptTime >= CurrentScript.Length)
             {
@@ -118,110 +133,96 @@ public class RenderTreeNode
                     Debug.WriteLine("activating chained script for object {1:X}: {0}",
                         nextScript.Name ?? nextScript.Id.ToString("X"), FrontendObject.NameHash);
 
-                    SetScript(nextScript);
+                    SetCurrentScript(nextScript);
                 }
                 else
                 {
                     Debug.WriteLine("Current script for object {0:X} has ended", FrontendObject.NameHash);
-                    SetScript(null);
+                    SetCurrentScript(null);
                 }
             }
 
-            CurrentScriptTime += deltaTime;
+            CurrentScriptTime += deltaMs;
         }
 
-        var scaleMatrix = Matrix4x4.CreateScale(size.X, size.Y, size.Z);
-        var rotateMatrix = Matrix4x4.CreateFromQuaternion(rotation);
-        var transMatrix = Matrix4x4.CreateTranslation(position.X, position.Y, position.Z);
+        var scaleMatrix = Matrix4x4.CreateScale(Size);
+        var rotateMatrix = Matrix4x4.CreateFromQuaternion(Rotation);
+        var transMatrix = Matrix4x4.CreateTranslation(Position);
         var outMatrix = Matrix4x4.Identity;
 
         outMatrix *= scaleMatrix;
 
-        if (matrixRotate && rotation != Quaternion.Identity)
+        if (Rotation != Quaternion.Identity)
         {
-            outMatrix *= Matrix4x4.CreateTranslation(-pivot);
+            outMatrix *= Matrix4x4.CreateTranslation(-Pivot);
             outMatrix *= rotateMatrix;
-            outMatrix *= Matrix4x4.CreateTranslation(pivot);
+            outMatrix *= Matrix4x4.CreateTranslation(Pivot);
         }
 
         outMatrix *= transMatrix;
-        outMatrix *= viewMatrix;
+        outMatrix *= context.ViewMatrix;
 
-        ObjectMatrix = outMatrix;
+        ObjectRotation = Rotation;
+        Transform = outMatrix;
+        BlendedColor = Color;
 
-        ObjectRotation = rotation;
-        ObjectColor = color;
-
-        if (parentNode != null)
+        if (context.Parent is { } parentNode)
         {
             ObjectRotation *= parentNode.ObjectRotation;
-            ObjectColor = Color4.Blend(ObjectColor, parentNode.ObjectColor);
+            BlendedColor = Color4.Blend(Color, parentNode.BlendedColor);
         }
     }
 
-    /// <summary>
-    /// Sets the currently running script and resets the script time.
-    /// </summary>
-    /// <param name="script">The script to run.</param>
-    public void SetScript(FEngLib.Scripts.Script script)
+    public override Script GetCurrentScript() => CurrentScript;
+
+    public override IObject<ObjectData> GetObject() => FrontendObject;
+
+    public sealed override void SetCurrentScript(uint? id)
     {
-        this.CurrentScript = script;
-        this.CurrentScriptTime = script == null ? -1 : 0;
+        SetCurrentScript(id != null ? this.FrontendObject.FindScript(id.Value) : null);
     }
 
-    /// <summary>
-    /// Gets the object's Z-coordinate.
-    /// </summary>
-    /// <returns></returns>
-    public float GetZ()
+    public override bool IsHidden()
     {
-        return ObjectMatrix.M43;
+        return (FrontendObject.Flags & ObjectFlags.HideInEdit) != 0 ||
+               (FrontendObject.Flags & ObjectFlags.Invisible) != 0;
     }
 
-    // private Track GetKeyTrack(FEngLib.Scripts.Script script, KeyTrackType trackType)
-    // {
-    //     uint offset = (uint)trackType;
-    //
-    //     return script.Tracks.Find(e => e.Offset == offset);
-    // }
-
-    public virtual Rectangle? Get2DExtents()
+    private void SetCurrentScript(TScript script)
     {
-        switch (FrontendObject.Type)
-        {
-            case ObjectType.Image:
-            case ObjectType.Movie:
-            case ObjectType.ColoredImage:
-                var pos = FrontendObject.Data.Position;
-                var objSize = new Size((int)FrontendObject.Data.Size.X, (int)FrontendObject.Data.Size.Y);
-                var topLeft = new Point((int)(pos.X - objSize.Width * 0.5), (int)(pos.Y - objSize.Height * 0.5));
-                return new Rectangle(topLeft, objSize);
-            case ObjectType.String:
-                //todo
-                return new Rectangle();
-            case ObjectType.Group:
-                throw new Exception("This node should be a RenderTreeGroup!!!");
-            case ObjectType.Model:
-            case ObjectType.List:
-            case ObjectType.CodeList:
-            case ObjectType.Effect:
-            case ObjectType.AnimImage:
-            case ObjectType.SimpleImage:
-            case ObjectType.MultiImage:
-                return new Rectangle();
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+        CurrentScript = script;
+        if (script == null)
+            CurrentScriptTime = -1;
     }
 
-    private enum KeyTrackType
+    protected virtual void LoadProperties()
     {
-        Color = 0,
-        Pivot = 4,
-        Position = 7,
-        Rotation = 10,
-        Size = 14,
-        UpperLeft = 17,
-        LowerRight = 19
+        Color = FrontendObject.Data.Color;
+        Pivot = FrontendObject.Data.Pivot;
+        Position = FrontendObject.Data.Position;
+        Rotation = FrontendObject.Data.Rotation;
+        Size = FrontendObject.Data.Size;
+    }
+
+    protected virtual void ApplyScript(TScript script, TScriptTracks tracks)
+    {
+        if (tracks.Color is { } colorTrack)
+            Color = InterpolateHelper(colorTrack);
+        if (tracks.Pivot is { } pivotTrack)
+            Pivot = InterpolateHelper(pivotTrack);
+        if (tracks.Position is { } positionTrack)
+            Position = InterpolateHelper(positionTrack);
+        if (tracks.Rotation is { } rotationTrack)
+            Rotation = InterpolateHelper(rotationTrack);
+        if (tracks.Size is { } sizeTrack) Size = InterpolateHelper(sizeTrack);
+    }
+
+    protected T InterpolateHelper<T>(Track<T> track) where T : struct => TrackInterpolation.Interpolate(track, CurrentScriptTime);
+}
+
+public abstract class RenderTreeNode<TObject> : RenderTreeNode<TObject, BaseObjectScript, ScriptTracks> where TObject : IObject<ObjectData>, IScriptedObject<BaseObjectScript>
+{
+    protected RenderTreeNode(TObject frontendObject) : base(frontendObject)
+    {
     }
 }

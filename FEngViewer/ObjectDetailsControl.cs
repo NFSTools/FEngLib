@@ -12,7 +12,7 @@ public partial class ObjectDetailsControl : UserControl
 
     public void UpdateObjectDetails(RenderTreeNode nodeTag)
     {
-        var obj = nodeTag.FrontendObject;
+        var obj = nodeTag.GetObject();
         labelObjType.Text = obj.Type.ToString();
         labelObjHash.Text = $"{obj.NameHash:X}";
         labelObjGUID.Text = $"{obj.Guid:X}";

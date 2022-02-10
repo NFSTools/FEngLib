@@ -109,7 +109,7 @@ public partial class PackageView : Form
 
     private static TreeNode CreateObjectTreeNode(TreeNodeCollection collection, RenderTreeNode viewNode)
     {
-        var feObj = viewNode.FrontendObject;
+        var feObj = viewNode.GetObject();
         var nodeImageKey = feObj.Type switch
         {
             ObjectType.String => "TreeItem_String",
@@ -266,7 +266,7 @@ public partial class PackageView : Form
             objectDetailsView1.Visible = true;
             objectDetailsView1.UpdateObjectDetails(viewNode);
             viewOutput.SelectedNode = viewNode;
-            objectPropertyGrid.SelectedObject = new ObjectViewWrapper(viewNode.FrontendObject);
+            objectPropertyGrid.SelectedObject = new ObjectViewWrapper(viewNode.GetObject());
             Render();
         }
         else
@@ -307,7 +307,7 @@ public partial class PackageView : Form
 
             var top = candidates.First();
 
-            var feObj = top.FrontendObject;
+            var feObj = top.GetObject();
             var key = $"{feObj.Name ?? feObj.NameHash.ToString("X")}";
             var foundNodes = treeView1.Nodes.Find(key, true);
             treeView1.SelectedNode = foundNodes[0];
@@ -382,7 +382,7 @@ public partial class PackageView : Form
         {
             var viewNode = (RenderTreeNode)hit_node.Parent.Tag;
 
-            toggleScriptItem.Text = ReferenceEquals(viewNode.CurrentScript, script) ? "Stop" : "Start";
+            toggleScriptItem.Text = ReferenceEquals(viewNode.GetCurrentScript(), script) ? "Stop" : "Start";
 
             scriptContextMenu.Show(treeView1, ctxPoint);
         }
@@ -392,7 +392,7 @@ public partial class PackageView : Form
     {
         if (treeView1.SelectedNode?.Tag is RenderTreeNode viewNode)
         {
-            viewNode.FrontendObject.Flags ^= ObjectFlags.HideInEdit;
+            viewNode.GetObject().Flags ^= ObjectFlags.HideInEdit;
 
             Render();
         }
@@ -403,7 +403,7 @@ public partial class PackageView : Form
         if (treeView1.SelectedNode?.Tag is Script script)
         {
             var viewNode = (RenderTreeNode)treeView1.SelectedNode.Parent.Tag;
-            viewNode.SetScript(ReferenceEquals(viewNode.CurrentScript, script) ? null : script);
+            viewNode.SetCurrentScript(ReferenceEquals(viewNode.GetCurrentScript(), script) ? null : script.Id);
         }
     }
 
