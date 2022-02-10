@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CommandLine;
 using FEngLib;
 using FEngLib.Packages;
@@ -11,13 +12,13 @@ namespace FEngCli;
 [Verb("compile")]
 public class CompileCommand : BaseCommand
 {
-    [Option('i')] public string InputPath { get; set; }
+    [Option('i')] public IEnumerable<string> InputPath { get; set; }
 
     [Option('o')] public string OutputPath { get; set; }
 
     public override int Execute()
     {
-        var package = JsonConvert.DeserializeObject<Package>(File.ReadAllText(InputPath), new JsonSerializerSettings
+        var packages = InputPath.Select(path => JsonConvert.DeserializeObject<Package>(File.ReadAllText(path), new JsonSerializerSettings
         {
             Formatting = Formatting.Indented,
             Converters = new List<JsonConverter>
@@ -28,9 +29,24 @@ public class CompileCommand : BaseCommand
             ReferenceLoopHandling = ReferenceLoopHandling.Error,
             PreserveReferencesHandling = PreserveReferencesHandling.Objects,
             NullValueHandling = NullValueHandling.Ignore
-        });
-        using var bw = new BinaryWriter(File.OpenWrite(OutputPath));
-        new FrontendChunkWriter(package).Write(bw);
+        }));
+
+
+        using var bw = new BinaryWriter(File.Create(OutputPath));
+
+        foreach (var package in packages)
+        {
+            using var tms = new MemoryStream();
+            using var tbw = new BinaryWriter(tms);
+            new FrontendChunkWriter(package).Write(tbw);
+            tms.Position = 0;
+
+            bw.Write(0x30203);
+            bw.Write((uint)tms.Length);
+            tms.CopyTo(bw.BaseStream);
+        }
+
+        //new FrontendChunkWriter(package).Write(bw);
 
         return 0;
     }
