@@ -110,9 +110,9 @@ public class FrontendChunkWriter
                     bw.Write(resourceRequest.ID);
                     bw.Write(nameOffset);
                     bw.WriteEnum(resourceRequest.Type);
-                    bw.Write(resourceRequest.Flags);
                     bw.Write(0u);
-                    bw.Write(resourceRequest.UserParam);
+                    bw.Write(0u);
+                    bw.Write(0u);
                 }
 
                 bw.AlignWriter(4);
