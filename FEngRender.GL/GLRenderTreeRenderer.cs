@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -22,7 +23,8 @@ public class GLRenderTreeRenderer
     private readonly OpenGL _gl;
     private readonly GLGlyphRenderer _glyphRenderer;
 
-    private readonly Dictionary<string, Texture> _textures = new Dictionary<string, Texture>();
+    private readonly Dictionary<string, Texture> _loadedTextures = new Dictionary<string, Texture>();
+    private readonly Dictionary<uint, Texture> _resourceRequestToTexture = new Dictionary<uint, Texture>();
     private long _lastRenderTime;
 
     private Stopwatch _stopwatch;
@@ -45,11 +47,11 @@ public class GLRenderTreeRenderer
 
     public void LoadTextures(string directory)
     {
-        _textures.Clear();
+        _loadedTextures.Clear();
         foreach (var pngFile in Directory.GetFiles(directory, "*.png"))
         {
             var filename = Path.GetFileNameWithoutExtension(pngFile) ?? "";
-            _textures.Add(filename.ToUpperInvariant(), new Texture(_gl, pngFile));
+            _loadedTextures.Add(filename.ToUpperInvariant(), new Texture(_gl, pngFile));
         }
     }
 
@@ -65,7 +67,9 @@ public class GLRenderTreeRenderer
         // disable depth
         _gl.DepthMask(0);
 
-        PrepareNodes(tree, Matrix4x4.Identity, (int)(_stopwatch.ElapsedMilliseconds - _lastRenderTime));
+        var dt = (int)(_stopwatch.ElapsedMilliseconds - _lastRenderTime);
+        _gl.DrawText(10, 10, 1, 0, 0, "Consolas", 16, $"dt: {dt}ms");
+        PrepareNodes(tree, Matrix4x4.Identity, dt);
         RenderTree(tree);
         // _stopwatch.Restart();
 
@@ -89,12 +93,17 @@ public class GLRenderTreeRenderer
     private void PrepareNodes(IEnumerable<RenderTreeNode> nodes,
         Matrix4x4 viewMatrix, int timeDelta, RenderTreeNode parent = null)
     {
+        var renderContext = new RenderContext(viewMatrix, parent);
         var nodeList = nodes.ToList();
 
-        nodeList.ForEach(r => r.PrepareForRender(viewMatrix, parent, timeDelta, true));
+        foreach (var node in nodeList)
+        {
+            node.Update(renderContext, timeDelta);
+        }
+
         foreach (var renderTreeGroup in nodeList.OfType<RenderTreeGroup>())
         {
-            PrepareNodes(renderTreeGroup, renderTreeGroup.ObjectMatrix, timeDelta, renderTreeGroup);
+            PrepareNodes(renderTreeGroup, renderTreeGroup.Transform, timeDelta, renderTreeGroup);
         }
     }
 
@@ -109,32 +118,59 @@ public class GLRenderTreeRenderer
 
     private void RenderNode(RenderTreeNode node, bool doBoundingBox = false)
     {
-        switch (node.FrontendObject)
+        switch (node)
         {
-            // there are some things we just don't need to handle
-            case Group _:
-                RenderGroupBB(node, doBoundingBox);
+            case RenderTreeGroup:
+                // TODO: render group bounding box
                 break;
-            case Movie _:
+            case RenderTreeMovie:
                 break;
-            case SimpleImage _:
-                RenderSimpleImage(node, doBoundingBox);
+            case RenderTreeSimpleImage si:
+                RenderSimpleImage(si, doBoundingBox);
                 break;
-            case IImage<ImageData> image:
-                RenderImage(node, image, doBoundingBox);
+            case RenderTreeColoredImage ci:
+                RenderColoredImage(ci, doBoundingBox);
                 break;
-            case Text str:
-                RenderString(node, str);
+            case RenderTreeImage img:
+                RenderRegularImage(img, doBoundingBox);
+                break;
+            case RenderTreeMultiImage mi:
+                RenderMultiImage(mi, doBoundingBox);
+                break;
+            case RenderTreeText text:
+                RenderString(text);
                 break;
             default:
-                Debug.Assert(false, "Unsupported object", "Type: {0}", node.FrontendObject.GetType());
+                Debug.Assert(false, "Unsupported node", "Type: {0}", node.GetType());
                 break;
         }
+        //switch (node.FrontendObject)
+        //{
+        //    // there are some things we just don't need to handle
+        //    case Group _:
+        //        RenderGroupBB(node, doBoundingBox);
+        //        break;
+        //    case Movie _:
+        //        break;
+        //    case SimpleImage _:
+        //        RenderSimpleImage(node, doBoundingBox);
+        //        break;
+        //    case IImage<ImageData> image:
+        //        RenderImage(node, image, doBoundingBox);
+        //        break;
+        //    case Text str:
+        //        RenderString(node, str);
+        //        break;
+        //    default:
+        //        Debug.Assert(false, "Unsupported object", "Type: {0}", node.FrontendObject.GetType());
+        //        break;
+        //}
     }
 
-    private void RenderString(RenderTreeNode node, Text str)
+    private void RenderString(RenderTreeText node)
     {
         var font = TextHelpers.GetFont(18);
+        var str = node.FrontendObject;
         var (_, _, width, height) = TextHelpers.MeasureText(str.Value, new RendererOptions(font)
         {
             WrappingWidth = str.MaxWidth
@@ -144,8 +180,8 @@ public class GLRenderTreeRenderer
         var yOffset = TextHelpers.CalculateYOffset((uint)str.Formatting,
             height);
 
-        _glyphRenderer.Transform = node.ObjectMatrix * Matrix4x4.CreateTranslation(320, 240, 0);
-        _glyphRenderer.Color = node.ObjectColor;
+        _glyphRenderer.Transform = node.Transform * Matrix4x4.CreateTranslation(320, 240, 0);
+        _glyphRenderer.Color = node.BlendedColor;
         _glyphRenderer.Formatting = str.Formatting;
 
         TextRenderer.RenderTextTo(_glyphRenderer, str.Value,
@@ -156,13 +192,13 @@ public class GLRenderTreeRenderer
         );
     }
 
-    private void RenderSimpleImage(RenderTreeNode node, bool doBoundingBox = false)
+    private void RenderSimpleImage(RenderTreeSimpleImage node, bool doBoundingBox = false)
     {
         // top left, top right, bottom right, bottom left
         Vector4[] colors = new Vector4[4];
-        colors[0] = colors[1] = colors[2] = colors[3] = node.ObjectColor;
+        colors[0] = colors[1] = colors[2] = colors[3] = node.BlendedColor;
 
-        var otkMat4 = node.ObjectMatrix * Matrix4x4.CreateTranslation(320, 240, 0);
+        var otkMat4 = node.Transform * Matrix4x4.CreateTranslation(320, 240, 0);
         var q = new Quad(-0.5f, -0.5f, 0.5f, 0.5f,
             1.0f,
             otkMat4,
@@ -176,64 +212,88 @@ public class GLRenderTreeRenderer
             q.Render(_gl);
     }
 
-    private void RenderImage(RenderTreeNode node, IObject<ImageData> image, bool doBoundingBox = false)
+    private void RenderColoredImage(RenderTreeColoredImage coloredImage, bool doBoundingBox = false)
     {
-        var texture = GetTexture(image.ResourceRequest);
+        var texture = GetTexture(coloredImage.FrontendObject.ResourceRequest);
 
         if (texture == null)
             return;
 
-        var otkMat4 = node.ObjectMatrix * Matrix4x4.CreateTranslation(320, 240, 0);
-
-        // this is done by the game, basically a noop in most cases but sometimes relevant?
-        // i think it's to do with square-ness and powers of two. or something
-        uint CalculateDivisor(int value)
-        {
-            if (texture.Width == 0) return 0;
-
-            var v10 = (uint)(value - 1) >> 1;
-            uint divisor;
-            for (divisor = 2; v10 != 0; divisor *= 2)
-            {
-                v10 >>= 1;
-            }
-
-            return divisor;
-        }
-
-        var widthDivide = (float)CalculateDivisor(texture.Width);
-        var heightDivide = (float)CalculateDivisor(texture.Height);
-
-        // var texUpLeft = new Vector2(
-        //     texture.Width / widthDivide * node.UpperLeft.X,
-        //     texture.Height / heightDivide * node.UpperLeft.Y
-        // );
-        //
-        // var texLowRight = new Vector2(
-        //     texture.Width / widthDivide * node.LowerRight.X,
-        //     texture.Height / heightDivide * node.LowerRight.Y
-        // );
+        var otkMat4 = coloredImage.Transform * Matrix4x4.CreateTranslation(320, 240, 0);
 
         // top left, top right, bottom right, bottom left
         Vector4[] colors = new Vector4[4];
 
-        if (image is ColoredImage ci)
-        {
-            colors[0] = ci.Data.TopLeft;
-            colors[1] = ci.Data.TopRight;
-            colors[2] = ci.Data.BottomRight;
-            colors[3] = ci.Data.BottomLeft;
-        }
-        else
-        {
-            colors[0] = colors[1] = colors[2] = colors[3] = node.ObjectColor;
-        }
+        colors[0] = coloredImage.TopLeft;
+        colors[1] = coloredImage.TopRight;
+        colors[2] = coloredImage.BottomRight;
+        colors[3] = coloredImage.BottomLeft;
 
         var q = new Quad(-0.5f, -0.5f, 0.5f, 0.5f,
             1.0f,
             otkMat4,
-            node.UpperLeft,
-            node.LowerRight,
+            coloredImage.UpperLeft,
+            coloredImage.LowerRight,
+            colors);
+
+        if (doBoundingBox)
+            q.DrawBoundingBox(_gl);
+        else
+            q.Render(_gl, texture);
+    }
+
+    private void RenderRegularImage(RenderTreeImage image, bool doBoundingBox = false)
+    {
+        var texture = GetTexture(image.FrontendObject.ResourceRequest);
+
+        if (texture == null)
+            return;
+
+        var otkMat4 = image.Transform * Matrix4x4.CreateTranslation(320, 240, 0);
+
+        // top left, top right, bottom right, bottom left
+        Vector4[] colors = new Vector4[4];
+
+        colors[0] = image.BlendedColor;
+        colors[1] = image.BlendedColor;
+        colors[2] = image.BlendedColor;
+        colors[3] = image.BlendedColor;
+
+        var q = new Quad(-0.5f, -0.5f, 0.5f, 0.5f,
+            1.0f,
+            otkMat4,
+            image.UpperLeft,
+            image.LowerRight,
+            colors);
+
+        if (doBoundingBox)
+            q.DrawBoundingBox(_gl);
+        else
+            q.Render(_gl, texture);
+    }
+
+    private void RenderMultiImage(RenderTreeMultiImage image, bool doBoundingBox = false)
+    {
+        var texture = GetTexture(image.FrontendObject.ResourceRequest);
+
+        if (texture == null)
+            return;
+
+        var otkMat4 = image.Transform * Matrix4x4.CreateTranslation(320, 240, 0);
+
+        // top left, top right, bottom right, bottom left
+        Vector4[] colors = new Vector4[4];
+
+        colors[0] = image.BlendedColor;
+        colors[1] = image.BlendedColor;
+        colors[2] = image.BlendedColor;
+        colors[3] = image.BlendedColor;
+
+        var q = new Quad(-0.5f, -0.5f, 0.5f, 0.5f,
+            1.0f,
+            otkMat4,
+            image.UpperLeft,
+            image.LowerRight,
             colors);
 
         if (doBoundingBox)
@@ -244,7 +304,7 @@ public class GLRenderTreeRenderer
 
     private void RenderGroupBB(RenderTreeNode node, bool doBoundingBox = false)
     {
-        var otkMat4 = node.ObjectMatrix * Matrix4x4.CreateTranslation(320, 240, 0);
+        var otkMat4 = node.Transform * Matrix4x4.CreateTranslation(320, 240, 0);
 
         var q = new Quad(-0.5f, -0.5f, 0.5f, 0.5f,
             1.0f,
@@ -264,11 +324,20 @@ public class GLRenderTreeRenderer
             return null;
         }
 
+        if (_resourceRequestToTexture.TryGetValue(resource.ID, out var texture)) return texture;
+
         var key = CleanResourcePath(resource.Name);
-        if (_textures.TryGetValue(key, out var tex))
-            return tex;
+        if (!_loadedTextures.TryGetValue(key, out texture))
+        {
+            Debug.WriteLine("Texture not found: {0}", new object[] { key });
+        }
+        else
+        {
+            _resourceRequestToTexture[resource.ID] = texture;
+        }
+
         //Debug.WriteLine("Texture not found: {0}", new object[] { key });
-        return null;
+        return texture;
     }
 
     private static string CleanResourcePath(string path)

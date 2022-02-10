@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using FEngLib.Objects;
+using FEngLib.Scripts;
 
 namespace FEngRender.Data;
 
 /// <summary>
 /// Represents a node in the render tree that can have children.
 /// </summary>
-public class RenderTreeGroup : RenderTreeNode, IEnumerable<RenderTreeNode>
+public class RenderTreeGroup : RenderTreeNode<Group>, IEnumerable<RenderTreeNode>
 {
     private readonly List<RenderTreeNode> _children;
 

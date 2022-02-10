@@ -4,7 +4,7 @@ using System.Numerics;
 using FEngLib.Scripts;
 using FEngLib.Structures;
 
-namespace FEngRender.Script;
+namespace FEngRender.Scripts;
 
 /// <summary>
 /// Implements interpolation of keys in <see cref="Track"/> objects
