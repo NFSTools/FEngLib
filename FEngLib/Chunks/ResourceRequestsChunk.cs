@@ -27,9 +27,11 @@ public class ResourceRequestsChunk : FrontendChunk
             resourceRequest.ID = reader.ReadUInt32();
             _nameOffsets[i] = reader.ReadUInt32();
             resourceRequest.Type = (ResourceType)reader.ReadUInt32();
-            resourceRequest.Flags = reader.ReadUInt32();
+            //resourceRequest.Flags = reader.ReadUInt32();
             reader.ReadUInt32();
-            resourceRequest.UserParam = reader.ReadUInt32();
+            reader.ReadUInt32();
+            reader.ReadUInt32();
+            //resourceRequest.UserParam = reader.ReadUInt32();
 
             ResourceRequests.Add(resourceRequest);
         }

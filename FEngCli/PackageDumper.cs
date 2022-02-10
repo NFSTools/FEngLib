@@ -58,7 +58,7 @@ public static class PackageDumper
         Console.WriteLine("Index  : {0}", index);
         Console.WriteLine("Name   : {0}", resourceRequest.Name);
         Console.WriteLine("Type   : {0}", resourceRequest.Type);
-        Console.WriteLine("Flags  : {0}", resourceRequest.Flags);
+        //Console.WriteLine("Flags  : {0}", resourceRequest.Flags);
         Console.WriteLine("ID     : 0x{0:X8}", resourceRequest.ID);
     }
 
