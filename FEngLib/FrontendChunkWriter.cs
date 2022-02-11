@@ -27,11 +27,14 @@ public class FrontendChunkWriter
 
     public void Write(BinaryWriter writer)
     {
-        WritePkHd(writer);
-        WriteTypS(writer);
-        WriteResCc(writer);
-        WriteObjCc(writer);
-        WriteMsgChunks(writer);
+        writer.WriteChunk(PackageStart, writer =>
+        {
+            WritePkHd(writer);
+            WriteTypS(writer);
+            WriteResCc(writer);
+            WriteObjCc(writer);
+            WriteMsgChunks(writer);
+        });
     }
 
     private void WritePkHd(BinaryWriter writer)

@@ -2,6 +2,7 @@
 
 public enum FrontendChunkType : uint
 {
+    PackageStart = 0xE76E4546,
     PackageHeader = 0x64486B50, // PkHd
     TypeList = 0x53707954, // TypS
     ResourcesContainer = 0xCC736552, // Res\xCC
