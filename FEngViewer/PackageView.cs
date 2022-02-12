@@ -248,11 +248,6 @@ public partial class PackageView : Form
         using var bw = new BinaryWriter(ms);
         new FrontendChunkWriter(_currentPackage).Write(bw);
 
-        fw.Write(0xE76E4546); // 'FEn\xE7'
-        fw.Write(ms.Length);
-        fs.Position = 8; // todo needed?
-
-        bw.Flush();
         ms.Position = 0;
         ms.CopyTo(fs);
 
