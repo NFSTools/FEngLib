@@ -127,7 +127,8 @@ public class FrontendChunkWriter
     {
         writer.WriteChunk(ObjectContainer, bw =>
         {
-            bw.WriteChunk(ButtonMapCount, bw => { bw.Write(Package.ButtonCount); });
+            bw.WriteChunk(ButtonMapCount,
+                bw => { bw.Write(Package.Objects.Count(o => o.Flags.HasFlag(ObjectFlags.IsButton))); });
 
             foreach (var obj in Package.Objects)
             {

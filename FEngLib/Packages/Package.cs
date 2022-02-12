@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using FEngLib.Objects;
 using FEngLib.Scripts;
-using FEngLib.Utils;
 
 namespace FEngLib.Packages;
 
@@ -28,8 +25,6 @@ public class Package
     public List<MessageResponse> MessageResponses { get; }
     public List<MessageTargetList> MessageTargetLists { get; }
     public List<MessageDefinition> MessageDefinitions { get; }
-
-    public int ButtonCount => Objects.Count(o => (o.Flags & ObjectFlags.IsButton) != 0);
 
     public IObject<ObjectData> FindObjectByGuid(uint guid)
     {
