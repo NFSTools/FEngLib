@@ -319,7 +319,7 @@ public class GLRenderTreeRenderer
 
     private Texture GetTexture(ResourceRequest resource)
     {
-        if (resource.Type != ResourceType.Image)
+        if (resource is not { Type: ResourceType.Image })
         {
             return null;
         }
