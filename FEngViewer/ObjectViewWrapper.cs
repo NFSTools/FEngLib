@@ -2,9 +2,11 @@
 using System.Drawing.Design;
 using System.Numerics;
 using FEngLib.Objects;
+using FEngLib.Packages;
 using FEngLib.Structures;
 using FEngViewer.TypeConverters;
 using FEngViewer.UIEditors;
+
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
@@ -18,9 +20,9 @@ public class ObjectViewWrapper
     {
         _obj = obj;
     }
-    
+
     #region Basic object properties
-    
+
     [Category("Meta")]
     [TypeConverter(typeof(HexTypeConverter))]
     public uint Guid
@@ -28,10 +30,19 @@ public class ObjectViewWrapper
         get => _obj.Guid;
         set => _obj.Guid = value;
     }
-    
+
+    [Editor(typeof(ResourceRequestEditor), typeof(UITypeEditor))]
+    [TypeConverter(typeof(ResourceRequestTypeConverter))]
+    public ResourceRequest Resource
+    {
+        get => _obj.ResourceRequest;
+        set => _obj.ResourceRequest = value;
+    }
+
     #endregion
 
     #region Common object data
+
     [Category("Data")]
     [TypeConverter(typeof(Color4TypeConverter))]
     [Editor(typeof(Color4Editor), typeof(UITypeEditor))]
@@ -40,7 +51,7 @@ public class ObjectViewWrapper
         get => _obj.Data.Color;
         set => _obj.Data.Color = value;
     }
-        
+
     [Category("Data")]
     [TypeConverter(typeof(Vector3TypeConverter))]
     public Vector3 Pivot
@@ -48,7 +59,7 @@ public class ObjectViewWrapper
         get => _obj.Data.Pivot;
         set => _obj.Data.Pivot = value;
     }
-        
+
     [Category("Data")]
     [TypeConverter(typeof(Vector3TypeConverter))]
     public Vector3 Position
@@ -56,7 +67,7 @@ public class ObjectViewWrapper
         get => _obj.Data.Position;
         set => _obj.Data.Position = value;
     }
-        
+
     [Category("Data")]
     [TypeConverter(typeof(QuaternionTypeConverter))]
     public Quaternion Rotation
@@ -64,7 +75,7 @@ public class ObjectViewWrapper
         get => _obj.Data.Rotation;
         set => _obj.Data.Rotation = value;
     }
-        
+
     [Category("Data")]
     [TypeConverter(typeof(Vector3TypeConverter))]
     public Vector3 Size
@@ -72,6 +83,7 @@ public class ObjectViewWrapper
         get => _obj.Data.Size;
         set => _obj.Data.Size = value;
     }
+
     #endregion
 
     #region Flags
@@ -94,7 +106,8 @@ public class ObjectViewWrapper
     [Description("Whether this object should only be shown on a specific platform.")]
     public EPlatformSpecific PlatformSpecific
     {
-        get {
+        get
+        {
             switch (_obj.Flags & (ObjectFlags.PCOnly | ObjectFlags.ConsoleOnly))
             {
                 case ObjectFlags.PCOnly:
@@ -128,21 +141,21 @@ public class ObjectViewWrapper
             }
         }
     }
-    
+
     [Category("Flags")]
     public bool MouseObject
     {
         get => (_obj.Flags & ObjectFlags.MouseObject) != 0;
         set => _obj.SetFlag(ObjectFlags.MouseObject, value);
     }
-    
+
     [Category("Flags")]
     public bool SaveStaticTracks
     {
         get => (_obj.Flags & ObjectFlags.SaveStaticTracks) != 0;
         set => _obj.SetFlag(ObjectFlags.SaveStaticTracks, value);
     }
-    
+
     [Category("Flags")]
     [Description("Button related. TODO")]
     public bool DontNavigate
@@ -150,16 +163,17 @@ public class ObjectViewWrapper
         get => (_obj.Flags & ObjectFlags.DontNavigate) != 0;
         set => _obj.SetFlag(ObjectFlags.DontNavigate, value);
     }
-    
+
     [Category("Flags")]
-    [Description("If set, this object's GUID is used to look up an object from another package to use as a 'template' of sorts. " +
-                 "Not supported, setting this flag WILL make the game fail reading this package.")]
+    [Description(
+        "If set, this object's GUID is used to look up an object from another package to use as a 'template' of sorts. " +
+        "Not supported, setting this flag WILL make the game fail reading this package.")]
     public bool UsesLibraryObject
     {
         get => (_obj.Flags & ObjectFlags.UsesLibraryObject) != 0;
         set => _obj.SetFlag(ObjectFlags.UsesLibraryObject, value);
     }
-    
+
     [Category("Flags")]
     public bool CodeSuppliedResource
     {
@@ -173,7 +187,7 @@ public class ObjectViewWrapper
         get => (_obj.Flags & ObjectFlags.ObjectLocked) != 0;
         set => _obj.SetFlag(ObjectFlags.ObjectLocked, value);
     }
-    
+
     [Category("Flags")]
     [Description("Whether this object should be displayed in the preview.")]
     public bool HideInEdit
@@ -181,7 +195,7 @@ public class ObjectViewWrapper
         get => (_obj.Flags & ObjectFlags.HideInEdit) != 0;
         set => _obj.SetFlag(ObjectFlags.HideInEdit, value);
     }
-    
+
     [Category("Flags")]
     [Description("Whether this object is a button. Buttons have a special role with regard to input/interaction. " +
                  "TODO: write up details on buttons somewhere")]
@@ -190,7 +204,7 @@ public class ObjectViewWrapper
         get => (_obj.Flags & ObjectFlags.IsButton) != 0;
         set => _obj.SetFlag(ObjectFlags.IsButton, value);
     }
-    
+
     [Category("Flags")]
     [Description("Whether this button should be ignored. Can only be set with IsButton." +
                  "TODO: write up details on buttons somewhere")]
@@ -203,23 +217,22 @@ public class ObjectViewWrapper
                 _obj.SetFlag(ObjectFlags.IgnoreButton, true);
             else // always allow clearing it
                 _obj.SetFlag(ObjectFlags.IgnoreButton, false);
-            
         }
     }
-    
+
     [Category("Flags")]
     public bool PerspectiveProjection
     {
         get => (_obj.Flags & ObjectFlags.PerspectiveProjection) != 0;
         set => _obj.SetFlag(ObjectFlags.PerspectiveProjection, value);
     }
-    
+
     [Category("Flags")]
     public bool AffectAllScripts
     {
         get => (_obj.Flags & ObjectFlags.AffectAllScripts) != 0;
         set => _obj.SetFlag(ObjectFlags.AffectAllScripts, value);
     }
-    
+
     #endregion
 }
