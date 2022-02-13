@@ -57,7 +57,7 @@ public class MultiImage : Image<MultiImageData, ImageScript<MultiImageScriptTrac
 {
     public MultiImage(MultiImageData data) : base(data)
     {
-        Data = data;
+        Type = ObjectType.MultiImage;
     }
 
     public uint Texture1 { get; set; }

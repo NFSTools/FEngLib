@@ -41,6 +41,7 @@ public class Image : Image<ImageData, ImageScript<ImageScriptTracks>>
 {
     public Image(ImageData data) : base(data)
     {
+        Type = ObjectType.Image;
     }
 }
 

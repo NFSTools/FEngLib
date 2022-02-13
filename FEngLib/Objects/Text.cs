@@ -24,6 +24,7 @@ public class Text : BaseObject
 
     public Text(ObjectData data) : base(data)
     {
+        Type = ObjectType.String;
     }
 
     public override void InitializeData()

@@ -132,36 +132,17 @@ public class ObjectDataChunk : FrontendObjectChunk
 
     private IObject<ObjectData> ProcessObjectTypeTag(ObjectTypeTag objectTypeTag)
     {
-        IObject<ObjectData> newInstance;
-
-        switch (objectTypeTag.Type)
+        IObject<ObjectData> newInstance = objectTypeTag.Type switch
         {
-            case ObjectType.Image:
-                newInstance = new Image(null);
-                break;
-            case ObjectType.Group:
-                newInstance = new Group(null);
-                break;
-            case ObjectType.String:
-                newInstance = new Text(null);
-                break;
-            case ObjectType.MultiImage:
-                newInstance = new MultiImage(null);
-                break;
-            case ObjectType.ColoredImage:
-                newInstance = new ColoredImage(null);
-                break;
-            case ObjectType.SimpleImage:
-                newInstance = new SimpleImage(null);
-                break;
-            case ObjectType.Movie:
-                newInstance = new Movie(null);
-                break;
-            default:
-                throw new IndexOutOfRangeException($"cannot handle object type: {objectTypeTag.Type}");
-        }
-
-        newInstance.Type = objectTypeTag.Type;
+            ObjectType.Image => new Image(null),
+            ObjectType.Group => new Group(null),
+            ObjectType.String => new Text(null),
+            ObjectType.MultiImage => new MultiImage(null),
+            ObjectType.ColoredImage => new ColoredImage(null),
+            ObjectType.SimpleImage => new SimpleImage(null),
+            ObjectType.Movie => new Movie(null),
+            _ => throw new IndexOutOfRangeException($"cannot handle object type: {objectTypeTag.Type}")
+        };
 
         return newInstance;
     }

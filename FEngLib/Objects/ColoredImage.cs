@@ -43,7 +43,7 @@ public class ColoredImage : Image<ColoredImageData, ImageScript<ColoredImageScri
 {
     public ColoredImage(ColoredImageData data) : base(data)
     {
-        Data = data;
+        Type = ObjectType.ColoredImage;
     }
 
     public override void InitializeData()
