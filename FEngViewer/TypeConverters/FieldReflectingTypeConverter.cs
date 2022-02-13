@@ -41,7 +41,7 @@ public abstract class FieldReflectingTypeConverter<TNativeType, TFieldTypeA> : T
         object value,
         Attribute[] attributes)
     {
-        if (!(value is TNativeType))
+        if (value is not TNativeType)
             return base.GetProperties(context, value, attributes);
 
         var fieldInfos = value.GetType().GetFields();

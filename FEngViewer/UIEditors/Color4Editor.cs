@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using FEngLib.Structures;
 
-namespace FEngViewer;
+namespace FEngViewer.UIEditors;
 
 /// <summary>
 /// Wraps ColorDialog for a PropertyGrid

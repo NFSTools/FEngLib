@@ -62,6 +62,14 @@ public interface IObject<out TData> : IScriptedObject, IHaveMessageResponses whe
     IObject<ObjectData> Parent { get; set; }
 
     void InitializeData();
+
+    void SetFlag(ObjectFlags flag, bool value)
+    {
+        if (value)
+            Flags |= flag;
+        else
+            Flags &= ~flag;
+    }
 }
 
 public interface IScriptedObject
