@@ -62,6 +62,14 @@ public interface IObject<out TData> : IScriptedObject where TData : ObjectData
     List<MessageResponse> MessageResponses { get; }
 
     void InitializeData();
+
+    void SetFlag(ObjectFlags flag, bool value)
+    {
+        if (value)
+            Flags |= flag;
+        else
+            Flags &= ~flag;
+    }
 }
 
 public interface IScriptedObject
