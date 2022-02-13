@@ -1,8 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using FEngLib.Messaging;
 using FEngLib.Packages;
-using FEngLib.Scripts;
-using FEngLib.Scripts.Tags;
+using FEngLib.Packages.Tags;
 using FEngLib.Tags;
 
 namespace FEngLib.Chunks;
@@ -12,68 +11,31 @@ public class PackageMessageTargetsChunk : FrontendChunk
     public override void Read(Package package, FrontendChunkBlock chunkBlock,
         FrontendChunkReader chunkReader, BinaryReader reader)
     {
-        TagStream tagStream = new MessageTagStream(reader, package, chunkBlock,
+        var tagProcessor = new MessageResponseTagProcessor<Package>();
+        TagStream tagStream = new MessageTagStream(reader,
             chunkBlock.Size);
 
         while (tagStream.HasTag())
         {
-            var tag = tagStream.NextTag(null);
-            package = ProcessTag(package, tag);
+            var tag = tagStream.NextTag();
+            ProcessTag(tagProcessor, package, tag);
         }
     }
 
-    private Package ProcessTag(Package package, Tag tag)
+    private void ProcessTag(MessageResponseTagProcessor<Package> messageResponseTagProcessor, Package package, Tag tag)
     {
         switch (tag)
         {
-            case MessageResponseInfoTag messageResponseInfoTag:
-                ProcessMessageResponseInfoTag(package, messageResponseInfoTag);
+            // TODO: do we want to use these for data validation?
+            case MessageTargetCountTag:
                 break;
-            case ResponseIdTag responseIdTag:
-                ProcessResponseIdTag(package, responseIdTag);
+            case MessageTargetListTag messageTargetListTag:
+                package.MessageTargetLists.Add(messageTargetListTag.Targets);
                 break;
-            case ResponseIntParamTag responseParamTag:
-                ProcessResponseParamTag(package, responseParamTag);
-                break;
-            case ResponseTargetTag responseTargetTag:
-                ProcessResponseTargetTag(package, responseTargetTag);
+            default:
+                messageResponseTagProcessor.ProcessTag(package, tag);
                 break;
         }
-
-        return package;
-    }
-
-    private void ProcessResponseParamTag(Package package,
-        ResponseIntParamTag responseIntParamTag)
-    {
-        package.MessageResponses[^1].Responses[^1].IntParam = responseIntParamTag.Param;
-    }
-
-    private void ProcessResponseTargetTag(Package package,
-        ResponseTargetTag responseTargetTag)
-    {
-        package.MessageResponses[^1].Responses[^1].Target = responseTargetTag.Target;
-    }
-
-    private void ProcessResponseIdTag(Package package,
-        ResponseIdTag responseIdTag)
-    {
-        var response = new Response { Id = responseIdTag.Id };
-        package.MessageResponses[^1].Responses.Add(response);
-    }
-
-    private void ProcessMessageResponseInfoTag(Package package,
-        MessageResponseInfoTag tag)
-    {
-        if (package.MessageResponses.Find(r => r.Id == tag.Hash) != null)
-        {
-            throw new Exception(
-                $"This is supposed to be impossible! Duplicate MessageResponse (0x{tag.Hash:X}) in package {package.Name}");
-        }
-
-        var response = new MessageResponse { Id = tag.Hash };
-
-        package.MessageResponses.Add(response);
     }
 
     public override FrontendChunkType GetChunkType()

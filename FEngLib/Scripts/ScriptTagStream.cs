@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using FEngLib.Chunks;
 using FEngLib.Objects;
 using FEngLib.Scripts.Tags;
@@ -10,33 +9,34 @@ namespace FEngLib.Scripts;
 
 public class ScriptTagStream : TagStream
 {
-    public ScriptTagStream(BinaryReader reader, FrontendChunkBlock frontendChunkBlock, long length) : base(
-        reader, frontendChunkBlock, length)
+    public ScriptTagStream(BinaryReader reader, long length, IObject<ObjectData> frontendObject,
+        ScriptProcessingContext scriptProcessingContext) : base(
+        reader, length)
     {
+        FrontendObject = frontendObject;
+        ScriptProcessingContext = scriptProcessingContext;
     }
 
-    public override Tag NextTag(IObject<ObjectData> frontendObject)
-    {
-        throw new NotImplementedException("Use NextTag(FrontendObject, Script) instead");
-    }
+    private IObject<ObjectData> FrontendObject { get; }
+    private ScriptProcessingContext ScriptProcessingContext { get; }
 
-    public Tag NextTag(IObject<ObjectData> frontendObject, ScriptProcessingContext scriptProcessingContext)
+    public override Tag NextTag()
     {
         var (id, size) = (Reader.ReadUInt16(), Reader.ReadUInt16());
         var pos = Reader.BaseStream.Position;
         Tag tag = (FrontendTagType)id switch
         {
-            ScriptHeader => new ScriptHeaderTag(frontendObject, scriptProcessingContext),
-            ScriptChain => new ScriptChainTag(frontendObject, scriptProcessingContext),
-            ScriptKeyTrack => new ScriptKeyTrackTag(frontendObject, scriptProcessingContext),
-            ScriptTrackOffset => new ScriptTrackOffsetTag(frontendObject, scriptProcessingContext),
-            ScriptKeyNode => new ScriptKeyNodeTag(frontendObject, scriptProcessingContext),
-            ScriptEvents => new ScriptEventsTag(frontendObject, scriptProcessingContext),
-            ScriptName => new ScriptNameTag(frontendObject, scriptProcessingContext),
+            ScriptHeader => new ScriptHeaderTag(FrontendObject, ScriptProcessingContext),
+            ScriptChain => new ScriptChainTag(FrontendObject, ScriptProcessingContext),
+            ScriptKeyTrack => new ScriptKeyTrackTag(FrontendObject, ScriptProcessingContext),
+            ScriptTrackOffset => new ScriptTrackOffsetTag(FrontendObject, ScriptProcessingContext),
+            ScriptKeyNode => new ScriptKeyNodeTag(FrontendObject, ScriptProcessingContext),
+            ScriptEvents => new ScriptEventsTag(FrontendObject, ScriptProcessingContext),
+            ScriptName => new ScriptNameTag(FrontendObject, ScriptProcessingContext),
             _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
         };
 
-        tag.Read(Reader, FrontendChunkBlock, null, id, size);
+        tag.Read(Reader, id, size);
 
         if (Reader.BaseStream.Position - pos != size)
             throw new ChunkReadingException(

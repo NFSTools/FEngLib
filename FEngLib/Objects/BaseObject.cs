@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
+using FEngLib.Messaging;
 using FEngLib.Packages;
 using FEngLib.Scripts;
 using FEngLib.Structures;
@@ -49,7 +50,7 @@ public class ObjectData : IBinaryAccess
 /// A type inheriting from ObjectData,
 /// representing the contents of an ObjD chunk for this object.
 /// </typeparam>
-public interface IObject<out TData> : IScriptedObject where TData : ObjectData
+public interface IObject<out TData> : IScriptedObject, IHaveMessageResponses where TData : ObjectData
 {
     TData Data { get; }
     ObjectType Type { get; set; }
@@ -59,7 +60,6 @@ public interface IObject<out TData> : IScriptedObject where TData : ObjectData
     uint NameHash { get; set; }
     uint Guid { get; set; }
     IObject<ObjectData> Parent { get; set; }
-    List<MessageResponse> MessageResponses { get; }
 
     void InitializeData();
 

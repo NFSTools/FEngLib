@@ -1,13 +1,15 @@
 ﻿using System.IO;
 using FEngLib.Tags;
 
-namespace FEngLib.Packages.Tags;
+namespace FEngLib.Messaging.Tags;
 
-public class MessageTargetCountTag : Tag
+public class ResponseIdTag : Tag
 {
+    public uint Id { get; set; }
+
     public override void Read(BinaryReader br, ushort id,
         ushort length)
     {
-        br.ReadUInt32();
+        Id = br.ReadUInt32();
     }
 }

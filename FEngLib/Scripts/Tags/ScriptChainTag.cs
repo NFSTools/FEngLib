@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using FEngLib.Objects;
-using FEngLib.Packages;
 
 namespace FEngLib.Scripts.Tags;
 
@@ -13,7 +12,7 @@ public class ScriptChainTag : ScriptTag
 
     public uint Id { get; set; }
 
-    public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, Package package,
+    public override void Read(BinaryReader br,
         ushort id,
         ushort length)
     {

@@ -1,20 +1,20 @@
 ﻿using System.Collections.Generic;
+using FEngLib.Messaging;
 using FEngLib.Objects;
-using FEngLib.Scripts;
 
 namespace FEngLib.Packages;
 
 /// <summary>
 ///     Stores frontend objects, resource names, etc.
 /// </summary>
-public class Package
+public class Package : IHaveMessageResponses
 {
     public Package()
     {
         ResourceRequests = new List<ResourceRequest>();
         Objects = new List<IObject<ObjectData>>();
         MessageResponses = new List<MessageResponse>();
-        MessageTargetLists = new List<MessageTargetList>();
+        MessageTargetLists = new List<MessageTargets>();
         MessageDefinitions = new List<MessageDefinition>();
     }
 
@@ -22,9 +22,9 @@ public class Package
     public string Filename { get; set; }
     public List<ResourceRequest> ResourceRequests { get; }
     public List<IObject<ObjectData>> Objects { get; }
-    public List<MessageResponse> MessageResponses { get; }
-    public List<MessageTargetList> MessageTargetLists { get; }
+    public List<MessageTargets> MessageTargetLists { get; }
     public List<MessageDefinition> MessageDefinitions { get; }
+    public List<MessageResponse> MessageResponses { get; }
 
     public IObject<ObjectData> FindObjectByGuid(uint guid)
     {

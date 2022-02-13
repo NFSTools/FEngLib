@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using FEngLib.Objects.Tags;
 using FEngLib.Objects;
+using FEngLib.Objects.Tags;
 using FEngLib.Packages;
 using FEngLib.Tags;
 using FEngLib.Utils;
@@ -17,13 +17,12 @@ public class ObjectDataChunk : FrontendObjectChunk
     public override IObject<ObjectData> Read(Package package, ObjectReaderState readerState, BinaryReader reader)
     {
         var newFrontendObject = FrontendObject;
-        TagStream tagStream = new ObjectTagStream(reader, readerState.CurrentChunkBlock,
-            readerState.CurrentChunkBlock.Size);
+        var tagStream = new ObjectTagStream(reader, readerState.CurrentChunkBlock.Size, newFrontendObject);
 
         while (tagStream.HasTag())
         {
-            var tag = tagStream.NextTag(newFrontendObject);
-            newFrontendObject = ProcessTag(package, newFrontendObject, tag);
+            var tag = tagStream.NextTag();
+            newFrontendObject = tagStream.Object = ProcessTag(package, newFrontendObject, tag);
         }
 
         return newFrontendObject;
@@ -77,7 +76,7 @@ public class ObjectDataChunk : FrontendObjectChunk
             case ObjectDataTag _: // ObjectDataTag calls IObject.InitializeData and then IObject.Data.Read
                 break;
             default:
-                throw new InvalidDataException($"Unknown tag: {tag}");
+                throw new NotImplementedException($"Unsupported tag type: {tag.GetType()}");
         }
 
         return frontendObject;

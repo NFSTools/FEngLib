@@ -1,13 +1,10 @@
 ﻿using System.IO;
+using FEngLib.Tags;
 
-namespace FEngLib.Objects.Tags;
+namespace FEngLib.Messaging.Tags;
 
-public class StringBufferLabelHashTag : ObjectTag
+public class MessageResponseInfoTag : Tag
 {
-    public StringBufferLabelHashTag(IObject<ObjectData> frontendObject) : base(frontendObject)
-    {
-    }
-
     public uint Hash { get; set; }
 
     public override void Read(BinaryReader br,
