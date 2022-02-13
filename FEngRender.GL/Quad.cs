@@ -27,7 +27,7 @@ public class Quad
         _vertices[0].TexCoords.Y = texTopLeft.Y;
 
         _vertices[1].TexCoords.X = texBottomRight.X;
-        _vertices[1].TexCoords.Y = texTopLeft.X;
+        _vertices[1].TexCoords.Y = texTopLeft.Y;
 
         _vertices[2].TexCoords.X = texBottomRight.X;
         _vertices[2].TexCoords.Y = texBottomRight.Y;
