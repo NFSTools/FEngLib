@@ -7,41 +7,44 @@ namespace FEngLib.Objects.Tags;
 
 public class ObjectTagStream : TagStream
 {
-    public ObjectTagStream(BinaryReader reader, FrontendChunkBlock frontendChunkBlock, long length) : base(
-        reader, frontendChunkBlock, length)
+    public ObjectTagStream(BinaryReader reader, long length, IObject<ObjectData> o) : base(
+        reader, length)
     {
+        Object = o;
     }
 
-    public override Tag NextTag(IObject<ObjectData> frontendObject)
+    public IObject<ObjectData> Object { get; set; }
+
+    public override Tag NextTag()
     {
         var (id, size) = (Reader.ReadUInt16(), Reader.ReadUInt16());
         var pos = Reader.BaseStream.Position;
         Tag tag = (FrontendTagType)id switch
         {
-            FrontendTagType.ObjectType => new ObjectTypeTag(frontendObject),
-            ObjectHash => new ObjectHashTag(frontendObject),
-            ObjectReference => new ObjectReferenceTag(frontendObject),
-            ImageInfo => new ImageInfoTag(frontendObject),
-            FrontendTagType.ObjectData => new ObjectDataTag(frontendObject),
-            ObjectParent => new ObjectParentTag(frontendObject),
-            StringBufferLength => new StringBufferLengthTag(frontendObject),
-            StringBufferText => new StringBufferTextTag(frontendObject),
-            StringBufferFormatting => new StringBufferFormattingTag(frontendObject),
-            StringBufferLeading => new StringBufferLeadingTag(frontendObject),
-            StringBufferMaxWidth => new StringBufferMaxWidthTag(frontendObject),
-            StringBufferLabelHash => new StringBufferLabelHashTag(frontendObject),
-            MultiImageTexture1 => new MultiImageTextureTag(frontendObject),
-            MultiImageTexture2 => new MultiImageTextureTag(frontendObject),
-            MultiImageTexture3 => new MultiImageTextureTag(frontendObject),
-            MultiImageTextureFlags1 => new MultiImageTextureFlagsTag(frontendObject),
-            MultiImageTextureFlags2 => new MultiImageTextureFlagsTag(frontendObject),
-            MultiImageTextureFlags3 => new MultiImageTextureFlagsTag(frontendObject),
-            ObjectName => new ObjectNameTag(frontendObject),
-            StringBufferLabel => new StringBufferLabelTag(frontendObject),
+            FrontendTagType.ObjectType => new ObjectTypeTag(Object),
+            ObjectHash => new ObjectHashTag(Object),
+            ObjectReference => new ObjectReferenceTag(Object),
+            ImageInfo => new ImageInfoTag(Object),
+            FrontendTagType.ObjectData => new ObjectDataTag(Object),
+            ObjectParent => new ObjectParentTag(Object),
+            StringBufferLength => new StringBufferLengthTag(Object),
+            StringBufferText => new StringBufferTextTag(Object),
+            StringBufferFormatting => new StringBufferFormattingTag(Object),
+            StringBufferLeading => new StringBufferLeadingTag(Object),
+            StringBufferMaxWidth => new StringBufferMaxWidthTag(Object),
+            StringBufferLabelHash => new StringBufferLabelHashTag(Object),
+            MultiImageTexture1 => new MultiImageTextureTag(Object),
+            MultiImageTexture2 => new MultiImageTextureTag(Object),
+            MultiImageTexture3 => new MultiImageTextureTag(Object),
+            MultiImageTextureFlags1 => new MultiImageTextureFlagsTag(Object),
+            MultiImageTextureFlags2 => new MultiImageTextureFlagsTag(Object),
+            MultiImageTextureFlags3 => new MultiImageTextureFlagsTag(Object),
+            ObjectName => new ObjectNameTag(Object),
+            StringBufferLabel => new StringBufferLabelTag(Object),
             _ => throw new ChunkReadingException($"Unrecognized tag: 0x{id:X4}")
         };
 
-        tag.Read(Reader, FrontendChunkBlock, null, id, size);
+        tag.Read(Reader, id, size);
 
         if (Reader.BaseStream.Position - pos != size)
             throw new ChunkReadingException(

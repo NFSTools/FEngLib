@@ -1,4 +1,4 @@
-﻿namespace FEngLib.Scripts;
+﻿namespace FEngLib.Messaging;
 
 public class Response
 {

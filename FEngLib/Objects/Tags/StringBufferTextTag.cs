@@ -1,11 +1,9 @@
 ﻿using System.IO;
 using System.Text;
-using FEngLib.Packages;
-using FEngLib.Tags;
 
 namespace FEngLib.Objects.Tags;
 
-public class StringBufferTextTag : Tag
+public class StringBufferTextTag : ObjectTag
 {
     public StringBufferTextTag(IObject<ObjectData> frontendObject) : base(frontendObject)
     {
@@ -13,7 +11,7 @@ public class StringBufferTextTag : Tag
 
     public string Value { get; set; }
 
-    public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, Package package,
+    public override void Read(BinaryReader br,
         ushort id,
         ushort length)
     {

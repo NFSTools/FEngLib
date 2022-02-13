@@ -1,7 +1,7 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using FEngLib.Chunks;
 using FEngLib.Objects;
-using FEngLib.Packages;
 
 namespace FEngLib.Scripts.Tags;
 
@@ -12,7 +12,9 @@ public class ScriptEventsTag : ScriptTag
     {
     }
 
-    public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, Package package,
+    public List<Event> Events { get; set; }
+
+    public override void Read(BinaryReader br,
         ushort id,
         ushort length)
     {
@@ -21,7 +23,10 @@ public class ScriptEventsTag : ScriptTag
             throw new ChunkReadingException($"Tag length ({length}) should be divisible by 12.");
         }
 
-        for (int i = 0; i < length / 0xC; i++)
+        var numEvents = length / 0xC;
+        Events = new List<Event>(numEvents);
+
+        for (var i = 0; i < numEvents; i++)
         {
             Event @event = new Event
             {
@@ -30,7 +35,7 @@ public class ScriptEventsTag : ScriptTag
                 Time = br.ReadUInt32()
             };
 
-            Script.Events.Add(@event);
+            Events.Add(@event);
         }
     }
 }

@@ -1,17 +1,14 @@
 ﻿using System.IO;
 using FEngLib.Chunks;
-using FEngLib.Objects;
 using FEngLib.Tags;
 
 namespace FEngLib.Packages.Tags;
 
 public class MessageTargetListTag : Tag
 {
-    public MessageTargetListTag(IObject<ObjectData> frontendObject) : base(frontendObject)
-    {
-    }
+    public MessageTargets Targets { get; private set; }
 
-    public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, Package package, ushort id,
+    public override void Read(BinaryReader br, ushort id,
         ushort length)
     {
         if (length % 4 != 0)
@@ -19,14 +16,14 @@ public class MessageTargetListTag : Tag
             throw new ChunkReadingException("Length not divisible by 4");
         }
 
-        MessageTargetList targetList = new MessageTargetList();
-        targetList.MsgId = br.ReadUInt32();
-
-        for (int i = 0; i < (length / 4) - 1; i++)
+        Targets = new MessageTargets
         {
-            targetList.Targets.Add(br.ReadUInt32());
-        }
+            MsgId = br.ReadUInt32()
+        };
 
-        package.MessageTargetLists.Add(targetList);
+        for (var i = 0; i < length / 4 - 1; i++)
+        {
+            Targets.Targets.Add(br.ReadUInt32());
+        }
     }
 }

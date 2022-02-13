@@ -1,11 +1,9 @@
 ﻿using System.IO;
-using FEngLib.Packages;
-using FEngLib.Tags;
 using FEngLib.Utils;
 
 namespace FEngLib.Objects.Tags;
 
-public class ObjectReferenceTag : Tag
+public class ObjectReferenceTag : ObjectTag
 {
     public ObjectReferenceTag(IObject<ObjectData> frontendObject) : base(frontendObject)
     {
@@ -16,7 +14,7 @@ public class ObjectReferenceTag : Tag
     public ObjectFlags Flags { get; set; }
     public int ResourceIndex { get; set; }
 
-    public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, Package package,
+    public override void Read(BinaryReader br,
         ushort id,
         ushort length)
     {

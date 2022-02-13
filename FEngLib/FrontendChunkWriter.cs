@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using FEngLib.Messaging;
 using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Scripts;
@@ -366,7 +367,7 @@ public class FrontendChunkWriter
             bw.WriteTag(MessageTargetCount, bw => bw.Write(Package.MessageTargetLists.Count));
             foreach (var targetList in Package.MessageTargetLists)
             {
-                bw.WriteTag(FrontendTagType.MessageTargetList, bw =>
+                bw.WriteTag(MessageTargetList, bw =>
                 {
                     bw.Write(targetList.MsgId);
                     foreach (var target in targetList.Targets)

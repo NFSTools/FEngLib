@@ -1,9 +1,8 @@
 ﻿using FEngLib.Objects;
-using FEngLib.Tags;
 
 namespace FEngLib.Scripts;
 
-public abstract class ScriptTag : Tag
+public abstract class ScriptTag : ObjectTag
 {
     protected ScriptTag(IObject<ObjectData> frontendObject, ScriptProcessingContext scriptProcessingContext) : base(
         frontendObject)

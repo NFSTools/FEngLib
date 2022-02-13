@@ -24,20 +24,12 @@ public class FrontendPackageLoader
                 case PackageHeaderChunk packageHeaderChunk:
                     ProcessPackageHeaderChunk(package, packageHeaderChunk);
                     break;
-                case ObjectContainerChunk objectContainerChunk:
-                    ProcessObjectContainerChunk(package, objectContainerChunk);
-                    break;
                 case MessageDefinitionsChunk messageNamesChunk:
                     package.MessageDefinitions.AddRange(messageNamesChunk.Definitions);
                     break;
             }
 
         return package;
-    }
-
-    private void ProcessObjectContainerChunk(Package package, ObjectContainerChunk objectContainerChunk)
-    {
-        package.Objects.AddRange(objectContainerChunk.Objects);
     }
 
     private void ProcessPackageHeaderChunk(Package package, PackageHeaderChunk packageHeaderChunk)

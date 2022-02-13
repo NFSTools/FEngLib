@@ -1,10 +1,8 @@
 ﻿using System.IO;
-using FEngLib.Packages;
-using FEngLib.Tags;
 
 namespace FEngLib.Objects.Tags;
 
-public class StringBufferLeadingTag : Tag
+public class StringBufferLeadingTag : ObjectTag
 {
     public StringBufferLeadingTag(IObject<ObjectData> frontendObject) : base(frontendObject)
     {
@@ -12,7 +10,7 @@ public class StringBufferLeadingTag : Tag
 
     public int Leading { get; set; }
 
-    public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, Package package,
+    public override void Read(BinaryReader br,
         ushort id,
         ushort length)
     {

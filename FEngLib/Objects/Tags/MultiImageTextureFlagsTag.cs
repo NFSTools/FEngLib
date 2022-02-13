@@ -1,17 +1,15 @@
 ﻿using System;
 using System.IO;
-using FEngLib.Packages;
-using FEngLib.Tags;
 
 namespace FEngLib.Objects.Tags;
 
-public class MultiImageTextureFlagsTag : Tag
+public class MultiImageTextureFlagsTag : ObjectTag
 {
     public MultiImageTextureFlagsTag(IObject<ObjectData> frontendObject) : base(frontendObject)
     {
     }
 
-    public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, Package package, ushort id,
+    public override void Read(BinaryReader br, ushort id,
         ushort length)
     {
         MultiImage multiImage = (MultiImage)FrontendObject;

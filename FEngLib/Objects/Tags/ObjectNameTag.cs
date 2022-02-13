@@ -1,11 +1,9 @@
 ﻿using System.IO;
-using FEngLib.Packages;
-using FEngLib.Tags;
 using FEngLib.Utils;
 
 namespace FEngLib.Objects.Tags;
 
-public class ObjectNameTag : Tag
+public class ObjectNameTag : ObjectTag
 {
     public ObjectNameTag(IObject<ObjectData> frontendObject) : base(frontendObject)
     {
@@ -14,7 +12,7 @@ public class ObjectNameTag : Tag
     public string Name { get; set; }
     public uint NameHash { get; set; }
 
-    public override void Read(BinaryReader br, FrontendChunkBlock chunkBlock, Package package,
+    public override void Read(BinaryReader br,
         ushort id,
         ushort length)
     {
