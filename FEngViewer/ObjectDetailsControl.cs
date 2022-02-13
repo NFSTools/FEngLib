@@ -27,19 +27,5 @@ public partial class ObjectDetailsControl : UserControl
         {
             labelObjResID.Text = "<n/a>";
         }
-
-        if (obj.Data is {} data)
-        {
-            labelObjDataColor.Text = data.Color.ToString();
-            labelObjDataPivot.Text = data.Pivot.ToString();
-            labelObjDataPosition.Text = data.Position.ToString();
-            labelObjDataRotation.Text = data.Rotation.ToString();
-            labelObjDataSize.Text = data.Size.ToString();
-        }
-        else
-        {
-            labelObjDataColor.Text = labelObjDataPivot.Text = labelObjDataPosition.Text =
-                labelObjDataRotation.Text = labelObjDataSize.Text = "<n/a>";
-        }
     }
 }
