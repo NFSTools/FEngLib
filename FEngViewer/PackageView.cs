@@ -21,6 +21,8 @@ public partial class PackageView : Form
     private Package _currentPackage;
     private RenderTree _currentRenderTree;
 
+    private TreeNode _rootNode;
+
     public PackageView()
     {
         InitializeComponent();
@@ -66,9 +68,9 @@ public partial class PackageView : Form
         treeView1.BeginUpdate();
         treeView1.Nodes.Clear();
 
-        var rootNode = treeView1.Nodes.Add(package.Name);
+        _rootNode = treeView1.Nodes.Add(package.Name);
 
-        var resourceListNode = rootNode.Nodes.Add("Resources");
+        var resourceListNode = _rootNode.Nodes.Add("Resources");
         resourceListNode.ImageKey = resourceListNode.SelectedImageKey = "TreeItem_ResourceList";
 
         foreach (var resourceRequest in package.ResourceRequests)
@@ -87,13 +89,13 @@ public partial class PackageView : Form
 
         //var objectListNode = rootNode.Nodes.Add("Objects");
         //objectListNode.ImageKey = "TreeItem_ObjectList";
-        ApplyObjectsToTreeNodes(feObjectNodes, rootNode.Nodes);
+        ApplyObjectsToTreeNodes(feObjectNodes, _rootNode.Nodes);
 
-        rootNode.Expand();
+        _rootNode.Expand();
         // treeView1.ExpandAll();
         treeView1.EndUpdate();
 
-        treeView1.SelectedNode = rootNode;
+        treeView1.SelectedNode = _rootNode;
     }
 
     private static void ApplyObjectsToTreeNodes(IEnumerable<RenderTreeNode> objectNodes,
@@ -306,14 +308,22 @@ public partial class PackageView : Form
         if (string.IsNullOrWhiteSpace(path))
             return;
         var package = AppService.Instance.LoadFile(path);
-        // window title
-        _currentPackage = package;
-        _currentRenderTree = RenderTree.Create(package);
-        PopulateTreeView(package, _currentRenderTree);
+
         viewOutput.Init(Path.Combine(Path.GetDirectoryName(path) ?? "", "textures"));
+        
+        _currentPackage = package;
+        CurrentPackageWasModified();
+    }
+
+    private void CurrentPackageWasModified()
+    {
+        _currentRenderTree = RenderTree.Create(_currentPackage);
+        PopulateTreeView(_currentPackage, _currentRenderTree);
+        viewOutput.SelectedNode = null;
         Render();
 
-        Text = package.Name;
+        // window title
+        Text = _currentPackage.Name;
     }
 
     private void SaveFileMenuItem_Click(object sender, EventArgs e)
@@ -358,16 +368,6 @@ public partial class PackageView : Form
         }
     }
 
-    private void toggleObjectVisibilityItem_Click(object sender, EventArgs e)
-    {
-        if (treeView1.SelectedNode?.Tag is RenderTreeNode viewNode)
-        {
-            viewNode.GetObject().Flags ^= ObjectFlags.HideInEdit;
-
-            Render();
-        }
-    }
-
     private void toggleScriptItem_Click(object sender, EventArgs e)
     {
         if (treeView1.SelectedNode?.Tag is Script script)
@@ -395,5 +395,17 @@ public partial class PackageView : Form
     private class Options
     {
         [Option('i', "input")] public string InputFile { get; [UsedImplicitly] set; }
+    }
+    
+    private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        if (treeView1.SelectedNode?.Tag is not RenderTreeNode node)
+            return;
+
+        if (node.GetObject() is Group grp)
+            return;
+
+        _currentPackage.Objects.Remove(node.GetObject());
+        CurrentPackageWasModified();
     }
 }

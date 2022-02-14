@@ -47,11 +47,9 @@ namespace FEngViewer
             this.OpenFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.SaveFileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.objectContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.toggleObjectVisibilityItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.changeObjectPositionItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.changeObjectColorItem = new System.Windows.Forms.ToolStripMenuItem();
             this.scriptContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toggleScriptItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -133,8 +131,8 @@ namespace FEngViewer
             this.viewOutput.Size = new System.Drawing.Size(640, 480);
             this.viewOutput.TabIndex = 0;
             this.viewOutput.TabStop = false;
-            this.viewOutput.MouseMove += new System.Windows.Forms.MouseEventHandler(this.viewOutput_MouseMove);
             this.viewOutput.MouseClick += new System.Windows.Forms.MouseEventHandler(this.viewOutput_MouseClick);
+            this.viewOutput.MouseMove += new System.Windows.Forms.MouseEventHandler(this.viewOutput_MouseMove);
             // 
             // labelCoordDisplay
             // 
@@ -204,7 +202,8 @@ namespace FEngViewer
             // 
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.OpenFileMenuItem, this.SaveFileMenuItem});
+            this.OpenFileMenuItem,
+            this.SaveFileMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1499, 28);
@@ -221,7 +220,7 @@ namespace FEngViewer
             // SaveFileMenuItem
             // 
             this.SaveFileMenuItem.Name = "SaveFileMenuItem";
-            this.SaveFileMenuItem.Size = new System.Drawing.Size(59, 24);
+            this.SaveFileMenuItem.Size = new System.Drawing.Size(54, 24);
             this.SaveFileMenuItem.Text = "Save";
             this.SaveFileMenuItem.Click += new System.EventHandler(this.SaveFileMenuItem_Click);
             // 
@@ -229,30 +228,9 @@ namespace FEngViewer
             // 
             this.objectContextMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.objectContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toggleObjectVisibilityItem,
-            this.changeObjectPositionItem,
-            this.changeObjectColorItem});
+            this.deleteToolStripMenuItem});
             this.objectContextMenu.Name = "objectContextMenu";
-            this.objectContextMenu.Size = new System.Drawing.Size(187, 76);
-            // 
-            // toggleObjectVisibilityItem
-            // 
-            this.toggleObjectVisibilityItem.Name = "toggleObjectVisibilityItem";
-            this.toggleObjectVisibilityItem.Size = new System.Drawing.Size(186, 24);
-            this.toggleObjectVisibilityItem.Text = "Toggle visibility";
-            this.toggleObjectVisibilityItem.Click += new System.EventHandler(this.toggleObjectVisibilityItem_Click);
-            // 
-            // changeObjectPositionItem
-            // 
-            this.changeObjectPositionItem.Name = "changeObjectPositionItem";
-            this.changeObjectPositionItem.Size = new System.Drawing.Size(186, 24);
-            this.changeObjectPositionItem.Text = "Change position";
-            // 
-            // changeObjectColorItem
-            // 
-            this.changeObjectColorItem.Name = "changeObjectColorItem";
-            this.changeObjectColorItem.Size = new System.Drawing.Size(186, 24);
-            this.changeObjectColorItem.Text = "Change color";
+            this.objectContextMenu.Size = new System.Drawing.Size(211, 110);
             // 
             // scriptContextMenu
             // 
@@ -268,6 +246,14 @@ namespace FEngViewer
             this.toggleScriptItem.Size = new System.Drawing.Size(211, 24);
             this.toggleScriptItem.Text = "toolStripMenuItem1";
             this.toggleScriptItem.Click += new System.EventHandler(this.toggleScriptItem_Click);
+            
+            // 
+            // deleteToolStripMenuItem
+            // 
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+            this.deleteToolStripMenuItem.Text = "Delete";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
             // PackageView
             // 
@@ -310,9 +296,6 @@ namespace FEngViewer
         private System.Windows.Forms.ToolStripMenuItem SaveFileMenuItem;
         private System.Windows.Forms.TreeView treeView1;
         private System.Windows.Forms.ContextMenuStrip objectContextMenu;
-        private System.Windows.Forms.ToolStripMenuItem toggleObjectVisibilityItem;
-        private System.Windows.Forms.ToolStripMenuItem changeObjectPositionItem;
-        private System.Windows.Forms.ToolStripMenuItem changeObjectColorItem;
         private System.Windows.Forms.ContextMenuStrip scriptContextMenu;
         private System.Windows.Forms.ToolStripMenuItem toggleScriptItem;
         private System.Windows.Forms.GroupBox groupBgColor;
@@ -320,5 +303,6 @@ namespace FEngViewer
         private System.Windows.Forms.RadioButton radioBgBlack;
         private System.Windows.Forms.PropertyGrid objectPropertyGrid;
         private SplitContainer splitContainer2;
+        private ToolStripMenuItem deleteToolStripMenuItem;
     }
 }
