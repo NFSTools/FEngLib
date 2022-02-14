@@ -81,6 +81,12 @@ public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTr
     where TScript : Script<TScriptTracks>
     where TScriptTracks : ScriptTracks, new()
 {
+    protected RenderTreeNode(TObject frontendObject)
+    {
+        FrontendObject = frontendObject;
+        SetCurrentScript(0x1744B3);
+    }
+
     /// <summary>
     /// The <see cref="IObject{TData}"/> instance owned by the node.
     /// </summary>
@@ -102,12 +108,6 @@ public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTr
     public Vector3 Pivot { get; private set; }
     public Color4 Color { get; private set; }
 
-    protected RenderTreeNode(TObject frontendObject)
-    {
-        this.FrontendObject = frontendObject;
-        this.SetCurrentScript(0x1744B3);
-    }
-
     public override void Update(RenderContext context, int deltaMs)
     {
         LoadProperties();
@@ -121,7 +121,7 @@ public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTr
             {
                 if ((CurrentScript.Flags & 1) == 1)
                 {
-                    Debug.WriteLine("looping script {0:X} for object {1:X}", CurrentScript.Id,
+                    Debug.WriteLine("Looping script {0:X} for object {1:X}", CurrentScript.Id,
                         FrontendObject.NameHash);
                     CurrentScriptTime = 0;
                 }
@@ -130,7 +130,7 @@ public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTr
                     var nextScript = FrontendObject.FindScript(currentScriptChainedId) ??
                                      throw new Exception(
                                          $"Cannot find chained script (object {FrontendObject.NameHash:X}, base script {CurrentScript.Id:X}): {currentScriptChainedId:X}");
-                    Debug.WriteLine("activating chained script for object {1:X}: {0}",
+                    Debug.WriteLine("Activating chained script for object {1:X}: {0}",
                         nextScript.Name ?? nextScript.Id.ToString("X"), FrontendObject.NameHash);
 
                     SetCurrentScript(nextScript);
@@ -141,8 +141,10 @@ public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTr
                     SetCurrentScript(null);
                 }
             }
-
-            CurrentScriptTime += deltaMs;
+            else
+            {
+                CurrentScriptTime += deltaMs;
+            }
         }
 
         var scaleMatrix = Matrix4x4.CreateScale(Size);
@@ -191,8 +193,7 @@ public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTr
     private void SetCurrentScript(TScript script)
     {
         CurrentScript = script;
-        if (script == null)
-            CurrentScriptTime = -1;
+        CurrentScriptTime = script == null ? -1 : 0;
     }
 
     protected virtual void LoadProperties()
@@ -217,10 +218,14 @@ public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTr
         if (tracks.Size is { } sizeTrack) Size = InterpolateHelper(sizeTrack);
     }
 
-    protected T InterpolateHelper<T>(Track<T> track) where T : struct => TrackInterpolation.Interpolate(track, CurrentScriptTime);
+    protected T InterpolateHelper<T>(Track<T> track) where T : struct
+    {
+        return TrackInterpolation.Interpolate(track, CurrentScriptTime);
+    }
 }
 
-public abstract class RenderTreeNode<TObject> : RenderTreeNode<TObject, BaseObjectScript, ScriptTracks> where TObject : IObject<ObjectData>, IScriptedObject<BaseObjectScript>
+public abstract class RenderTreeNode<TObject> : RenderTreeNode<TObject, BaseObjectScript, ScriptTracks>
+    where TObject : IObject<ObjectData>, IScriptedObject<BaseObjectScript>
 {
     protected RenderTreeNode(TObject frontendObject) : base(frontendObject)
     {
