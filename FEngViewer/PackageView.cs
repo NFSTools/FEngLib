@@ -234,10 +234,8 @@ public partial class PackageView : Form
 
     private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
     {
-        if (e.Node.Tag is RenderTreeNode viewNode)
+        if (e.Node?.Tag is RenderTreeNode viewNode)
         {
-            objectDetailsView1.Visible = true;
-            objectDetailsView1.UpdateObjectDetails(viewNode);
             viewOutput.SelectedNode = viewNode;
             var wrappedObject = viewNode.GetObject();
             objectPropertyGrid.SelectedObject = wrappedObject switch
@@ -248,10 +246,6 @@ public partial class PackageView : Form
                 _ => new DefaultObjectViewWrapper(wrappedObject)
             };
             Render();
-        }
-        else
-        {
-            objectDetailsView1.Visible = false;
         }
     }
 

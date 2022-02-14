@@ -37,7 +37,6 @@ namespace FEngViewer
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.viewOutput = new FEngViewer.GLRenderControl();
             this.labelCoordDisplay = new System.Windows.Forms.Label();
-            this.objectDetailsView1 = new FEngViewer.ObjectDetailsControl();
             this.groupBgColor = new System.Windows.Forms.GroupBox();
             this.radioBgGreen = new System.Windows.Forms.RadioButton();
             this.radioBgBlack = new System.Windows.Forms.RadioButton();
@@ -106,7 +105,6 @@ namespace FEngViewer
             // 
             this.splitContainer2.Panel1.Controls.Add(this.viewOutput);
             this.splitContainer2.Panel1.Controls.Add(this.labelCoordDisplay);
-            this.splitContainer2.Panel1.Controls.Add(this.objectDetailsView1);
             this.splitContainer2.Panel1.Controls.Add(this.groupBgColor);
             // 
             // splitContainer2.Panel2
@@ -142,16 +140,6 @@ namespace FEngViewer
             this.labelCoordDisplay.Size = new System.Drawing.Size(92, 20);
             this.labelCoordDisplay.TabIndex = 2;
             this.labelCoordDisplay.Text = "X:    0   Y:    0";
-            // 
-            // objectDetailsView1
-            // 
-            this.objectDetailsView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.objectDetailsView1.Location = new System.Drawing.Point(3, 654);
-            this.objectDetailsView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.objectDetailsView1.Name = "objectDetailsView1";
-            this.objectDetailsView1.Size = new System.Drawing.Size(643, 393);
-            this.objectDetailsView1.TabIndex = 1;
             // 
             // groupBgColor
             // 
@@ -289,7 +277,6 @@ namespace FEngViewer
         private System.Windows.Forms.SplitContainer splitContainer1;
         private GLRenderControl viewOutput;
         private System.Windows.Forms.ColorDialog colorDialog1;
-        private ObjectDetailsControl objectDetailsView1;
         private System.Windows.Forms.Label labelCoordDisplay;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem OpenFileMenuItem;
