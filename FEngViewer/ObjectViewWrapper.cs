@@ -6,20 +6,21 @@ using FEngLib.Packages;
 using FEngLib.Structures;
 using FEngViewer.TypeConverters;
 using FEngViewer.UIEditors;
+using JetBrains.Annotations;
 
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
 namespace FEngViewer;
 
-public class ObjectViewWrapper
+public abstract class ObjectViewWrapper<TObject> where TObject : class, IObject<ObjectData>
 {
-    private IObject<ObjectData> _obj;
-
-    public ObjectViewWrapper(IObject<ObjectData> obj)
+    protected ObjectViewWrapper(TObject wrappedObject)
     {
-        _obj = obj;
+        WrappedObject = wrappedObject;
     }
+
+    [NotNull] protected TObject WrappedObject { get; }
 
     #region Basic object properties
 
@@ -27,16 +28,16 @@ public class ObjectViewWrapper
     [TypeConverter(typeof(HexTypeConverter))]
     public uint Guid
     {
-        get => _obj.Guid;
-        set => _obj.Guid = value;
+        get => WrappedObject.Guid;
+        set => WrappedObject.Guid = value;
     }
 
     [Editor(typeof(ResourceRequestEditor), typeof(UITypeEditor))]
     [TypeConverter(typeof(ResourceRequestTypeConverter))]
     public ResourceRequest Resource
     {
-        get => _obj.ResourceRequest;
-        set => _obj.ResourceRequest = value;
+        get => WrappedObject.ResourceRequest;
+        set => WrappedObject.ResourceRequest = value;
     }
 
     #endregion
@@ -48,40 +49,40 @@ public class ObjectViewWrapper
     [Editor(typeof(Color4Editor), typeof(UITypeEditor))]
     public Color4 Color
     {
-        get => _obj.Data.Color;
-        set => _obj.Data.Color = value;
+        get => WrappedObject.Data.Color;
+        set => WrappedObject.Data.Color = value;
     }
 
     [Category("Data")]
     [TypeConverter(typeof(Vector3TypeConverter))]
     public Vector3 Pivot
     {
-        get => _obj.Data.Pivot;
-        set => _obj.Data.Pivot = value;
+        get => WrappedObject.Data.Pivot;
+        set => WrappedObject.Data.Pivot = value;
     }
 
     [Category("Data")]
     [TypeConverter(typeof(Vector3TypeConverter))]
     public Vector3 Position
     {
-        get => _obj.Data.Position;
-        set => _obj.Data.Position = value;
+        get => WrappedObject.Data.Position;
+        set => WrappedObject.Data.Position = value;
     }
 
     [Category("Data")]
     [TypeConverter(typeof(QuaternionTypeConverter))]
     public Quaternion Rotation
     {
-        get => _obj.Data.Rotation;
-        set => _obj.Data.Rotation = value;
+        get => WrappedObject.Data.Rotation;
+        set => WrappedObject.Data.Rotation = value;
     }
 
     [Category("Data")]
     [TypeConverter(typeof(Vector3TypeConverter))]
     public Vector3 Size
     {
-        get => _obj.Data.Size;
-        set => _obj.Data.Size = value;
+        get => WrappedObject.Data.Size;
+        set => WrappedObject.Data.Size = value;
     }
 
     #endregion
@@ -91,8 +92,8 @@ public class ObjectViewWrapper
     [Category("Flags")]
     public bool Invisible
     {
-        get => (_obj.Flags & ObjectFlags.Invisible) != 0;
-        set => _obj.SetFlag(ObjectFlags.Invisible, value);
+        get => (WrappedObject.Flags & ObjectFlags.Invisible) != 0;
+        set => WrappedObject.SetFlag(ObjectFlags.Invisible, value);
     }
 
     public enum EPlatformSpecific
@@ -108,7 +109,7 @@ public class ObjectViewWrapper
     {
         get
         {
-            switch (_obj.Flags & (ObjectFlags.PCOnly | ObjectFlags.ConsoleOnly))
+            switch (WrappedObject.Flags & (ObjectFlags.PCOnly | ObjectFlags.ConsoleOnly))
             {
                 case ObjectFlags.PCOnly:
                     return EPlatformSpecific.PcOnly;
@@ -127,16 +128,16 @@ public class ObjectViewWrapper
             switch (value)
             {
                 case EPlatformSpecific.PcOnly:
-                    _obj.SetFlag(ObjectFlags.PCOnly, true);
-                    _obj.SetFlag(ObjectFlags.ConsoleOnly, false);
+                    WrappedObject.SetFlag(ObjectFlags.PCOnly, true);
+                    WrappedObject.SetFlag(ObjectFlags.ConsoleOnly, false);
                     break;
                 case EPlatformSpecific.ConsoleOnly:
-                    _obj.SetFlag(ObjectFlags.PCOnly, false);
-                    _obj.SetFlag(ObjectFlags.ConsoleOnly, true);
+                    WrappedObject.SetFlag(ObjectFlags.PCOnly, false);
+                    WrappedObject.SetFlag(ObjectFlags.ConsoleOnly, true);
                     break;
                 case EPlatformSpecific.None:
-                    _obj.SetFlag(ObjectFlags.PCOnly, false);
-                    _obj.SetFlag(ObjectFlags.ConsoleOnly, false);
+                    WrappedObject.SetFlag(ObjectFlags.PCOnly, false);
+                    WrappedObject.SetFlag(ObjectFlags.ConsoleOnly, false);
                     break;
             }
         }
@@ -145,23 +146,23 @@ public class ObjectViewWrapper
     [Category("Flags")]
     public bool MouseObject
     {
-        get => (_obj.Flags & ObjectFlags.MouseObject) != 0;
-        set => _obj.SetFlag(ObjectFlags.MouseObject, value);
+        get => (WrappedObject.Flags & ObjectFlags.MouseObject) != 0;
+        set => WrappedObject.SetFlag(ObjectFlags.MouseObject, value);
     }
 
     [Category("Flags")]
     public bool SaveStaticTracks
     {
-        get => (_obj.Flags & ObjectFlags.SaveStaticTracks) != 0;
-        set => _obj.SetFlag(ObjectFlags.SaveStaticTracks, value);
+        get => (WrappedObject.Flags & ObjectFlags.SaveStaticTracks) != 0;
+        set => WrappedObject.SetFlag(ObjectFlags.SaveStaticTracks, value);
     }
 
     [Category("Flags")]
     [Description("Button related. TODO")]
     public bool DontNavigate
     {
-        get => (_obj.Flags & ObjectFlags.DontNavigate) != 0;
-        set => _obj.SetFlag(ObjectFlags.DontNavigate, value);
+        get => (WrappedObject.Flags & ObjectFlags.DontNavigate) != 0;
+        set => WrappedObject.SetFlag(ObjectFlags.DontNavigate, value);
     }
 
     [Category("Flags")]
@@ -170,30 +171,30 @@ public class ObjectViewWrapper
         "Not supported, setting this flag WILL make the game fail reading this package.")]
     public bool UsesLibraryObject
     {
-        get => (_obj.Flags & ObjectFlags.UsesLibraryObject) != 0;
-        set => _obj.SetFlag(ObjectFlags.UsesLibraryObject, value);
+        get => (WrappedObject.Flags & ObjectFlags.UsesLibraryObject) != 0;
+        set => WrappedObject.SetFlag(ObjectFlags.UsesLibraryObject, value);
     }
 
     [Category("Flags")]
     public bool CodeSuppliedResource
     {
-        get => (_obj.Flags & ObjectFlags.CodeSuppliedResource) != 0;
-        set => _obj.SetFlag(ObjectFlags.CodeSuppliedResource, value);
+        get => (WrappedObject.Flags & ObjectFlags.CodeSuppliedResource) != 0;
+        set => WrappedObject.SetFlag(ObjectFlags.CodeSuppliedResource, value);
     }
 
     [Category("Flags")]
     public bool ObjectLocked
     {
-        get => (_obj.Flags & ObjectFlags.ObjectLocked) != 0;
-        set => _obj.SetFlag(ObjectFlags.ObjectLocked, value);
+        get => (WrappedObject.Flags & ObjectFlags.ObjectLocked) != 0;
+        set => WrappedObject.SetFlag(ObjectFlags.ObjectLocked, value);
     }
 
     [Category("Flags")]
     [Description("Whether this object should be displayed in the preview.")]
     public bool HideInEdit
     {
-        get => (_obj.Flags & ObjectFlags.HideInEdit) != 0;
-        set => _obj.SetFlag(ObjectFlags.HideInEdit, value);
+        get => (WrappedObject.Flags & ObjectFlags.HideInEdit) != 0;
+        set => WrappedObject.SetFlag(ObjectFlags.HideInEdit, value);
     }
 
     [Category("Flags")]
@@ -201,8 +202,8 @@ public class ObjectViewWrapper
                  "TODO: write up details on buttons somewhere")]
     public bool IsButton
     {
-        get => (_obj.Flags & ObjectFlags.IsButton) != 0;
-        set => _obj.SetFlag(ObjectFlags.IsButton, value);
+        get => (WrappedObject.Flags & ObjectFlags.IsButton) != 0;
+        set => WrappedObject.SetFlag(ObjectFlags.IsButton, value);
     }
 
     [Category("Flags")]
@@ -210,29 +211,181 @@ public class ObjectViewWrapper
                  "TODO: write up details on buttons somewhere")]
     public bool IgnoreButton
     {
-        get => (_obj.Flags & ObjectFlags.IgnoreButton) != 0;
+        get => (WrappedObject.Flags & ObjectFlags.IgnoreButton) != 0;
         set
         {
             if (value && IsButton) // only allow setting this flag on buttons
-                _obj.SetFlag(ObjectFlags.IgnoreButton, true);
+                WrappedObject.SetFlag(ObjectFlags.IgnoreButton, true);
             else // always allow clearing it
-                _obj.SetFlag(ObjectFlags.IgnoreButton, false);
+                WrappedObject.SetFlag(ObjectFlags.IgnoreButton, false);
         }
     }
 
     [Category("Flags")]
     public bool PerspectiveProjection
     {
-        get => (_obj.Flags & ObjectFlags.PerspectiveProjection) != 0;
-        set => _obj.SetFlag(ObjectFlags.PerspectiveProjection, value);
+        get => (WrappedObject.Flags & ObjectFlags.PerspectiveProjection) != 0;
+        set => WrappedObject.SetFlag(ObjectFlags.PerspectiveProjection, value);
     }
 
     [Category("Flags")]
     public bool AffectAllScripts
     {
-        get => (_obj.Flags & ObjectFlags.AffectAllScripts) != 0;
-        set => _obj.SetFlag(ObjectFlags.AffectAllScripts, value);
+        get => (WrappedObject.Flags & ObjectFlags.AffectAllScripts) != 0;
+        set => WrappedObject.SetFlag(ObjectFlags.AffectAllScripts, value);
     }
 
     #endregion
+}
+
+public class DefaultObjectViewWrapper : ObjectViewWrapper<IObject<ObjectData>>
+{
+    public DefaultObjectViewWrapper(IObject<ObjectData> wrappedObject) : base(wrappedObject)
+    {
+    }
+
+    [ReadOnly(true)]
+    [Category("Meta")]
+    [Description("The type of the object.")]
+    public ObjectType Type => WrappedObject.Type;
+}
+
+public class TextObjectViewWrapper : ObjectViewWrapper<Text>
+{
+    public TextObjectViewWrapper(Text wrappedObject) : base(wrappedObject)
+    {
+    }
+
+    [Category("Text")]
+    [Description("The amount of memory the game must allocate to store the localized version of the text.")]
+    public uint BufferLength
+    {
+        get => WrappedObject.BufferLength;
+        set => WrappedObject.BufferLength = value;
+    }
+
+    [Category("Text")]
+    [Description("Placeholder text to be shown at design time.")]
+    public string Placeholder
+    {
+        get => WrappedObject.Value;
+        set => WrappedObject.Value = value;
+    }
+
+    [Category("Text")]
+    [Description("The ID of the localized string to display in-game.")]
+    [TypeConverter(typeof(HexTypeConverter))]
+    public uint LabelHash
+    {
+        get => WrappedObject.Hash;
+        set => WrappedObject.Hash = value;
+    }
+
+    [Category("Text")]
+    public TextFormat Formatting
+    {
+        get => WrappedObject.Formatting;
+        set => WrappedObject.Formatting = value;
+    }
+
+    [Category("Text")]
+    public int Leading
+    {
+        get => WrappedObject.Leading;
+        set => WrappedObject.Leading = value;
+    }
+
+    [Category("Text")]
+    public uint MaxWidth
+    {
+        get => WrappedObject.MaxWidth;
+        set => WrappedObject.MaxWidth = value;
+    }
+}
+
+public abstract class ImageObjectViewWrapper<TImage> : ObjectViewWrapper<TImage> where TImage : class, IImage<ImageData>
+{
+    protected ImageObjectViewWrapper(TImage wrappedObject) : base(wrappedObject)
+    {
+    }
+
+    [Category("Image")]
+    [DisplayName("Upper Left UV")]
+    [TypeConverter(typeof(Vector2TypeConverter))]
+    public Vector2 UpperLeft
+    {
+        get => WrappedObject.Data.UpperLeft;
+        set => WrappedObject.Data.UpperLeft = value;
+    }
+
+    [Category("Image")]
+    [DisplayName("Lower Right UV")]
+    [TypeConverter(typeof(Vector2TypeConverter))]
+    public Vector2 LowerRight
+    {
+        get => WrappedObject.Data.LowerRight;
+        set => WrappedObject.Data.LowerRight = value;
+    }
+
+    [Category("Image")]
+    [DisplayName("FE Image Flags")]
+    public uint ImageFlags
+    {
+        get => WrappedObject.ImageFlags;
+        set => WrappedObject.ImageFlags = value;
+    }
+}
+
+public class ImageObjectViewWrapper : ImageObjectViewWrapper<Image>
+{
+    public ImageObjectViewWrapper(Image wrappedObject) : base(wrappedObject)
+    {
+    }
+}
+
+public class ColoredImageObjectViewWrapper : ImageObjectViewWrapper<ColoredImage>
+{
+    public ColoredImageObjectViewWrapper(ColoredImage wrappedObject) : base(wrappedObject)
+    {
+    }
+
+    [Category("Image (Colored)")]
+    [DisplayName("Top Left Color")]
+    [TypeConverter(typeof(Color4TypeConverter))]
+    [Editor(typeof(Color4Editor), typeof(UITypeEditor))]
+    public Color4 TopLeft
+    {
+        get => WrappedObject.Data.TopLeft;
+        set => WrappedObject.Data.TopLeft = value;
+    }
+
+    [Category("Image (Colored)")]
+    [DisplayName("Top Right Color")]
+    [TypeConverter(typeof(Color4TypeConverter))]
+    [Editor(typeof(Color4Editor), typeof(UITypeEditor))]
+    public Color4 TopRight
+    {
+        get => WrappedObject.Data.TopRight;
+        set => WrappedObject.Data.TopRight = value;
+    }
+
+    [Category("Image (Colored)")]
+    [DisplayName("Bottom Left Color")]
+    [TypeConverter(typeof(Color4TypeConverter))]
+    [Editor(typeof(Color4Editor), typeof(UITypeEditor))]
+    public Color4 BottomLeft
+    {
+        get => WrappedObject.Data.BottomLeft;
+        set => WrappedObject.Data.BottomLeft = value;
+    }
+
+    [Category("Image (Colored)")]
+    [DisplayName("Bottom Right Color")]
+    [TypeConverter(typeof(Color4TypeConverter))]
+    [Editor(typeof(Color4Editor), typeof(UITypeEditor))]
+    public Color4 BottomRight
+    {
+        get => WrappedObject.Data.BottomRight;
+        set => WrappedObject.Data.BottomRight = value;
+    }
 }

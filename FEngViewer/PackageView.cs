@@ -13,6 +13,7 @@ using FEngLib.Structures;
 using FEngRender.Data;
 using FEngViewer.Properties;
 using JetBrains.Annotations;
+using Image = FEngLib.Objects.Image;
 
 namespace FEngViewer;
 
@@ -238,7 +239,14 @@ public partial class PackageView : Form
             objectDetailsView1.Visible = true;
             objectDetailsView1.UpdateObjectDetails(viewNode);
             viewOutput.SelectedNode = viewNode;
-            objectPropertyGrid.SelectedObject = new ObjectViewWrapper(viewNode.GetObject());
+            var wrappedObject = viewNode.GetObject();
+            objectPropertyGrid.SelectedObject = wrappedObject switch
+            {
+                Text t => new TextObjectViewWrapper(t),
+                Image i => new ImageObjectViewWrapper(i),
+                ColoredImage ci => new ColoredImageObjectViewWrapper(ci),
+                _ => new DefaultObjectViewWrapper(wrappedObject)
+            };
             Render();
         }
         else
@@ -310,7 +318,7 @@ public partial class PackageView : Form
         var package = AppService.Instance.LoadFile(path);
 
         viewOutput.Init(Path.Combine(Path.GetDirectoryName(path) ?? "", "textures"));
-        
+
         _currentPackage = package;
         CurrentPackageWasModified();
     }
@@ -391,12 +399,6 @@ public partial class PackageView : Form
         Render();
     }
 
-    [UsedImplicitly]
-    private class Options
-    {
-        [Option('i', "input")] public string InputFile { get; [UsedImplicitly] set; }
-    }
-    
     private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
     {
         if (treeView1.SelectedNode?.Tag is not RenderTreeNode node)
@@ -407,5 +409,11 @@ public partial class PackageView : Form
 
         _currentPackage.Objects.Remove(node.GetObject());
         CurrentPackageWasModified();
+    }
+
+    [UsedImplicitly]
+    private class Options
+    {
+        [Option('i', "input")] public string InputFile { get; [UsedImplicitly] set; }
     }
 }
