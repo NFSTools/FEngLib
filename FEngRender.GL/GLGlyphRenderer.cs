@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Numerics;
+﻿using System.Numerics;
 using FEngLib.Objects;
 using FEngLib.Structures;
 using SharpGL;
@@ -171,7 +170,7 @@ public class GLGlyphRenderer : IGlyphRenderer
     /// </summary>
     void IGlyphRenderer.EndGlyph()
     {
-        Debug.Write("\n");
+        // Debug.Write("\n");
         // says the all figures have completed for the current glyph/layer.
         // NOTE this will be called even if BeginGlyph return false.
     }
