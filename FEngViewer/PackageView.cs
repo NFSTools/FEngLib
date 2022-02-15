@@ -243,6 +243,7 @@ public partial class PackageView : Form
                 Text t => new TextObjectViewWrapper(t),
                 Image i => new ImageObjectViewWrapper(i),
                 ColoredImage ci => new ColoredImageObjectViewWrapper(ci),
+                MultiImage mi => new MultiImageObjectViewWrapper(mi),
                 _ => new DefaultObjectViewWrapper(wrappedObject)
             };
             Render();

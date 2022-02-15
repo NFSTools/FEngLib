@@ -389,3 +389,127 @@ public class ColoredImageObjectViewWrapper : ImageObjectViewWrapper<ColoredImage
         set => WrappedObject.Data.BottomRight = value;
     }
 }
+
+public class MultiImageObjectViewWrapper : ObjectViewWrapper<MultiImage>
+{
+    public MultiImageObjectViewWrapper(MultiImage wrappedObject) : base(wrappedObject)
+    {
+    }
+
+    [Category("Image (Multiple)")]
+    [DisplayName("Texture #1 ID")]
+    [TypeConverter(typeof(HexTypeConverter))]
+    public uint Texture1
+    {
+        get => WrappedObject.Texture1;
+        set => WrappedObject.Texture1 = value;
+    }
+
+    [Category("Image (Multiple)")]
+    [DisplayName("Texture #2 ID")]
+    [TypeConverter(typeof(HexTypeConverter))]
+    public uint Texture2
+    {
+        get => WrappedObject.Texture2;
+        set => WrappedObject.Texture2 = value;
+    }
+
+    [Category("Image (Multiple)")]
+    [DisplayName("Texture #3 ID")]
+    [TypeConverter(typeof(HexTypeConverter))]
+    public uint Texture3
+    {
+        get => WrappedObject.Texture3;
+        set => WrappedObject.Texture3 = value;
+    }
+
+    [Category("Image (Multiple)")]
+    [DisplayName("Texture #1 Flags")]
+    [TypeConverter(typeof(HexTypeConverter))]
+    public uint TextureFlags1
+    {
+        get => WrappedObject.TextureFlags1;
+        set => WrappedObject.TextureFlags1 = value;
+    }
+
+    [Category("Image (Multiple)")]
+    [DisplayName("Texture #2 Flags")]
+    [TypeConverter(typeof(HexTypeConverter))]
+    public uint TextureFlags2
+    {
+        get => WrappedObject.TextureFlags2;
+        set => WrappedObject.TextureFlags2 = value;
+    }
+
+    [Category("Image (Multiple)")]
+    [DisplayName("Texture #3 Flags")]
+    [TypeConverter(typeof(HexTypeConverter))]
+    public uint TextureFlags3
+    {
+        get => WrappedObject.TextureFlags3;
+        set => WrappedObject.TextureFlags3 = value;
+    }
+
+    [Category("Image (Multiple)")]
+    [DisplayName("Texture #1 Top Left")]
+    [TypeConverter(typeof(Vector2TypeConverter))]
+    public Vector2 TopLeft1
+    {
+        get => WrappedObject.Data.TopLeft1;
+        set => WrappedObject.Data.TopLeft1 = value;
+    }
+
+    [Category("Image (Multiple)")]
+    [DisplayName("Texture #1 Bottom Right")]
+    [TypeConverter(typeof(Vector2TypeConverter))]
+    public Vector2 BottomRight1
+    {
+        get => WrappedObject.Data.BottomRight1;
+        set => WrappedObject.Data.BottomRight1 = value;
+    }
+
+    [Category("Image (Multiple)")]
+    [DisplayName("Texture #2 Top Left")]
+    [TypeConverter(typeof(Vector2TypeConverter))]
+    public Vector2 TopLeft2
+    {
+        get => WrappedObject.Data.TopLeft2;
+        set => WrappedObject.Data.TopLeft2 = value;
+    }
+
+    [Category("Image (Multiple)")]
+    [DisplayName("Texture #2 Bottom Right")]
+    [TypeConverter(typeof(Vector2TypeConverter))]
+    public Vector2 BottomRight2
+    {
+        get => WrappedObject.Data.BottomRight2;
+        set => WrappedObject.Data.BottomRight2 = value;
+    }
+
+    [Category("Image (Multiple)")]
+    [DisplayName("Texture #3 Top Left")]
+    [TypeConverter(typeof(Vector2TypeConverter))]
+    public Vector2 TopLeft3
+    {
+        get => WrappedObject.Data.TopLeft3;
+        set => WrappedObject.Data.TopLeft3 = value;
+    }
+
+    [Category("Image (Multiple)")]
+    [DisplayName("Texture #3 Bottom Right")]
+    [TypeConverter(typeof(Vector2TypeConverter))]
+    public Vector2 BottomRight3
+    {
+        get => WrappedObject.Data.BottomRight3;
+        set => WrappedObject.Data.BottomRight3 = value;
+    }
+
+    [Category("Image (Multiple)")]
+    [DisplayName("Pivot Rotation")]
+    [TypeConverter(typeof(Vector3TypeConverter))]
+    public Vector3 PivotRotation
+    {
+        get => WrappedObject.Data.PivotRotation;
+        set => WrappedObject.Data.PivotRotation = value;
+    }
+}
