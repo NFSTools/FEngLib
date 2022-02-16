@@ -57,7 +57,7 @@ public class Quad
         {
             gl.Color(vertex.Color.X, vertex.Color.Y, vertex.Color.Z, vertex.Color.W);
             gl.TexCoord(vertex.TexCoords.X, vertex.TexCoords.Y);
-            gl.Vertex(vertex.Position.X * XScale - 1.0f, -(vertex.Position.Y * YScale - 1.0f), 0);
+            Vertex(gl, vertex.Position.X, vertex.Position.Y, 0);
         }
 
         gl.End();
@@ -73,9 +73,14 @@ public class Quad
         gl.Color(1.0f, 0, 0, 1.0f);
         foreach (var vertex in _vertices)
         {
-            gl.Vertex(vertex.Position.X * XScale - 1.0f, -(vertex.Position.Y * YScale - 1.0f), 0);
+            Vertex(gl, vertex.Position.X, vertex.Position.Y, 0);
         }
 
         gl.End();
+    }
+
+    private static void Vertex(OpenGL gl, float x, float y, float z)
+    {
+        gl.Vertex(x * XScale, -y * YScale, z);
     }
 }

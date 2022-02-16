@@ -186,7 +186,7 @@ public class GLGlyphRenderer : IGlyphRenderer
 
     private void Vertex(float x, float y)
     {
-        _gl.Vertex(x * XScale - 1.0f, -(y * YScale - 1.0f), Z);
+        _gl.Vertex(x * XScale, -(y * YScale), Z);
     }
 
     private void Vertex(Vector2 v)

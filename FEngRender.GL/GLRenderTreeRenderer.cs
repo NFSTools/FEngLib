@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Numerics;
-using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Structures;
 using FEngRender.Data;
@@ -22,11 +20,11 @@ public class GLRenderTreeRenderer
 {
     private readonly OpenGL _gl;
     private readonly GLGlyphRenderer _glyphRenderer;
+    private readonly Dictionary<string, Texture> _loadedTextures = new();
+    private readonly LinkedList<RenderTreeNode>[] _renderLayers = new LinkedList<RenderTreeNode>[256];
+    private readonly Dictionary<uint, Texture> _resourceRequestToTexture = new();
 
-    private readonly Dictionary<string, Texture> _loadedTextures = new Dictionary<string, Texture>();
-    private readonly Dictionary<uint, Texture> _resourceRequestToTexture = new Dictionary<uint, Texture>();
     private long _lastRenderTime;
-
     private Stopwatch _stopwatch;
 
     public GLRenderTreeRenderer(OpenGL gl)
@@ -68,18 +66,26 @@ public class GLRenderTreeRenderer
         _gl.DepthMask(0);
 
         var dt = (int)(_stopwatch.ElapsedMilliseconds - _lastRenderTime);
-        _gl.DrawText(10, 10, 1, 0, 0, "Consolas", 16, $"dt: {dt}ms");
+
+        for (var i = 0; i < _renderLayers.Length; i++) _renderLayers[i] = new LinkedList<RenderTreeNode>();
+
         PrepareNodes(tree, Matrix4x4.Identity, dt);
-        RenderTree(tree);
-        // _stopwatch.Restart();
+
+        for (var i = 255; i >= 0; i--)
+            foreach (var node in _renderLayers[i])
+                RenderNode(node);
 
         if (SelectedNode != null)
         {
             RenderNode(SelectedNode, true);
         }
 
+        _gl.BindTexture(OpenGL.GL_TEXTURE_2D, 0);
+        _gl.Disable(OpenGL.GL_TEXTURE_2D);
+        _gl.DrawText(10, 10, 1, 0, 0, "Consolas", 16, $"dt: {dt}ms");
+
         _gl.MatrixMode(MatrixMode.Projection);
-        _gl.Ortho(0, 640, 480, 0, -1, 1);
+        _gl.Ortho(-320, 320, -240, 240, -1, 1);
         _gl.Flush();
         _lastRenderTime = _stopwatch.ElapsedMilliseconds;
     }
@@ -90,29 +96,26 @@ public class GLRenderTreeRenderer
         _gl.ClearColor(colorV.X, colorV.Y, colorV.Z, colorV.W);
     }
 
-    private void PrepareNodes(IEnumerable<RenderTreeNode> nodes,
-        Matrix4x4 viewMatrix, int timeDelta, RenderTreeNode parent = null)
+    private void PrepareNodes(IEnumerable<RenderTreeNode> rootNodes,
+        Matrix4x4 viewMatrix, int timeDelta)
     {
-        var renderContext = new RenderContext(viewMatrix, parent);
-        var nodeList = nodes.ToList();
+        var nodeListQueue =
+            new Queue<(IEnumerable<RenderTreeNode> nodes, RenderTreeNode parent, Matrix4x4 transform)>();
 
-        foreach (var node in nodeList)
-        {
-            node.Update(renderContext, timeDelta);
-        }
+        nodeListQueue.Enqueue((rootNodes, null, viewMatrix));
 
-        foreach (var renderTreeGroup in nodeList.OfType<RenderTreeGroup>())
+        while (nodeListQueue.TryDequeue(out var nodeListEntry))
         {
-            PrepareNodes(renderTreeGroup, renderTreeGroup.Transform, timeDelta, renderTreeGroup);
-        }
-    }
+            var renderContext = new RenderContext(nodeListEntry.transform, nodeListEntry.parent);
+            foreach (var node in nodeListEntry.nodes)
+            {
+                node.Update(renderContext, timeDelta);
+                var nodeZ = Math.Max(0, Math.Min(255, (int)node.GetZ()));
+                _renderLayers[nodeZ].AddLast(node);
 
-    private void RenderTree(IEnumerable<RenderTreeNode> nodes)
-    {
-        foreach (var renderTreeNode in Data.RenderTree.GetAllTreeNodesForRendering(nodes)
-                     .OrderByDescending(n => n.GetZ()))
-        {
-            RenderNode(renderTreeNode);
+                if (node is RenderTreeGroup groupNode)
+                    nodeListQueue.Enqueue((groupNode, groupNode, groupNode.Transform));
+            }
         }
     }
 
@@ -180,7 +183,7 @@ public class GLRenderTreeRenderer
         var yOffset = TextHelpers.CalculateYOffset((uint)str.Formatting,
             height);
 
-        _glyphRenderer.Transform = node.Transform * Matrix4x4.CreateTranslation(320, 240, 0);
+        _glyphRenderer.Transform = node.Transform;
         _glyphRenderer.Color = node.BlendedColor;
         _glyphRenderer.Formatting = str.Formatting;
 
@@ -198,7 +201,7 @@ public class GLRenderTreeRenderer
         Vector4[] colors = new Vector4[4];
         colors[0] = colors[1] = colors[2] = colors[3] = node.BlendedColor;
 
-        var otkMat4 = node.Transform * Matrix4x4.CreateTranslation(320, 240, 0);
+        var otkMat4 = node.Transform;
         var q = new Quad(-0.5f, -0.5f, 0.5f, 0.5f,
             1.0f,
             otkMat4,
@@ -219,7 +222,7 @@ public class GLRenderTreeRenderer
         if (texture == null)
             return;
 
-        var otkMat4 = coloredImage.Transform * Matrix4x4.CreateTranslation(320, 240, 0);
+        var otkMat4 = coloredImage.Transform;
 
         // top left, top right, bottom right, bottom left
         Vector4[] colors = new Vector4[4];
@@ -249,7 +252,7 @@ public class GLRenderTreeRenderer
         if (texture == null)
             return;
 
-        var otkMat4 = image.Transform * Matrix4x4.CreateTranslation(320, 240, 0);
+        var otkMat4 = image.Transform;
 
         // top left, top right, bottom right, bottom left
         Vector4[] colors = new Vector4[4];
@@ -279,7 +282,7 @@ public class GLRenderTreeRenderer
         if (texture == null)
             return;
 
-        var otkMat4 = image.Transform * Matrix4x4.CreateTranslation(320, 240, 0);
+        var otkMat4 = image.Transform;
 
         // top left, top right, bottom right, bottom left
         Vector4[] colors = new Vector4[4];
@@ -304,7 +307,7 @@ public class GLRenderTreeRenderer
 
     private void RenderGroupBB(RenderTreeNode node, bool doBoundingBox = false)
     {
-        var otkMat4 = node.Transform * Matrix4x4.CreateTranslation(320, 240, 0);
+        var otkMat4 = node.Transform;
 
         var q = new Quad(-0.5f, -0.5f, 0.5f, 0.5f,
             1.0f,
@@ -344,4 +347,10 @@ public class GLRenderTreeRenderer
     {
         return path.Split('\\')[^1].Split('.')[0].ToUpperInvariant();
     }
+
+    private record InternalRenderNode(RenderTreeNode TreeNode, Quad RenderQuad);
+    // {
+    //     public RenderTreeNode TreeNode { get; }
+    //     public Quad RenderQuad { get; }
+    // }
 }
