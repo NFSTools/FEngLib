@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using FEngLib.Objects;
 using FEngLib.Structures;
 using SharpGL;
@@ -16,8 +17,10 @@ public class GLGlyphRenderer : IGlyphRenderer
     private readonly OpenGL _gl;
 
     private Vector2 _currentPoint;
+
     public Color4 Color;
     public TextFormat Formatting;
+    public float MinX, MaxX, MinY, MaxY;
     public Matrix4x4 Transform;
 
     public GLGlyphRenderer(OpenGL gl)
@@ -78,7 +81,7 @@ public class GLGlyphRenderer : IGlyphRenderer
     {
         // move current point to location marked by point without describing a line;
 
-        _currentPoint = Vector2.Transform(point, Transform);
+        _currentPoint = point;
     }
 
     /// <summary>
@@ -94,14 +97,11 @@ public class GLGlyphRenderer : IGlyphRenderer
 
         // TODO actually implement proper bezier with Map1
 
-        var secondCpTransformed = Vector2.Transform(secondControlPoint, Transform);
-        var nextPointTransformed = Vector2.Transform(point, Transform);
-
         _gl.Begin(BeginMode.LineStrip);
         {
             Vertex(_currentPoint);
-            Vertex(secondCpTransformed);
-            _currentPoint = nextPointTransformed;
+            Vertex(secondControlPoint);
+            _currentPoint = point;
             Vertex(_currentPoint);
         }
         _gl.End();
@@ -121,16 +121,12 @@ public class GLGlyphRenderer : IGlyphRenderer
 
         // TODO actually implement proper bezier with Map1
 
-        var secondCpTransformed = Vector2.Transform(secondControlPoint, Transform);
-        var thirdCpTransformed = Vector2.Transform(thirdControlPoint, Transform);
-        var nextPointTransformed = Vector2.Transform(point, Transform);
-
         _gl.Begin(BeginMode.LineStrip);
         {
             Vertex(_currentPoint);
-            Vertex(secondCpTransformed);
-            Vertex(thirdCpTransformed);
-            _currentPoint = nextPointTransformed;
+            Vertex(secondControlPoint);
+            Vertex(thirdControlPoint);
+            _currentPoint = point;
             Vertex(_currentPoint);
         }
         _gl.End();
@@ -145,12 +141,10 @@ public class GLGlyphRenderer : IGlyphRenderer
         // describes straight line from the 'current point' to the final 'point' 
         // leaving the 'current point' at 'point'
 
-        var nextPointTransformed = Vector2.Transform(point, Transform);
-
         _gl.Begin(BeginMode.Lines);
         {
             Vertex(_currentPoint);
-            _currentPoint = nextPointTransformed;
+            _currentPoint = point;
             Vertex(_currentPoint);
         }
         _gl.End();
@@ -186,11 +180,16 @@ public class GLGlyphRenderer : IGlyphRenderer
 
     private void Vertex(float x, float y)
     {
+        MinX = MinX == 0 ? x : Math.Min(MinX, x);
+        MaxX = MaxX == 0 ? x : Math.Max(MaxX, x);
+        MinY = MinY == 0 ? y : Math.Min(MinY, y);
+        MaxY = MaxY == 0 ? y : Math.Max(MaxY, y);
         _gl.Vertex(x * XScale, -(y * YScale), Z);
     }
 
     private void Vertex(Vector2 v)
     {
-        Vertex(v.X, v.Y);
+        var v2 = Vector2.Transform(v, Transform);
+        Vertex(v2.X, v2.Y);
     }
 }

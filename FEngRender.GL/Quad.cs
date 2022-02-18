@@ -1,4 +1,7 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Numerics;
 using SharpGL;
 using SharpGL.Enumerations;
 
@@ -9,6 +12,11 @@ public class Quad
     public const float XScale = 1.0f / 320.0f;
     private const float YScale = 1.0f / 240.0f;
     private readonly VertexDeclaration[] _vertices = new VertexDeclaration[4];
+
+    public Quad(VertexDeclaration[] vertices)
+    {
+        _vertices = vertices;
+    }
 
     public Quad(
         float left, float up,
@@ -44,12 +52,13 @@ public class Quad
     public void Render(OpenGL gl, Texture tex = null)
     {
         gl.Enable(OpenGL.GL_TEXTURE_2D);
+        gl.Enable(OpenGL.GL_BLEND);
+
         tex?.GLTexture.Push(gl);
         gl.TexParameter(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MAG_FILTER, (int)OpenGL.GL_NEAREST);
         gl.TexParameter(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MIN_FILTER, (int)OpenGL.GL_NEAREST);
 
         gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
-        gl.Enable(OpenGL.GL_BLEND);
 
         gl.Begin(BeginMode.Quads);
 
@@ -62,6 +71,8 @@ public class Quad
 
         gl.End();
         tex?.GLTexture.Pop(gl);
+
+        gl.Disable(OpenGL.GL_BLEND);
         gl.Disable(OpenGL.GL_TEXTURE_2D);
     }
 
@@ -82,5 +93,41 @@ public class Quad
     private static void Vertex(OpenGL gl, float x, float y, float z)
     {
         gl.Vertex(x * XScale, -y * YScale, z);
+    }
+
+    public static Quad MaxBox(IEnumerable<Quad> quads)
+    {
+        Quad best = null;
+
+        foreach (var quad in quads)
+        {
+            Debug.Assert(quad != null, "quad!=null");
+            best = best == null ? quad : MaxBox(best, quad);
+        }
+
+        return best;
+    }
+
+    public static Quad MaxBox(Quad q1, Quad q2)
+    {
+        var vertices = new VertexDeclaration[4];
+
+        // MINIMIZE top left X/Y
+        var (tl1, tl2) = (q1._vertices[0].Position, q2._vertices[0].Position);
+        vertices[0].Position = new Vector3(Math.Min(tl1.X, tl2.X), Math.Min(tl1.Y, tl2.Y), 0);
+
+        // MAXIMIZE top right X, MINIMIZE top right Y
+        var (tr1, tr2) = (q1._vertices[1].Position, q2._vertices[1].Position);
+        vertices[1].Position = new Vector3(Math.Max(tr1.X, tr2.X), Math.Min(tr1.Y, tr2.Y), 0);
+
+        // MAXIMIZE bottom right X/Y
+        var (br1, br2) = (q1._vertices[2].Position, q2._vertices[2].Position);
+        vertices[2].Position = new Vector3(Math.Max(br1.X, br2.X), Math.Max(br1.Y, br2.Y), 0);
+
+        // MINIMIZE bottom left X, MAXIMIZE bottom left Y
+        var (bl1, bl2) = (q1._vertices[3].Position, q2._vertices[3].Position);
+        vertices[3].Position = new Vector3(Math.Min(bl1.X, bl2.X), Math.Max(bl1.Y, bl2.Y), 0);
+
+        return new Quad(vertices);
     }
 }

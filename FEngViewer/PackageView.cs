@@ -246,7 +246,6 @@ public partial class PackageView : Form
                 MultiImage mi => new MultiImageObjectViewWrapper(mi),
                 _ => new DefaultObjectViewWrapper(wrappedObject)
             };
-            Render();
         }
     }
 
