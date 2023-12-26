@@ -9,9 +9,9 @@ namespace FEngCli;
 [Verb("decompile")]
 public class DecompileCommand : BaseCommand
 {
-    [Option('i')] public string InputPath { get; set; }
+    [Option('i', Required = true)] public string InputPath { get; set; }
 
-    [Option('o')] public string OutputPath { get; set; }
+    [Option('o', Required = true)] public string OutputPath { get; set; }
 
     public override int Execute()
     {

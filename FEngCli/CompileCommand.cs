@@ -12,25 +12,25 @@ namespace FEngCli;
 [Verb("compile")]
 public class CompileCommand : BaseCommand
 {
-    [Option('i')] public IEnumerable<string> InputPath { get; set; }
+    [Option('i', Required = true)] public IEnumerable<string> InputPath { get; set; }
 
-    [Option('o')] public string OutputPath { get; set; }
+    [Option('o', Required = true)] public string OutputPath { get; set; }
 
     public override int Execute()
     {
-        var packages = InputPath.Select(path => JsonConvert.DeserializeObject<Package>(File.ReadAllText(path), new JsonSerializerSettings
-        {
-            Formatting = Formatting.Indented,
-            Converters = new List<JsonConverter>
+        var packages = InputPath.Select(path => JsonConvert.DeserializeObject<Package>(File.ReadAllText(path),
+            new JsonSerializerSettings
             {
-                new StringEnumConverter()
-            },
-            TypeNameHandling = TypeNameHandling.Auto,
-            ReferenceLoopHandling = ReferenceLoopHandling.Error,
-            PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-            NullValueHandling = NullValueHandling.Ignore
-        }));
-
+                Formatting = Formatting.Indented,
+                Converters = new List<JsonConverter>
+                {
+                    new StringEnumConverter()
+                },
+                TypeNameHandling = TypeNameHandling.Auto,
+                ReferenceLoopHandling = ReferenceLoopHandling.Error,
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                NullValueHandling = NullValueHandling.Ignore
+            }));
 
         using var bw = new BinaryWriter(File.Create(OutputPath));
 
@@ -45,8 +45,6 @@ public class CompileCommand : BaseCommand
             bw.Write((uint)tms.Length);
             tms.CopyTo(bw.BaseStream);
         }
-
-        //new FrontendChunkWriter(package).Write(bw);
 
         return 0;
     }
