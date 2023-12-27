@@ -54,7 +54,7 @@ public interface IImage<out TData> : IObject<TData> where TData : ImageData
     uint ImageFlags { get; set; }
 }
 
-public class Image<TData, TScript> : BaseObject<TData, TScript>, IImage<TData>
+public abstract class Image<TData, TScript> : BaseObject<TData, TScript>, IImage<TData>
     where TData : ImageData, new() where TScript : Script, new()
 {
     protected Image(TData data) : base(data)
