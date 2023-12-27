@@ -34,7 +34,7 @@ public class RenderTree : IEnumerable<RenderTreeNode>
     {
         return GetEnumerator();
     }
-        
+
     public static IEnumerable<RenderTreeNode> GetAllTreeNodesForRendering(IEnumerable<RenderTreeNode> nodes)
     {
         foreach (var node in nodes)
@@ -67,9 +67,9 @@ public class RenderTree : IEnumerable<RenderTreeNode>
         var nodes = new List<RenderTreeNode>();
 
         var childrenDict = package.Objects
-            .Where(o => o.Type == ObjectType.Group)
+            .Where(o => o.GetObjectType() == ObjectType.Group)
             .ToDictionary(
-                o => o.Guid, 
+                o => o.Guid,
                 o => new List<IObject<ObjectData>>());
 
         // Build up children mapping
@@ -98,7 +98,7 @@ public class RenderTree : IEnumerable<RenderTreeNode>
                     SimpleImage si => new RenderTreeSimpleImage(si),
                     Movie movie => new RenderTreeMovie(movie),
                     Text text => new RenderTreeText(text),
-                    _ => throw new NotImplementedException($"Unsupported object type: {frontendObject.GetType()}")
+                    _ => throw new NotImplementedException($"Unsupported object type: {frontendObject.GetObjectType()}")
                 });
             }
         }

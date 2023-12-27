@@ -53,13 +53,13 @@ public class ObjectData : IBinaryAccess
 public interface IObject<out TData> : IScriptedObject, IHaveMessageResponses where TData : ObjectData
 {
     TData Data { get; }
-    ObjectType Type { get; set; }
     ObjectFlags Flags { get; set; }
     ResourceRequest ResourceRequest { get; set; }
     string Name { get; set; }
     uint NameHash { get; set; }
     uint Guid { get; set; }
     IObject<ObjectData> Parent { get; set; }
+    ObjectType GetObjectType();
 
     void InitializeData();
 
@@ -124,7 +124,6 @@ public abstract class BaseObject<TData, TScript> : IObject<TData>, IScriptedObje
     public List<TScript> Scripts { get; }
 
     public TData Data { get; protected set; }
-    public ObjectType Type { get; set; }
     public ObjectFlags Flags { get; set; }
     public ResourceRequest ResourceRequest { get; set; }
     public string Name { get; set; }
@@ -134,6 +133,7 @@ public abstract class BaseObject<TData, TScript> : IObject<TData>, IScriptedObje
     public List<MessageResponse> MessageResponses { get; }
 
     public abstract void InitializeData();
+    public abstract ObjectType GetObjectType();
 
     Script IScriptedObject.FindScript(uint id)
     {

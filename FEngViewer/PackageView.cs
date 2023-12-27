@@ -113,7 +113,7 @@ public partial class PackageView : Form
     private static TreeNode CreateObjectTreeNode(TreeNodeCollection collection, RenderTreeNode viewNode)
     {
         var feObj = viewNode.GetObject();
-        var nodeImageKey = feObj.Type switch
+        var nodeImageKey = feObj.GetObjectType() switch
         {
             ObjectType.String => "TreeItem_String",
             ObjectType.Image => "TreeItem_Image",
@@ -128,7 +128,7 @@ public partial class PackageView : Form
 
         if (nodeImageKey == null)
         {
-            nodeText = feObj.Type + " " + nodeText;
+            nodeText = feObj.GetObjectType() + " " + nodeText;
         }
 
         var objTreeNode = collection.Add(nodeText);

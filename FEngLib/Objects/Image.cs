@@ -41,7 +41,11 @@ public class Image : Image<ImageData, ImageScript<ImageScriptTracks>>
 {
     public Image(ImageData data) : base(data)
     {
-        Type = ObjectType.Image;
+    }
+
+    public override ObjectType GetObjectType()
+    {
+        return ObjectType.Image;
     }
 }
 

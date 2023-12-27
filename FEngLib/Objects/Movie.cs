@@ -2,10 +2,13 @@
 
 public class Movie : BaseObject
 {
-    //
     public Movie(ObjectData data) : base(data)
     {
-        Type = ObjectType.Movie;
+    }
+
+    public override ObjectType GetObjectType()
+    {
+        return ObjectType.Movie;
     }
 
     public override void InitializeData()

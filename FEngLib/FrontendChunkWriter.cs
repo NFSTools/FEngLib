@@ -75,8 +75,8 @@ public class FrontendChunkWriter
             var usedTypes = new List<ObjectType>();
             Package.Objects.ForEach(o =>
             {
-                if (!usedTypes.Contains(o.Type))
-                    usedTypes.Add(o.Type);
+                if (!usedTypes.Contains(o.GetObjectType()))
+                    usedTypes.Add(o.GetObjectType());
             });
 
             foreach (var type in usedTypes)
@@ -137,7 +137,7 @@ public class FrontendChunkWriter
                 {
                     bw.WriteChunk(FrontendChunkType.ObjectData, bw =>
                     {
-                        bw.WriteTag(FrontendTagType.ObjectType, bw => bw.WriteEnum(obj.Type));
+                        bw.WriteTag(FrontendTagType.ObjectType, bw => bw.WriteEnum(obj.GetObjectType()));
                         if (obj.Name != null)
                         {
                             bw.WriteTag(ObjectName, bw =>
@@ -171,7 +171,7 @@ public class FrontendChunkWriter
                             bw.WriteTag(ObjectParent, bw => bw.Write(obj.Parent.Guid));
                         }
 
-                        switch (obj.Type)
+                        switch (obj.GetObjectType())
                         {
                             case ObjectType.Image:
                                 var img = (IImage<ImageData>)obj;
@@ -214,7 +214,8 @@ public class FrontendChunkWriter
                                 bw.WriteTag(MultiImageTextureFlags3, bw => bw.Write(mImg.TextureFlags3));
                                 break;
                             default:
-                                Console.WriteLine($"!!!!!! idk whether/how to write a {obj.Type}'s specific tags!");
+                                Console.WriteLine(
+                                    $"!!!!!! idk whether/how to write a {obj.GetObjectType()}'s specific tags!");
                                 throw new NotImplementedException();
                         }
 

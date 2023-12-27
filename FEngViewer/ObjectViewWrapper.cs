@@ -247,7 +247,7 @@ public class DefaultObjectViewWrapper : ObjectViewWrapper<IObject<ObjectData>>
     [ReadOnly(true)]
     [Category("Meta")]
     [Description("The type of the object.")]
-    public ObjectType Type => WrappedObject.Type;
+    public ObjectType Type => WrappedObject.GetObjectType();
 }
 
 public class TextObjectViewWrapper : ObjectViewWrapper<Text>

@@ -162,7 +162,7 @@ public class ScriptDataChunk : FrontendObjectChunk
             }
         else
             throw new NotImplementedException(
-                $"Track offset > 14 with an unexpected object type ({FrontendObject.Type}) ...");
+                $"Track offset > 14 with an unexpected object type ({FrontendObject.GetObjectType()}) ...");
     }
 
     private void ProcessScriptKeyTrackTag(ScriptProcessingContext ctx, ScriptKeyTrackTag scriptKeyTrackTag)

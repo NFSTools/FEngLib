@@ -14,6 +14,10 @@ public enum TextFormat : uint
 
 public class Text : BaseObject
 {
+    public Text(ObjectData data) : base(data)
+    {
+    }
+
     public uint BufferLength { get; set; }
     public string Value { get; set; }
     public string Label { get; set; }
@@ -22,9 +26,9 @@ public class Text : BaseObject
     public int Leading { get; set; }
     public uint MaxWidth { get; set; }
 
-    public Text(ObjectData data) : base(data)
+    public override ObjectType GetObjectType()
     {
-        Type = ObjectType.String;
+        return ObjectType.String;
     }
 
     public override void InitializeData()

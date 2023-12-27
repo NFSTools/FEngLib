@@ -57,7 +57,6 @@ public class MultiImage : Image<MultiImageData, ImageScript<MultiImageScriptTrac
 {
     public MultiImage(MultiImageData data) : base(data)
     {
-        Type = ObjectType.MultiImage;
     }
 
     public uint Texture1 { get; set; }
@@ -66,6 +65,11 @@ public class MultiImage : Image<MultiImageData, ImageScript<MultiImageScriptTrac
     public uint TextureFlags2 { get; set; }
     public uint Texture3 { get; set; }
     public uint TextureFlags3 { get; set; }
+
+    public override ObjectType GetObjectType()
+    {
+        return ObjectType.MultiImage;
+    }
 
     public override void InitializeData()
     {

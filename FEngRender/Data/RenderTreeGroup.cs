@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using FEngLib.Objects;
-using FEngLib.Scripts;
 
 namespace FEngRender.Data;
 
@@ -41,12 +39,12 @@ public class RenderTreeGroup : RenderTreeNode<Group>, IEnumerable<RenderTreeNode
     // Groups extents are the smallest rectangle that contains all of its members' extents
     public override Rectangle? Get2DExtents()
     {
-        if (FrontendObject.Type != ObjectType.Group) // this should never be possible?
+        if (FrontendObject.GetObjectType() != ObjectType.Group) // this should never be possible?
             return base.Get2DExtents();
 
         if (_children.Count == 0)
             return null;
-            
+
         var narrowestRectMaybe = _children.First().Get2DExtents();
 
 
@@ -54,7 +52,7 @@ public class RenderTreeGroup : RenderTreeNode<Group>, IEnumerable<RenderTreeNode
             return null;
 
         var narrowestRect = (Rectangle)narrowestRectMaybe;
-            
+
         foreach (var child in _children)
         {
             var childExtents = child.Get2DExtents();
@@ -62,8 +60,8 @@ public class RenderTreeGroup : RenderTreeNode<Group>, IEnumerable<RenderTreeNode
                 narrowestRect = Rectangle.Union(narrowestRect, childExtents.Value);
         }
 
-        narrowestRect.Location += new Size((int)FrontendObject.Data.Position.X, (int) FrontendObject.Data.Position.Y);
-            
+        narrowestRect.Location += new Size((int)FrontendObject.Data.Position.X, (int)FrontendObject.Data.Position.Y);
+
         return narrowestRect;
     }
 }
