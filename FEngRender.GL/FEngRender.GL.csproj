@@ -2,8 +2,10 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <RootNamespace>FEngRender.GL</RootNamespace>
-        <PackageId>FEngRender.GL</PackageId>
+        <Authors>heyitsleo;Fridtjof</Authors>
+        <Company>NFSTools</Company>
+        <Description>OpenGL renderer for FNGs</Description>
+        <Version>2.0.0-alpha</Version>
     </PropertyGroup>
 
     <ItemGroup>

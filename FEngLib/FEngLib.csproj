@@ -2,8 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Platforms>AnyCPU</Platforms>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Configurations>Debug;Release</Configurations>
+    <Authors>heyitsleo;Fridtjof</Authors>
+    <Company>NFSTools</Company>
+    <Description>Library for reading and writing FNGs</Description>
+    <Version>2.0.0-alpha</Version>
   </PropertyGroup>
+
 </Project>

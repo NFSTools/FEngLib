@@ -2,6 +2,10 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
+        <Authors>heyitsleo;Fridtjof</Authors>
+        <Company>NFSTools</Company>
+        <Description>Framework for rendering FNGs</Description>
+        <Version>2.0.0-alpha</Version>
     </PropertyGroup>
 
     <ItemGroup>
