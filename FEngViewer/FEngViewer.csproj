@@ -45,6 +45,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\FngMessages.txt"/>
+    <EmbeddedResource Include="Resources\FngObjects.txt"/>
+    <EmbeddedResource Include="Resources\FngScripts.txt"/>
   </ItemGroup>
 
 </Project>

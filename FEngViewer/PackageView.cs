@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using CommandLine;
 using FEngLib;
@@ -10,6 +11,7 @@ using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Scripts;
 using FEngLib.Structures;
+using FEngLib.Utils;
 using FEngRender.Data;
 using FEngViewer.Properties;
 using JetBrains.Annotations;
@@ -19,10 +21,20 @@ namespace FEngViewer;
 
 public partial class PackageView : Form
 {
+    private static readonly HashList _objHashList;
+    private static readonly HashList _scriptHashList;
+    private static HashList _msgHashList;
     private Package _currentPackage;
     private RenderTree _currentRenderTree;
 
     private TreeNode _rootNode;
+
+    static PackageView()
+    {
+        _objHashList = HashList.FromEmbeddedFile("FEngViewer.Resources.FngObjects.txt");
+        _scriptHashList = HashList.FromEmbeddedFile("FEngViewer.Resources.FngScripts.txt");
+        _msgHashList = HashList.FromEmbeddedFile("FEngViewer.Resources.FngMessages.txt");
+    }
 
     public PackageView()
     {
@@ -99,7 +111,7 @@ public partial class PackageView : Form
         treeView1.SelectedNode = _rootNode;
     }
 
-    private static void ApplyObjectsToTreeNodes(IEnumerable<RenderTreeNode> objectNodes,
+    private void ApplyObjectsToTreeNodes(IEnumerable<RenderTreeNode> objectNodes,
         TreeNodeCollection treeNodes)
     {
         foreach (var feObjectNode in objectNodes)
@@ -110,7 +122,7 @@ public partial class PackageView : Form
         }
     }
 
-    private static TreeNode CreateObjectTreeNode(TreeNodeCollection collection, RenderTreeNode viewNode)
+    private TreeNode CreateObjectTreeNode(TreeNodeCollection collection, RenderTreeNode viewNode)
     {
         var feObj = viewNode.GetObject();
         var nodeImageKey = feObj.GetObjectType() switch
@@ -124,29 +136,35 @@ public partial class PackageView : Form
             _ => null
         };
 
-        var nodeText = $"{feObj.Name ?? feObj.NameHash.ToString("X")}";
+        // var nodeText = $"{feObj.Name ?? feObj.NameHash.ToString("X")}";
+        var nodeText = feObj.Name ?? _objHashList.Lookup(feObj.NameHash);
 
         if (nodeImageKey == null)
         {
             nodeText = feObj.GetObjectType() + " " + nodeText;
         }
 
-        var objTreeNode = collection.Add(nodeText);
+        var objTreeNode = collection.Add("");
         objTreeNode.Tag = viewNode;
         objTreeNode.Name = nodeText;
         if (nodeImageKey != null) objTreeNode.ImageKey = objTreeNode.SelectedImageKey = nodeImageKey;
+        objTreeNode.NodeFont = new Font(treeView1.Font, feObj.Name == null ? FontStyle.Regular : FontStyle.Bold);
+        objTreeNode.Text = nodeText;
 
         foreach (var script in feObj.GetScripts()) CreateScriptTreeNode(objTreeNode.Nodes, script);
 
         return objTreeNode;
     }
 
-    private static void CreateScriptTreeNode(TreeNodeCollection collection, Script script)
+    private void CreateScriptTreeNode(TreeNodeCollection collection, Script script)
     {
-        var node = collection.Add(script.Name ?? $"0x{script.Id:X}");
+        var nodeText = script.Name ?? _scriptHashList.Lookup(script.Id);
+        var node = collection.Add("");
         // ReSharper disable once LocalizableElement
         node.ImageKey = node.SelectedImageKey = "TreeItem_Script";
         node.Tag = script;
+        node.NodeFont = new Font(treeView1.Font, script.Name == null ? FontStyle.Regular : FontStyle.Bold);
+        node.Text = nodeText;
 
         foreach (var scriptEvent in script.Events)
         {
@@ -403,6 +421,39 @@ public partial class PackageView : Form
 
         _currentPackage.Objects.Remove(node.GetObject());
         CurrentPackageWasModified();
+    }
+
+    internal class HashList
+    {
+        private Dictionary<uint, string> _dictionary;
+
+        internal static HashList FromEmbeddedFile(string name)
+        {
+            var dict = new Dictionary<uint, string>();
+            using var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(name);
+            if (s == null)
+                throw new Exception($"Could not find embedded file: {name}");
+            using var sr = new StreamReader(s);
+            while (sr.ReadLine() is { } line)
+            {
+                var hash = Hashing.BinHash(line);
+                if (!dict.TryGetValue(hash, out var existing))
+                    dict.Add(hash, line);
+                else if (existing != line)
+                    throw new Exception($"Hash conflict in {name}: {line} and {existing} both hash to 0x{hash:X8}");
+                // dict.Add(Hashing.BinHash(line), line);
+            }
+
+            return new HashList
+            {
+                _dictionary = dict
+            };
+        }
+
+        internal string Lookup(uint hash)
+        {
+            return _dictionary.TryGetValue(hash, out var s) ? s : $"0x{hash:X8}";
+        }
     }
 
     [UsedImplicitly]
