@@ -105,7 +105,8 @@ public class GLRenderTreeRenderer
 
         DoNodeRender(dt);
 
-        _selectedRenderNode?.GetBoundingQuad().DrawBoundingBox(_gl);
+        // todo: fix bounding boxes
+        // _selectedRenderNode?.GetBoundingQuad().DrawBoundingBox(_gl);
 
         _gl.BindTexture(OpenGL.GL_TEXTURE_2D, 0);
         _gl.Disable(OpenGL.GL_TEXTURE_2D);
