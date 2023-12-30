@@ -56,6 +56,7 @@ public partial class PackageView : Form
         imageList.Images.Add("TreeItem_GenericResource", Resources.TreeItem_GenericResource);
         imageList.Images.Add("TreeItem_Font", Resources.TreeItem_Font);
         imageList.Images.Add("TreeItem_Keyframe", Resources.TreeItem_Keyframe);
+        imageList.Images.Add("TreeItem_SimpleImage", Resources.TreeItem_SimpleImage);
         treeView1.ImageList = imageList;
     }
 
@@ -133,6 +134,7 @@ public partial class PackageView : Form
             ObjectType.Movie => "TreeItem_Movie",
             ObjectType.ColoredImage => "TreeItem_ColoredImage",
             ObjectType.MultiImage => "TreeItem_MultiImage",
+            ObjectType.SimpleImage => "TreeItem_SimpleImage",
             _ => null
         };
 
