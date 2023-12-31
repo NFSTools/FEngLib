@@ -186,7 +186,7 @@ public partial class PackageView : Form
         foreach (var scriptEvent in script.Events)
         {
             var eventNode =
-                node.Nodes.Add($"0x{scriptEvent.EventId:X} -> {scriptEvent.Target:X} @ T={scriptEvent.Time}");
+                node.Nodes.Add($"{_msgHashList.Lookup(scriptEvent.EventId)} -> {scriptEvent.Target:X} @ T={scriptEvent.Time}");
             eventNode.ImageKey = eventNode.SelectedImageKey = "TreeItem_ScriptEvent";
         }
 
