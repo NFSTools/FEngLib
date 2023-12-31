@@ -123,6 +123,26 @@ namespace FEngViewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap TreeItem_Message {
+            get {
+                object obj = ResourceManager.GetObject("TreeItem_Message", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap TreeItem_MessageResponse {
+            get {
+                object obj = ResourceManager.GetObject("TreeItem_MessageResponse", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap TreeItem_Movie {
             get {
                 object obj = ResourceManager.GetObject("TreeItem_Movie", resourceCulture);

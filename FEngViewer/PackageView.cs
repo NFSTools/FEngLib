@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using CommandLine;
 using FEngLib;
+using FEngLib.Messaging;
 using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Scripts;
@@ -57,6 +58,8 @@ public partial class PackageView : Form
         imageList.Images.Add("TreeItem_Font", Resources.TreeItem_Font);
         imageList.Images.Add("TreeItem_Keyframe", Resources.TreeItem_Keyframe);
         imageList.Images.Add("TreeItem_SimpleImage", Resources.TreeItem_SimpleImage);
+        imageList.Images.Add("TreeItem_Message", Resources.TreeItem_Message);
+        imageList.Images.Add("TreeItem_MessageResponse", Resources.TreeItem_MessageResponse);
         treeView1.ImageList = imageList;
     }
 
@@ -100,6 +103,15 @@ public partial class PackageView : Form
                 _ => "TreeItem_GenericResource"
             };
         }
+
+        var packageMsgList = _rootNode.Nodes.Add("Messages");
+        packageMsgList.ImageKey = packageMsgList.SelectedImageKey = "TreeItem_Message";
+        foreach (var messageDefinition in package.MessageDefinitions)
+        {
+            var node = packageMsgList.Nodes.Add($"{messageDefinition.Name} (cat: {messageDefinition.Category})");
+            node.ImageKey = node.SelectedImageKey = "TreeItem_Message";
+        }
+        CreateMessageResponsesList(_rootNode.Nodes, package);
 
         //var objectListNode = rootNode.Nodes.Add("Objects");
         //objectListNode.ImageKey = "TreeItem_ObjectList";
@@ -153,8 +165,11 @@ public partial class PackageView : Form
         objTreeNode.NodeFont = new Font(treeView1.Font, feObj.Name == null ? FontStyle.Regular : FontStyle.Bold);
         objTreeNode.Text = nodeText;
 
-        foreach (var script in feObj.GetScripts()) CreateScriptTreeNode(objTreeNode.Nodes, script);
+        var scriptsTreeNode = objTreeNode.Nodes.Add("Scripts");
+        scriptsTreeNode.ImageKey = scriptsTreeNode.SelectedImageKey = "TreeItem_Script";
+        foreach (var script in feObj.GetScripts()) CreateScriptTreeNode(scriptsTreeNode.Nodes, script);
 
+        CreateMessageResponsesList(objTreeNode.Nodes, feObj);
         return objTreeNode;
     }
 
@@ -232,6 +247,22 @@ public partial class PackageView : Form
                 break;
             default:
                 throw new NotImplementedException($"Unsupported: {track.GetType()}");
+        }
+    }
+
+    private void CreateMessageResponsesList(TreeNodeCollection collection, IHaveMessageResponses responsesContainer)
+    {
+        var rootNode = collection.Add("Message Responses");
+        rootNode.ImageKey = rootNode.SelectedImageKey = "TreeItem_MessageResponse";
+        foreach (var message in responsesContainer.MessageResponses)
+        {
+            var messageNode = rootNode.Nodes.Add(_msgHashList.Lookup(message.Id));
+            messageNode.ImageKey = messageNode.SelectedImageKey = "TreeItem_Message";
+            foreach (var response in message.Responses)
+            {
+                var respNode = messageNode.Nodes.Add($"{_msgHashList.Lookup(response.Id)} -> 0x{response.Target:X}");
+                respNode.ImageKey = respNode.SelectedImageKey = "TreeItem_MessageResponse";
+            }
         }
     }
 
