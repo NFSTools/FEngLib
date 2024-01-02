@@ -35,7 +35,6 @@ public class GLRenderTreeRenderer
     public GLRenderTreeRenderer(OpenGL gl)
     {
         _gl = gl;
-        _stopwatch = Stopwatch.StartNew();
     }
 
     public RenderTreeNode SelectedNode { get; private set; }
@@ -91,6 +90,7 @@ public class GLRenderTreeRenderer
 
         SelectedNode = null;
         _selectedRenderNode = null;
+        _stopwatch = Stopwatch.StartNew();
     }
 
     public void Render()
@@ -162,6 +162,7 @@ public class GLRenderTreeRenderer
             foreach (var node in nodeListEntry.nodes)
             {
                 // Debug.WriteLine("Updating node: {0:X}", node.GetObject().Guid);
+                // if (node.GetObject().Data == null) continue;
                 node.Update(renderContext, timeDelta);
 
                 if (node is RenderTreeGroup groupNode)
