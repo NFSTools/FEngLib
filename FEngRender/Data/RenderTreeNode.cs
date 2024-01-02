@@ -5,6 +5,7 @@ using System.Numerics;
 using FEngLib.Objects;
 using FEngLib.Scripts;
 using FEngLib.Structures;
+using FEngLib.Utils;
 using FEngRender.Scripts;
 
 namespace FEngRender.Data;
@@ -84,7 +85,6 @@ public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTr
     protected RenderTreeNode(TObject frontendObject)
     {
         FrontendObject = frontendObject;
-        SetCurrentScript(0x1744B3);
     }
 
     /// <summary>
@@ -110,42 +110,145 @@ public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTr
 
     public override void Update(RenderContext context, int deltaMs)
     {
-        LoadProperties();
-
-        if (CurrentScript is { } currentScript
-            && CurrentScriptTime >= 0)
+        if (CurrentScript == null)
         {
-            ApplyScript(currentScript, currentScript.Tracks);
+            LoadProperties();
+            SetCurrentScript(Hashing.BinHash("INIT"));
+            if (CurrentScript == null)
+                throw new Exception($"Init script not found for object 0x{FrontendObject.Guid:X}");
+        }
 
-            if (CurrentScriptTime >= CurrentScript.Length)
+        var currentScriptTimeInit = CurrentScriptTime;
+        var currentScriptLength = (int)CurrentScript.Length;
+        var currentScriptTimeUpdated = Math.Max(0, deltaMs + currentScriptTimeInit);
+        CurrentScriptTime = currentScriptTimeUpdated;
+
+        // see FEPackage::UpdateObject in MW IDB
+        if (currentScriptTimeUpdated < currentScriptLength)
+        {
+            // TODO: Add an "executing" condition so we can pause playback
+            if (CurrentScript.Events.Count > 0)
             {
-                if ((CurrentScript.Flags & 1) == 1)
-                {
-                    Debug.WriteLine("Looping script {0:X} for object {1:X}", CurrentScript.Id,
-                        FrontendObject.NameHash);
-                    CurrentScriptTime = 0;
-                }
-                else if (CurrentScript.ChainedId is { } currentScriptChainedId)
-                {
-                    var nextScript = FrontendObject.FindScript(currentScriptChainedId) ??
-                                     throw new Exception(
-                                         $"Cannot find chained script (object {FrontendObject.NameHash:X}, base script {CurrentScript.Id:X}): {currentScriptChainedId:X}");
-                    Debug.WriteLine("Activating chained script for object {1:X}: {0}",
-                        nextScript.Name ?? nextScript.Id.ToString("X"), FrontendObject.NameHash);
+                // TODO: Implement script events (FEPackage::IssueScriptMessages)
+            }
+        }
+        else
+        {
+            // TODO: Add an "executing" condition so we can pause playback
+            if (CurrentScript.ChainedId is { } chainedScriptId)
+            {
+                ApplyScript(CurrentScript, CurrentScript.Tracks);
 
-                    SetCurrentScript(nextScript);
+                Debug.WriteLine("Script 0x{0:X} has ended, starting chained script 0x{1:X}", CurrentScript.Id, chainedScriptId);
+                var chainedScript = FrontendObject.FindScript(chainedScriptId) ??
+                                    throw new Exception($"Could not find chained script: 0x{chainedScriptId:X}");
+                // "overtime" is how far beyond the end of the script we got
+                var currentScriptOvertime = CurrentScriptTime - currentScriptLength;
+
+                if (CurrentScript.Events.Count > 0)
+                {
+                    // TODO: Implement script events (FEPackage::IssueScriptMessages)
+                }
+
+                CurrentScript = chainedScript;
+                CurrentScriptTime = currentScriptOvertime;
+
+                if (chainedScript.Events.Count > 0)
+                {
+                    // TODO: Implement script events (FEPackage::IssueScriptMessages)
+                }
+
+                Debug.WriteLine("Activated chained script 0x{0:X} at time {1}", CurrentScript.Id, CurrentScriptTime);
+            }
+            else if ((CurrentScript.Flags & 2) == 2)
+            {
+                Debug.Assert(false, "Unexpected script flag: 2");
+                //if (currentScriptLength > 0)
+                //{
+                //    CurrentScriptTime = currentScriptTimeUpdated % (2 * currentScriptLength);
+                //}
+                //else
+                //{
+                //    CurrentScriptTime = 0;
+                //}
+            }
+            else if ((CurrentScript.Flags & 1) == 1)
+            {
+                if (currentScriptLength > 0)
+                {
+                    if (CurrentScript.Events.Count > 0)
+                    {
+                        // TODO: Implement script events (FEPackage::IssueScriptMessages)
+                    }
+
+                    CurrentScriptTime %= currentScriptLength;
+                    Debug.WriteLine("Looping script 0x{0:X}, time is now {1}", CurrentScript.Id, CurrentScriptTime);
                 }
                 else
                 {
-                    Debug.WriteLine("Current script for object {0:X} has ended", FrontendObject.NameHash);
-                    SetCurrentScript(null);
+                    CurrentScriptTime = 0;
                 }
             }
             else
             {
-                CurrentScriptTime += deltaMs;
+                if (CurrentScript.Events.Count > 0)
+                {
+                    // TODO: Implement script events (FEPackage::IssueScriptMessages)
+                }
+
+                //Debug.WriteLine("Script 0x{0:X} has ended at time {1}", CurrentScript.Id, CurrentScriptTime);
+                CurrentScriptTime = currentScriptLength + 1;
             }
         }
+
+        // TODO: Add an "executing" condition so we can pause playback
+        if (currentScriptTimeInit != CurrentScriptTime || currentScriptTimeInit != CurrentScript.Length + 1)
+        {
+            ApplyScript(CurrentScript, CurrentScript.Tracks);
+        }
+
+        //if (CurrentScript is { } currentScript
+        //    && CurrentScriptTime >= 0)
+        //{
+        //    ApplyScript(currentScript, currentScript.Tracks);
+
+        //    if (CurrentScriptTime >= CurrentScript.Length)
+        //    {
+        //        if ((CurrentScript.Flags & 1) == 1)
+        //        {
+        //            Debug.WriteLine("Looping script {0:X} for object {1:X}", CurrentScript.Id,
+        //                FrontendObject.NameHash);
+        //            if (CurrentScript.Length > 0)
+        //            {
+        //                CurrentScriptTime %= (int)CurrentScript.Length;
+        //                Debug.WriteLine("Rolled time over to {0}", CurrentScriptTime);
+        //            }
+        //            else
+        //            {
+        //                CurrentScriptTime = 0;
+        //            }
+        //        }
+        //        else if (CurrentScript.ChainedId is { } currentScriptChainedId)
+        //        {
+        //            var nextScript = FrontendObject.FindScript(currentScriptChainedId) ??
+        //                             throw new Exception(
+        //                                 $"Cannot find chained script (object {FrontendObject.NameHash:X}, base script {CurrentScript.Id:X}): {currentScriptChainedId:X}");
+        //            Debug.WriteLine("Activating chained script for object {1:X}: {0}",
+        //                nextScript.Name ?? nextScript.Id.ToString("X"), FrontendObject.NameHash);
+
+        //            SetCurrentScript(nextScript);
+        //        }
+        //        else
+        //        {
+        //            Debug.WriteLine("Current script for object {0:X} has ended", FrontendObject.NameHash);
+        //            SetCurrentScript(null);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        CurrentScriptTime += deltaMs;
+        //    }
+        //}
 
         var scaleMatrix = Matrix4x4.CreateScale(Size);
         var rotateMatrix = Matrix4x4.CreateFromQuaternion(Rotation);
