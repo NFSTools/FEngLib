@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using FEngLib.Messaging;
@@ -111,6 +112,7 @@ public abstract class BaseObject : BaseObject<ObjectData, BaseObjectScript>
 /// A type inheriting from ObjectData that represents any additional attributes relevant for this object type.
 /// </typeparam>
 /// <typeparam name="TScript"></typeparam>
+[DebuggerDisplay("{GetObjectType()}: {Guid,h} (parent: {Parent?.Guid,h})")]
 public abstract class BaseObject<TData, TScript> : IObject<TData>, IScriptedObject<TScript>
     where TData : ObjectData where TScript : Script, new()
 {
