@@ -26,11 +26,9 @@ public class PackageMessageTargetsChunk : FrontendChunk
     {
         switch (tag)
         {
-            // TODO: do we want to use these for data validation?
+            // These are not really important to us. They are also trivial to regenerate.
             case MessageTargetCountTag:
-                break;
-            case MessageTargetListTag messageTargetListTag:
-                package.MessageTargetLists.Add(messageTargetListTag.Targets);
+            case MessageTargetListTag:
                 break;
             default:
                 messageResponseTagProcessor.ProcessTag(package, tag);

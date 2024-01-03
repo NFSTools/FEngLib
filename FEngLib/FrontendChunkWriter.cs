@@ -365,8 +365,13 @@ public class FrontendChunkWriter
 
         writer.WriteChunk(Targets, bw =>
         {
-            bw.WriteTag(MessageTargetCount, bw => bw.Write(Package.MessageTargetLists.Count));
-            foreach (var targetList in Package.MessageTargetLists)
+            var targetLists = Package.Objects.SelectMany(o => o.MessageResponses.Select(mr => (o.Guid, mr.Id)))
+                .GroupBy(e => e.Id)
+                .Select(g => new MessageTargets(g.Key, g.Select(e => e.Guid).ToList()))
+                .ToList();
+
+            bw.WriteTag(MessageTargetCount, bw => bw.Write(targetLists.Count));
+            foreach (var targetList in targetLists)
             {
                 bw.WriteTag(MessageTargetList, bw =>
                 {

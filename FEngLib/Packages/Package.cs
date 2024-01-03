@@ -14,7 +14,6 @@ public class Package : IHaveMessageResponses
         ResourceRequests = new List<ResourceRequest>();
         Objects = new List<IObject<ObjectData>>();
         MessageResponses = new List<MessageResponse>();
-        MessageTargetLists = new List<MessageTargets>();
         MessageDefinitions = new List<MessageDefinition>();
     }
 
@@ -22,7 +21,6 @@ public class Package : IHaveMessageResponses
     public string Filename { get; set; }
     public List<ResourceRequest> ResourceRequests { get; }
     public List<IObject<ObjectData>> Objects { get; }
-    public List<MessageTargets> MessageTargetLists { get; }
     public List<MessageDefinition> MessageDefinitions { get; }
     public List<MessageResponse> MessageResponses { get; }
 

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using FEngLib.Chunks;
 using FEngLib.Tags;
 
@@ -16,14 +17,15 @@ public class MessageTargetListTag : Tag
             throw new ChunkReadingException("Length not divisible by 4");
         }
 
-        Targets = new MessageTargets
-        {
-            MsgId = br.ReadUInt32()
-        };
+        var msgId = br.ReadUInt32();
+        length -= 4;
+        var targetList = new List<uint>(length / 4);
 
-        for (var i = 0; i < length / 4 - 1; i++)
+        for (int i = 0; i < targetList.Capacity; i++)
         {
-            Targets.Targets.Add(br.ReadUInt32());
+            targetList.Add(br.ReadUInt32());
         }
+
+        Targets = new MessageTargets(msgId, targetList);
     }
 }
