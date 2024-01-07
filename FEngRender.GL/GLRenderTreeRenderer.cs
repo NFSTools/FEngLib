@@ -21,7 +21,8 @@ namespace FEngRender.GL;
 public class GLRenderTreeRenderer
 {
     private readonly OpenGL _gl;
-    private readonly Dictionary<string, Texture> _loadedTextures = new();
+    private readonly ITextureProvider _textureProvider;
+    //private readonly Dictionary<string, Texture> _loadedTextures = new();
     private readonly Dictionary<RenderTreeNode, InternalRenderNode> _renderTreeToInternalNode = new();
     private readonly Dictionary<uint, Texture> _resourceRequestToTexture = new();
 
@@ -32,9 +33,10 @@ public class GLRenderTreeRenderer
     private Stopwatch _stopwatch;
     private List<RenderTreeNode> _treeRootNodes;
 
-    public GLRenderTreeRenderer(OpenGL gl)
+    public GLRenderTreeRenderer(OpenGL gl, ITextureProvider textureProvider)
     {
         _gl = gl;
+        _textureProvider = textureProvider;
     }
 
     public RenderTreeNode SelectedNode { get; private set; }
@@ -69,15 +71,15 @@ public class GLRenderTreeRenderer
         _gl.Enable(OpenGL.GL_TEXTURE_2D);
     }
 
-    public void LoadTextures(string directory)
-    {
-        _loadedTextures.Clear();
-        foreach (var pngFile in Directory.GetFiles(directory, "*.png"))
-        {
-            var filename = Path.GetFileNameWithoutExtension(pngFile) ?? "";
-            _loadedTextures.Add(filename.ToUpperInvariant(), new Texture(_gl, pngFile));
-        }
-    }
+    //public void LoadTextures(string directory)
+    //{
+    //    _loadedTextures.Clear();
+    //    foreach (var pngFile in Directory.GetFiles(directory, "*.png"))
+    //    {
+    //        var filename = Path.GetFileNameWithoutExtension(pngFile) ?? "";
+    //        _loadedTextures.Add(filename.ToUpperInvariant(), new Texture(_gl, pngFile));
+    //    }
+    //}
 
     public void SetTree(RenderTree tree)
     {
@@ -175,7 +177,7 @@ public class GLRenderTreeRenderer
 
     private InternalRenderNode GenerateInternalRenderNode(RenderTreeNode node)
     {
-        var texture = GetTexture(node.GetObject().ResourceRequest);
+        var texture = new Texture(_gl, _textureProvider.GetTexture(node.GetObject().ResourceRequest));
         return node switch
         {
             RenderTreeColoredImage ci => new ColoredImageInternalRenderNode(ci, texture),
@@ -205,26 +207,26 @@ public class GLRenderTreeRenderer
     //         q.DrawBoundingBox(_gl);
     // }
 
-    private Texture GetTexture(ResourceRequest resource)
-    {
-        if (resource is not { Type: ResourceType.Image }) return null;
+    //private Texture GetTexture(ResourceRequest resource)
+    //{
+    //    if (resource is not { Type: ResourceType.Image }) return null;
 
-        if (_resourceRequestToTexture.TryGetValue(resource.ID, out var texture)) return texture;
+    //    if (_resourceRequestToTexture.TryGetValue(resource.ID, out var texture)) return texture;
 
-        var key = CleanResourcePath(resource.Name);
-        if (!_loadedTextures.TryGetValue(key, out texture))
-            Debug.WriteLine("Texture not found: {0}", new object[] { key });
-        else
-            _resourceRequestToTexture[resource.ID] = texture;
+    //    var key = CleanResourcePath(resource.Name);
+    //    if (!_loadedTextures.TryGetValue(key, out texture))
+    //        Debug.WriteLine("Texture not found: {0}", new object[] { key });
+    //    else
+    //        _resourceRequestToTexture[resource.ID] = texture;
 
-        //Debug.WriteLine("Texture not found: {0}", new object[] { key });
-        return texture;
-    }
+    //    //Debug.WriteLine("Texture not found: {0}", new object[] { key });
+    //    return texture;
+    //}
 
-    private static string CleanResourcePath(string path)
-    {
-        return path.Split('\\')[^1].Split('.')[0].ToUpperInvariant();
-    }
+    //private static string CleanResourcePath(string path)
+    //{
+    //    return path.Split('\\')[^1].Split('.')[0].ToUpperInvariant();
+    //}
 
     private abstract class InternalRenderNode
     {

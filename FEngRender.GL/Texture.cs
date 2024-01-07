@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Diagnostics;
+using System.Drawing;
 using SharpGL;
 
 namespace FEngRender.GL;
@@ -10,13 +11,14 @@ public class Texture
     public readonly int Width;
     public readonly int Height;
 
-    public Texture(OpenGL gl, string path)
+    public Texture(OpenGL gl, Bitmap image)
     {
         GLTexture = new SharpGL.SceneGraph.Assets.Texture();
-        using var image = new Bitmap(path);
-
         Width = image.Width;
         Height = image.Height;
-        GLTexture.Create(gl, image);
+        GLTexture.Create(gl, (Bitmap) image.Clone());
+
+        Debug.Assert((Width & (Width - 1)) == 0);
+        Debug.Assert((Height & (Height - 1)) == 0);
     }
 }

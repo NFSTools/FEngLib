@@ -11,11 +11,13 @@ namespace FEngViewer;
 public partial class GLRenderControl : UserControl, IRenderControl
 {
     private GLRenderTreeRenderer _renderer;
+    private readonly TextureProvider _textureProvider;
 
     [CanBeNull] private RenderTree _renderTree;
 
     public GLRenderControl()
     {
+        _textureProvider = new TextureProvider();
         InitializeComponent();
     }
 
@@ -32,7 +34,7 @@ public partial class GLRenderControl : UserControl, IRenderControl
 
     public void Init(string textureDir)
     {
-        _renderer?.LoadTextures(textureDir);
+        _textureProvider.LoadTextures(textureDir);
     }
 
     public void Render(RenderTree renderTree)
@@ -43,7 +45,7 @@ public partial class GLRenderControl : UserControl, IRenderControl
 
     private void openglControl1_OpenGLInitialized(object sender, EventArgs e)
     {
-        _renderer = new GLRenderTreeRenderer(openglControl1.OpenGL);
+        _renderer = new GLRenderTreeRenderer(openglControl1.OpenGL, _textureProvider);
         _renderer.PrepareRender();
     }
 

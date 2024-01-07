@@ -63,6 +63,16 @@ namespace FEngViewer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap DefaultTexture {
+            get {
+                object obj = ResourceManager.GetObject("DefaultTexture", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap TreeItem_ColoredImage {
             get {
                 object obj = ResourceManager.GetObject("TreeItem_ColoredImage", resourceCulture);
