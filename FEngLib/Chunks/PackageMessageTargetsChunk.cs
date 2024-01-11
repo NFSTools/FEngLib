@@ -38,6 +38,6 @@ public class PackageMessageTargetsChunk : FrontendChunk
 
     public override FrontendChunkType GetChunkType()
     {
-        return FrontendChunkType.PackageResponses;
+        return FrontendChunkType.Targets;
     }
 }
