@@ -21,7 +21,7 @@ public class TextureProvider : ITextureProvider
     public Bitmap GetTexture(ResourceRequest resourceRequest)
     {
         // if the resource isn't in the cache, we might still have it, but try not to waste time
-        if (resourceRequest.Type != ResourceType.Image || string.IsNullOrWhiteSpace(resourceRequest.Name))
+        if (resourceRequest is not { Type: ResourceType.Image } || string.IsNullOrWhiteSpace(resourceRequest.Name))
         {
             // TODO(2024/01/07): this should really just throw. there's no reason for us to be calling GetTexture on font resources, for example.
             // "there's no reason" but we're doing it anyway... oh well
