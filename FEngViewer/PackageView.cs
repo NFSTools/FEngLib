@@ -469,10 +469,10 @@ public partial class PackageView : Form
             using var sr = new StreamReader(s);
             while (sr.ReadLine() is { } line)
             {
-                var hash = Hashing.BinHash(line);
+                var hash = Hashing.BinHash(line.ToUpper());
                 if (!dict.TryGetValue(hash, out var existing))
                     dict.Add(hash, line);
-                else if (existing != line)
+                else if (!string.Equals(line, existing, StringComparison.InvariantCultureIgnoreCase))
                     throw new Exception($"Hash conflict in {name}: {line} and {existing} both hash to 0x{hash:X8}");
                 // dict.Add(Hashing.BinHash(line), line);
             }
