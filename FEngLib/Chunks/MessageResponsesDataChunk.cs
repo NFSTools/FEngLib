@@ -14,15 +14,17 @@ public class MessageResponsesDataChunk : FrontendObjectChunk
 
     public override IObject<ObjectData> Read(Package package, ObjectReaderState readerState, BinaryReader reader)
     {
-        var tagProcessor = new MessageResponseTagProcessor<IObject<ObjectData>>();
+        var tagProcessor = new MessageResponseTagProcessor();
         TagStream tagStream = new MessageTagStream(reader,
             readerState.CurrentChunkBlock.Size);
 
         while (tagStream.HasTag())
         {
             var tag = tagStream.NextTag();
-            tagProcessor.ProcessTag(FrontendObject, tag);
+            tagProcessor.ProcessTag(tag);
         }
+
+        ResponseHelpers.PopulateMessageResponseList(tagProcessor.MessageResponseEntryList, FrontendObject);
 
         return FrontendObject;
     }

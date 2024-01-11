@@ -10,15 +10,17 @@ public class PackageResponsesChunk : FrontendChunk
     public override void Read(Package package, FrontendChunkBlock chunkBlock,
         FrontendChunkReader chunkReader, BinaryReader reader)
     {
-        var tagProcessor = new MessageResponseTagProcessor<Package>();
+        var tagProcessor = new MessageResponseTagProcessor();
         TagStream tagStream = new MessageTagStream(reader,
             chunkBlock.Size);
 
         while (tagStream.HasTag())
         {
             var tag = tagStream.NextTag();
-            tagProcessor.ProcessTag(package, tag);
+            tagProcessor.ProcessTag(tag);
         }
+
+        ResponseHelpers.PopulateMessageResponseList(tagProcessor.MessageResponseEntryList, package);
     }
 
     public override FrontendChunkType GetChunkType()

@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using CommandLine;
 using FEngLib;
 using FEngLib.Messaging;
+using FEngLib.Messaging.Commands;
 using FEngLib.Objects;
 using FEngLib.Packages;
 using FEngLib.Scripts;
@@ -260,10 +261,21 @@ public partial class PackageView : Form
             messageNode.ImageKey = messageNode.SelectedImageKey = "TreeItem_Message";
             foreach (var response in message.Responses)
             {
-                var respNode = messageNode.Nodes.Add($"{_msgHashList.Lookup(response.Id)} -> 0x{response.Target:X}");
+                var respNode = messageNode.Nodes.Add(DescribeMessageResponse(response));
                 respNode.ImageKey = respNode.SelectedImageKey = "TreeItem_MessageResponse";
             }
         }
+    }
+
+    private static string DescribeMessageResponse(ResponseCommand response)
+    {
+        return response switch
+        {
+            SetScript setScript => $"SetScript({_scriptHashList.Lookup(setScript.ScriptHash)})",
+            ITargetedCommand targetedCommand and MessageCommand messageCommand =>
+                $"{response.GetCommandName()}(0x{targetedCommand.Target:X}, {_msgHashList.Lookup(messageCommand.MessageHash)})",
+            _ => response.ToString()
+        };
     }
 
     private void SavePackageToChunk(string path)

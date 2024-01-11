@@ -391,18 +391,26 @@ public class FrontendChunkWriter
         bw.WriteTag(MessageResponseCount, bw => bw.Write(msgr.Responses.Count));
         foreach (var resp in msgr.Responses)
         {
-            bw.WriteTag(ResponseId, bw => bw.Write(resp.Id));
+            bw.WriteTag(ResponseId, bw => bw.Write(resp.GetId()));
 
-            if (resp.IntParam != null)
-                bw.WriteTag(ResponseIntParam, bw => bw.Write(resp.IntParam.Value));
-            else if (resp.StringParam != null)
-                bw.WriteTag(ResponseStringParam, bw =>
-                {
-                    bw.WriteCString(resp.StringParam);
-                    bw.AlignWriter(4);
-                });
+            switch (resp)
+            {
+                case IIntegerCommand integerCommand:
+                    bw.WriteTag(ResponseIntParam, bw => bw.Write(integerCommand.GetParameter()));
+                    break;
+                case IStringCommand stringCommand:
+                    bw.WriteTag(ResponseStringParam, bw =>
+                    {
+                        bw.WriteCString(stringCommand.GetParameter());
+                        bw.AlignWriter(4);
+                    });
+                    break;
+                case NonParameterizedCommand:
+                    bw.WriteTag(ResponseIntParam, bw => bw.Write(0u));
+                    break;
+            }
 
-            bw.WriteTag(ResponseTarget, bw => bw.Write(resp.Target));
+            bw.WriteTag(ResponseTarget, bw => bw.Write(resp is ITargetedCommand targetedCommand ? targetedCommand.Target : 0));
         }
     }
 }

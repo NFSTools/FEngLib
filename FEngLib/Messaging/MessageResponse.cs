@@ -6,9 +6,15 @@ public class MessageResponse
 {
     public MessageResponse()
     {
-        Responses = new List<Response>();
+        Responses = new List<ResponseCommand>();
+    }
+
+    public MessageResponse(uint id, List<ResponseCommand> responses)
+    {
+        Id = id;
+        Responses = responses;
     }
 
     public uint Id { get; set; }
-    public List<Response> Responses { get; set; }
+    public List<ResponseCommand> Responses { get; set; }
 }
