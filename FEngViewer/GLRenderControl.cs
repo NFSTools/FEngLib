@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 using FEngLib.Structures;
 using FEngRender.Data;
@@ -34,7 +35,8 @@ public partial class GLRenderControl : UserControl, IRenderControl
 
     public void Init(string textureDir)
     {
-        _textureProvider.LoadTextures(textureDir);
+        if (Directory.Exists(textureDir))
+            _textureProvider.LoadTextures(textureDir);
     }
 
     public void Render(RenderTree renderTree)
