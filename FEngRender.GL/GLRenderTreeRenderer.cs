@@ -128,16 +128,17 @@ public class GLRenderTreeRenderer
 
     private void DoNodeRender(int dt)
     {
-        var renderNodes = new List<InternalRenderNode>(512);
+        //var renderNodes = new List<InternalRenderNode>(512);
 
         // Step 1: Reset object sorter
         _nodeSorter.Reset();
 
         // Step 2: Update nodes
-        PrepareNodes(Matrix4x4.Identity, dt, renderNodes);
+        //PrepareNodes(Matrix4x4.Identity, dt, renderNodes);
+            UpdateNodes(dt, _treeRootNodes, null, Matrix4x4.Identity);
 
         // Step 3: Build render list
-        foreach (var renderNode in renderNodes) renderNode.Init(_nodeSorter);
+        foreach (var treeNode in _treeRootNodes) _renderTreeToInternalNode[treeNode].Init(_nodeSorter);
 
         // Step 3.5: Fix node order
         _nodeSorter.Finish();
@@ -150,29 +151,16 @@ public class GLRenderTreeRenderer
             renderNode.Render(_gl);
     }
 
-    private void PrepareNodes(Matrix4x4 viewMatrix, int timeDelta, ICollection<InternalRenderNode> renderNodeList)
+    private void UpdateNodes(int timeDelta, IEnumerable<RenderTreeNode> nodes, RenderTreeNode parent, Matrix4x4 transform)
     {
-        Debug.WriteLine("Preparing nodes");
-        var nodeUpdateQueue =
-            new Queue<(IEnumerable<RenderTreeNode> nodes, RenderTreeNode parent, Matrix4x4 transform)>();
+        var renderContext = new RenderContext(transform, parent);
 
-        nodeUpdateQueue.Enqueue((_treeRootNodes, null, viewMatrix));
-
-        while (nodeUpdateQueue.TryDequeue(out var nodeListEntry))
-        {
-            var renderContext = new RenderContext(nodeListEntry.transform, nodeListEntry.parent);
-            foreach (var node in nodeListEntry.nodes)
+        foreach (var node in nodes)
             {
-                // Debug.WriteLine("Updating node: {0:X}", node.GetObject().Guid);
-                // if (node.GetObject().Data == null) continue;
                 node.Update(renderContext, timeDelta);
-
-                if (node is RenderTreeGroup groupNode)
-                    nodeUpdateQueue.Enqueue((groupNode, groupNode, groupNode.Transform));
-            }
+            if (node is RenderTreeGroup group)
+                UpdateNodes(timeDelta, group, group, group.Transform);
         }
-
-        foreach (var treeRootNode in _treeRootNodes) renderNodeList.Add(_renderTreeToInternalNode[treeRootNode]);
     }
 
     private InternalRenderNode GenerateInternalRenderNode(RenderTreeNode node)
