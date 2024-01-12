@@ -95,7 +95,7 @@ public class GLRenderTreeRenderer
         _stopwatch = Stopwatch.StartNew();
     }
 
-    public void Render()
+    public void Render(bool shouldUpdateNodes, float timeStretch)
     {
         _gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
         _gl.LoadIdentity();
@@ -103,9 +103,10 @@ public class GLRenderTreeRenderer
         // disable depth
         _gl.DepthMask(0);
 
-        var dt = (int)(_stopwatch.ElapsedMilliseconds - _lastRenderTime);
+        var dt = (_stopwatch.ElapsedMilliseconds - _lastRenderTime);
+        var renderDt = (int)(dt * timeStretch);
 
-        DoNodeRender(dt);
+        DoNodeRender(renderDt, shouldUpdateNodes);
 
         // todo: fix bounding boxes
         // _selectedRenderNode?.GetBoundingQuad().DrawBoundingBox(_gl);
@@ -126,7 +127,7 @@ public class GLRenderTreeRenderer
         _gl.ClearColor(colorV.X, colorV.Y, colorV.Z, colorV.W);
     }
 
-    private void DoNodeRender(int dt)
+    private void DoNodeRender(int dt, bool shouldUpdateNodes)
     {
         //var renderNodes = new List<InternalRenderNode>(512);
 
@@ -135,6 +136,7 @@ public class GLRenderTreeRenderer
 
         // Step 2: Update nodes
         //PrepareNodes(Matrix4x4.Identity, dt, renderNodes);
+        if (shouldUpdateNodes)
             UpdateNodes(dt, _treeRootNodes, null, Matrix4x4.Identity);
 
         // Step 3: Build render list
@@ -156,8 +158,8 @@ public class GLRenderTreeRenderer
         var renderContext = new RenderContext(transform, parent);
 
         foreach (var node in nodes)
-            {
-                node.Update(renderContext, timeDelta);
+        {
+            node.Update(renderContext, timeDelta);
             if (node is RenderTreeGroup group)
                 UpdateNodes(timeDelta, group, group, group.Transform);
         }

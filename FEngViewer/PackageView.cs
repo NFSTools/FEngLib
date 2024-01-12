@@ -38,6 +38,12 @@ public partial class PackageView : Form
         _msgHashList = HashList.FromEmbeddedFile("FEngViewer.Resources.FngMessages.txt");
     }
 
+    public record ScriptSpeedOption(float Value)
+    {
+        [UsedImplicitly]
+        public string Description => $"{Value}x";
+    }
+
     public PackageView()
     {
         InitializeComponent();
@@ -62,6 +68,15 @@ public partial class PackageView : Form
         imageList.Images.Add("TreeItem_Message", Resources.TreeItem_Message);
         imageList.Images.Add("TreeItem_MessageResponse", Resources.TreeItem_MessageResponse);
         treeView1.ImageList = imageList;
+
+        toolStripScriptSpeedCombox.SelectedIndexChanged += (o, e) =>
+        {
+            viewOutput.PlaySpeed = ((ScriptSpeedOption)toolStripScriptSpeedCombox.ComboBox!.SelectedItem).Value;
+        };
+        toolStripScriptSpeedCombox.Items.AddRange(new object[] { new ScriptSpeedOption(0.5f), new ScriptSpeedOption(1.0f), new ScriptSpeedOption(2.0f) });
+        toolStripScriptSpeedCombox.ComboBox!.DisplayMember = "Description";
+        toolStripScriptSpeedCombox.ComboBox!.ValueMember = null;
+        toolStripScriptSpeedCombox.SelectedIndex = 1; // 1.0x default speed
     }
 
     private void PackageView_Load(object sender, EventArgs e)
@@ -377,6 +392,7 @@ public partial class PackageView : Form
         viewOutput.Init(Path.Combine(Path.GetDirectoryName(path) ?? "", "textures"));
 
         _currentPackage = package;
+        UpdatePausePlayState(true);
         CurrentPackageWasModified();
     }
 
@@ -505,5 +521,28 @@ public partial class PackageView : Form
     private class Options
     {
         [Option('i', "input")] public string InputFile { get; [UsedImplicitly] set; }
+    }
+
+    private void toolStripPausePlayButton_Click(object sender, EventArgs e)
+    {
+        UpdatePausePlayState(!viewOutput.PlayEnabled);
+    }
+
+    private void UpdatePausePlayState(bool isPlaying)
+    {
+        toolStripPausePlayButton.Enabled = _currentPackage != null;
+        if (isPlaying)
+        {
+            toolStripPausePlayButton.Text = toolStripPausePlayButton.ToolTipText = "Pause";
+            toolStripPausePlayButton.Image = Resources.Action_Pause;
+        }
+        else
+        {
+            toolStripPausePlayButton.Text = toolStripPausePlayButton.ToolTipText = "Play";
+            toolStripPausePlayButton.Image = Resources.Action_Play;
+        }
+
+
+        viewOutput.PlayEnabled = _currentPackage != null && isPlaying;
     }
 }

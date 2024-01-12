@@ -16,6 +16,9 @@ public partial class GLRenderControl : UserControl, IRenderControl
 
     [CanBeNull] private RenderTree _renderTree;
 
+    public bool PlayEnabled { get; set; }
+    public float PlaySpeed { get; set; }
+
     public GLRenderControl()
     {
         _textureProvider = new TextureProvider();
@@ -54,7 +57,9 @@ public partial class GLRenderControl : UserControl, IRenderControl
     private void openglControl1_OpenGLDraw(object sender, RenderEventArgs args)
     {
         if (_renderTree != null)
-            _renderer.Render();
+        {
+            _renderer.Render(shouldUpdateNodes: PlayEnabled, timeStretch: PlaySpeed);
+        }
     }
 
     private void openglControl1_MouseMove(object sender, MouseEventArgs e)
