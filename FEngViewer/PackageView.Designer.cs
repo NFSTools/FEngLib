@@ -55,6 +55,8 @@ namespace FEngViewer
             toolStripSeparator1 = new ToolStripSeparator();
             toolStripLabel1 = new ToolStripLabel();
             toolStripScriptSpeedCombox = new ToolStripComboBox();
+            statusStrip1 = new StatusStrip();
+            toolStripStatusLabel1 = new ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -68,6 +70,7 @@ namespace FEngViewer
             objectContextMenu.SuspendLayout();
             scriptContextMenu.SuspendLayout();
             toolStrip1.SuspendLayout();
+            statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // splitContainer1
@@ -208,7 +211,7 @@ namespace FEngViewer
             // 
             OpenFileMenuItem.Name = "OpenFileMenuItem";
             OpenFileMenuItem.ShortcutKeys = Keys.Control | Keys.O;
-            OpenFileMenuItem.Size = new System.Drawing.Size(180, 22);
+            OpenFileMenuItem.Size = new System.Drawing.Size(146, 22);
             OpenFileMenuItem.Text = "Open";
             OpenFileMenuItem.Click += OpenFileMenuItem_Click;
             // 
@@ -216,7 +219,7 @@ namespace FEngViewer
             // 
             SaveFileMenuItem.Name = "SaveFileMenuItem";
             SaveFileMenuItem.ShortcutKeys = Keys.Control | Keys.S;
-            SaveFileMenuItem.Size = new System.Drawing.Size(180, 22);
+            SaveFileMenuItem.Size = new System.Drawing.Size(146, 22);
             SaveFileMenuItem.Text = "Save";
             SaveFileMenuItem.Click += SaveFileMenuItem_Click;
             // 
@@ -283,11 +286,29 @@ namespace FEngViewer
             toolStripScriptSpeedCombox.DropDownStyle = ComboBoxStyle.DropDownList;
             toolStripScriptSpeedCombox.Name = "toolStripScriptSpeedCombox";
             toolStripScriptSpeedCombox.Size = new System.Drawing.Size(121, 25);
+            // 
+            // statusStrip1
+            // 
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
+            statusStrip1.Location = new System.Drawing.Point(0, 1130);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new System.Drawing.Size(1499, 22);
+            statusStrip1.SizingGrip = false;
+            statusStrip1.TabIndex = 6;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Size = new System.Drawing.Size(113, 17);
+            toolStripStatusLabel1.Text = "Testing, testing, 123!";
+            // 
             // PackageView
             // 
             AutoScaleMode = AutoScaleMode.Inherit;
             BackColor = System.Drawing.SystemColors.ControlLight;
             ClientSize = new System.Drawing.Size(1499, 1152);
+            Controls.Add(statusStrip1);
             Controls.Add(toolStrip1);
             Controls.Add(menuStrip1);
             Controls.Add(splitContainer1);
@@ -311,6 +332,8 @@ namespace FEngViewer
             scriptContextMenu.ResumeLayout(false);
             toolStrip1.ResumeLayout(false);
             toolStrip1.PerformLayout();
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -336,6 +359,8 @@ namespace FEngViewer
         private ToolStripMenuItem OpenFileMenuItem;
         private ToolStripMenuItem SaveFileMenuItem;
         private ToolStrip toolStrip1;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel toolStripStatusLabel1;
         private ToolStripButton toolStripPausePlayButton;
         private ToolStripComboBox toolStripScriptSpeedCombox;
         private ToolStripSeparator toolStripSeparator1;

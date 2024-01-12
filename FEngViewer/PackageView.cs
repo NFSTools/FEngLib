@@ -69,6 +69,7 @@ public partial class PackageView : Form
         imageList.Images.Add("TreeItem_MessageResponse", Resources.TreeItem_MessageResponse);
         treeView1.ImageList = imageList;
 
+        toolStripStatusLabel1.Text = "Ready";
         toolStripScriptSpeedCombox.SelectedIndexChanged += (o, e) =>
         {
             viewOutput.PlaySpeed = ((ScriptSpeedOption)toolStripScriptSpeedCombox.ComboBox!.SelectedItem).Value;
@@ -387,10 +388,11 @@ public partial class PackageView : Form
     {
         if (string.IsNullOrWhiteSpace(path))
             return;
+        toolStripStatusLabel1.Text = $"Loading: {path}";
         var package = AppService.Instance.LoadFile(path);
 
         viewOutput.Init(Path.Combine(Path.GetDirectoryName(path) ?? "", "textures"));
-
+        toolStripStatusLabel1.Text = path;
         _currentPackage = package;
         UpdatePausePlayState(true);
         CurrentPackageWasModified();
