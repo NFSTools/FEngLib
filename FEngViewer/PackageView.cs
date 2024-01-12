@@ -203,7 +203,7 @@ public partial class PackageView : Form
         foreach (var scriptEvent in script.Events)
         {
             var eventNode =
-                node.Nodes.Add($"{_msgHashList.Lookup(scriptEvent.EventId)} -> {scriptEvent.Target:X} @ T={scriptEvent.Time}");
+                node.Nodes.Add($"{_msgHashList.Lookup(scriptEvent.EventId)} -> {ResolveObjectGuid(scriptEvent.Target)} @ T={scriptEvent.Time}");
             eventNode.ImageKey = eventNode.SelectedImageKey = "TreeItem_ScriptEvent";
         }
 
@@ -289,15 +289,27 @@ public partial class PackageView : Form
         }
     }
 
-    private static string DescribeMessageResponse(ResponseCommand response)
+    private string DescribeMessageResponse(ResponseCommand response)
     {
         return response switch
         {
             SetScript setScript => $"SetScript({_scriptHashList.Lookup(setScript.ScriptHash)})",
             ITargetedCommand targetedCommand and MessageCommand messageCommand =>
-                $"{response.GetCommandName()}(0x{targetedCommand.Target:X}, {_msgHashList.Lookup(messageCommand.MessageHash)})",
+                $"{response.GetCommandName()}({ResolveObjectGuid(targetedCommand.Target)}, {_msgHashList.Lookup(messageCommand.MessageHash)})",
+            ObjectCommand objectCommand => $"{response.GetCommandName()}({ResolveObjectGuid(objectCommand.ObjectGuid)})",
+            ScriptCommand scriptCommand => $"{response.GetCommandName()}({_scriptHashList.Lookup(scriptCommand.ScriptHash)})",
             _ => response.ToString()
         };
+    }
+
+    private string ResolveObjectGuid(uint guid)
+    {
+        if (_currentPackage.Objects.Find(o => o.Guid == guid) is { } foundObject)
+        {
+            return foundObject.Name ?? _objHashList.Lookup(foundObject.NameHash);
+        }
+
+        return $"0x{guid:X}";
     }
 
     private void SavePackageToChunk(string path)
