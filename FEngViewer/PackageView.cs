@@ -233,7 +233,7 @@ public partial class PackageView : Form
         }
     }
 
-    private static void CreateTrackNode(TreeNode scriptNode, Track track, string name)
+    private void CreateTrackNode(TreeNode scriptNode, Track track, string name)
     {
         if (track == null)
             return;
@@ -243,23 +243,29 @@ public partial class PackageView : Form
 
         void AddNodeKey(int time, object value)
         {
-            var node = trackNode.Nodes.Add($"T={time}: {value}");
+            var timecode = time == -1 ? "Base" : $"T={time}";
+            var node = trackNode.Nodes.Add($"{timecode}: {value}");
             node.ImageKey = node.SelectedImageKey = "TreeItem_Keyframe";
-            ;
+            if (time == -1)
+                node.NodeFont = new Font(treeView1.Font, FontStyle.Bold);
         }
 
         switch (track)
         {
             case Vector2Track vector2Track:
+                AddNodeKey(-1, vector2Track.BaseKey);
                 foreach (var deltaKey in vector2Track.DeltaKeys) AddNodeKey(deltaKey.Time, deltaKey.Val);
                 break;
             case Vector3Track vector3Track:
+                AddNodeKey(-1, vector3Track.BaseKey);
                 foreach (var deltaKey in vector3Track.DeltaKeys) AddNodeKey(deltaKey.Time, deltaKey.Val);
                 break;
             case QuaternionTrack quaternionTrack:
+                AddNodeKey(-1, quaternionTrack.BaseKey);
                 foreach (var deltaKey in quaternionTrack.DeltaKeys) AddNodeKey(deltaKey.Time, deltaKey.Val);
                 break;
             case ColorTrack colorTrack:
+                AddNodeKey(-1, colorTrack.BaseKey);
                 foreach (var deltaKey in colorTrack.DeltaKeys) AddNodeKey(deltaKey.Time, deltaKey.Val);
                 break;
             default:
