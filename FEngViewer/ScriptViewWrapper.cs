@@ -39,6 +39,7 @@ internal class ScriptViewWrapper
     }
 
     [Category("Properties")]
+    [DisplayName("Chained Script")]
     [Description("The script that should play after this script ends.")]
     [Editor(typeof(ScriptChainEditor), typeof(UITypeEditor))]
     [TypeConverter(typeof(ScriptChainTypeConverter))]
