@@ -6,7 +6,6 @@ using FEngLib.Objects;
 using FEngLib.Scripts;
 using FEngLib.Structures;
 using FEngLib.Utils;
-using FEngRender.Scripts;
 
 namespace FEngRender.Data;
 
@@ -323,7 +322,7 @@ public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTr
 
     protected T InterpolateHelper<T>(Track<T> track) where T : struct
     {
-        return TrackInterpolation.Interpolate(track, CurrentScriptTime);
+        return TrackHelpers.Interpolate(track, CurrentScriptTime);
     }
 }
 
