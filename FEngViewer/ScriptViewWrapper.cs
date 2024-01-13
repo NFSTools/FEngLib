@@ -35,7 +35,15 @@ internal class ScriptViewWrapper
     public uint Length
     {
         get => WrappedScript.Length;
-        set => WrappedScript.Length = value;
+        set
+        {
+            if (value < TrackHelpers.GetAllTracks(WrappedScript).Max(t => t.Length))
+            {
+                throw new Exception("Script length must be greater than or equal to all track lengths.");
+            }
+
+            WrappedScript.Length = value;
+        }
     }
 
     [Category("Properties")]
