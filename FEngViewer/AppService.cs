@@ -16,6 +16,8 @@ public class AppService
 
     public static AppService Instance => LazyInstance.Value;
 
+    public bool PlaybackEnabled { get; set; }
+
     public Package LoadFile(string path)
     {
         using var fs = new FileStream(path, FileMode.Open);

@@ -9,6 +9,8 @@ using SharpGL;
 
 namespace FEngViewer;
 
+public delegate void RenderEventHandler();
+
 public partial class GLRenderControl : UserControl, IRenderControl
 {
     private GLRenderTreeRenderer _renderer;
@@ -16,8 +18,8 @@ public partial class GLRenderControl : UserControl, IRenderControl
 
     [CanBeNull] private RenderTree _renderTree;
 
-    public bool PlayEnabled { get; set; }
     public float PlaySpeed { get; set; }
+    public event RenderEventHandler FrameRender;
 
     public GLRenderControl()
     {
@@ -48,6 +50,11 @@ public partial class GLRenderControl : UserControl, IRenderControl
         _renderer.SetTree(_renderTree);
     }
 
+    public void RefreshInstant()
+    {
+        _renderer.Render(true, 0);
+    }
+
     private void openglControl1_OpenGLInitialized(object sender, EventArgs e)
     {
         _renderer = new GLRenderTreeRenderer(openglControl1.OpenGL, _textureProvider);
@@ -58,7 +65,8 @@ public partial class GLRenderControl : UserControl, IRenderControl
     {
         if (_renderTree != null)
         {
-            _renderer.Render(shouldUpdateNodes: PlayEnabled, timeStretch: PlaySpeed);
+            _renderer.Render(shouldUpdateNodes: AppService.Instance.PlaybackEnabled, timeStretch: PlaySpeed);
+            FrameRender?.Invoke();
         }
     }
 

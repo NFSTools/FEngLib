@@ -35,11 +35,13 @@ namespace FEngViewer
             splitContainer1 = new SplitContainer();
             treeView1 = new TreeView();
             splitContainer2 = new SplitContainer();
-            viewOutput = new GLRenderControl();
+            trackEditorControl = new TrackEditorControl();
+            viewOutputControlPanel = new Panel();
             labelCoordDisplay = new Label();
             groupBgColor = new GroupBox();
             radioBgGreen = new RadioButton();
             radioBgBlack = new RadioButton();
+            viewOutput = new GLRenderControl();
             objectPropertyGrid = new PropertyGrid();
             colorDialog1 = new ColorDialog();
             menuStrip1 = new MenuStrip();
@@ -65,6 +67,7 @@ namespace FEngViewer
             splitContainer2.Panel1.SuspendLayout();
             splitContainer2.Panel2.SuspendLayout();
             splitContainer2.SuspendLayout();
+            viewOutputControlPanel.SuspendLayout();
             groupBgColor.SuspendLayout();
             menuStrip1.SuspendLayout();
             objectContextMenu.SuspendLayout();
@@ -109,9 +112,9 @@ namespace FEngViewer
             // 
             // splitContainer2.Panel1
             // 
+            splitContainer2.Panel1.Controls.Add(trackEditorControl);
+            splitContainer2.Panel1.Controls.Add(viewOutputControlPanel);
             splitContainer2.Panel1.Controls.Add(viewOutput);
-            splitContainer2.Panel1.Controls.Add(labelCoordDisplay);
-            splitContainer2.Panel1.Controls.Add(groupBgColor);
             // 
             // splitContainer2.Panel2
             // 
@@ -120,28 +123,30 @@ namespace FEngViewer
             splitContainer2.SplitterDistance = 649;
             splitContainer2.TabIndex = 5;
             // 
-            // viewOutput
+            // trackEditorControl
             // 
-            viewOutput.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            viewOutput.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            viewOutput.BackColor = System.Drawing.Color.Black;
-            viewOutput.Location = new System.Drawing.Point(3, 2);
-            viewOutput.Margin = new Padding(3, 2, 3, 2);
-            viewOutput.MaximumSize = new System.Drawing.Size(640, 480);
-            viewOutput.MinimumSize = new System.Drawing.Size(640, 480);
-            viewOutput.Name = "viewOutput";
-            viewOutput.PlayEnabled = false;
-            viewOutput.SelectedNode = null;
-            viewOutput.Size = new System.Drawing.Size(640, 480);
-            viewOutput.TabIndex = 0;
-            viewOutput.TabStop = false;
-            viewOutput.MouseClick += viewOutput_MouseClick;
-            viewOutput.MouseMove += viewOutput_MouseMove;
+            trackEditorControl.Dock = DockStyle.Top;
+            trackEditorControl.Location = new System.Drawing.Point(0, 564);
+            trackEditorControl.MinimumSize = new System.Drawing.Size(649, 150);
+            trackEditorControl.Name = "trackEditorControl";
+            trackEditorControl.Size = new System.Drawing.Size(649, 150);
+            trackEditorControl.TabIndex = 5;
+            // 
+            // viewOutputControlPanel
+            // 
+            viewOutputControlPanel.BorderStyle = BorderStyle.FixedSingle;
+            viewOutputControlPanel.Controls.Add(labelCoordDisplay);
+            viewOutputControlPanel.Controls.Add(groupBgColor);
+            viewOutputControlPanel.Dock = DockStyle.Top;
+            viewOutputControlPanel.Location = new System.Drawing.Point(0, 480);
+            viewOutputControlPanel.Name = "viewOutputControlPanel";
+            viewOutputControlPanel.Size = new System.Drawing.Size(649, 84);
+            viewOutputControlPanel.TabIndex = 4;
             // 
             // labelCoordDisplay
             // 
             labelCoordDisplay.AutoSize = true;
-            labelCoordDisplay.Location = new System.Drawing.Point(3, 484);
+            labelCoordDisplay.Location = new System.Drawing.Point(12, 14);
             labelCoordDisplay.Name = "labelCoordDisplay";
             labelCoordDisplay.Size = new System.Drawing.Size(72, 15);
             labelCoordDisplay.TabIndex = 2;
@@ -151,7 +156,7 @@ namespace FEngViewer
             // 
             groupBgColor.Controls.Add(radioBgGreen);
             groupBgColor.Controls.Add(radioBgBlack);
-            groupBgColor.Location = new System.Drawing.Point(489, 484);
+            groupBgColor.Location = new System.Drawing.Point(486, 14);
             groupBgColor.Name = "groupBgColor";
             groupBgColor.Size = new System.Drawing.Size(154, 58);
             groupBgColor.TabIndex = 3;
@@ -181,6 +186,24 @@ namespace FEngViewer
             radioBgBlack.Text = "Black";
             radioBgBlack.UseVisualStyleBackColor = true;
             radioBgBlack.CheckedChanged += radioBgBlack_CheckedChanged;
+            // 
+            // viewOutput
+            // 
+            viewOutput.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            viewOutput.BackColor = System.Drawing.Color.Black;
+            viewOutput.Dock = DockStyle.Top;
+            viewOutput.Location = new System.Drawing.Point(0, 0);
+            viewOutput.Margin = new Padding(3, 2, 3, 2);
+            viewOutput.MaximumSize = new System.Drawing.Size(649, 480);
+            viewOutput.MinimumSize = new System.Drawing.Size(649, 480);
+            viewOutput.Name = "viewOutput";
+            viewOutput.PlaySpeed = 0F;
+            viewOutput.SelectedNode = null;
+            viewOutput.Size = new System.Drawing.Size(649, 480);
+            viewOutput.TabIndex = 0;
+            viewOutput.TabStop = false;
+            viewOutput.MouseClick += viewOutput_MouseClick;
+            viewOutput.MouseMove += viewOutput_MouseMove;
             // 
             // objectPropertyGrid
             // 
@@ -320,10 +343,11 @@ namespace FEngViewer
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
             splitContainer1.ResumeLayout(false);
             splitContainer2.Panel1.ResumeLayout(false);
-            splitContainer2.Panel1.PerformLayout();
             splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitContainer2).EndInit();
             splitContainer2.ResumeLayout(false);
+            viewOutputControlPanel.ResumeLayout(false);
+            viewOutputControlPanel.PerformLayout();
             groupBgColor.ResumeLayout(false);
             groupBgColor.PerformLayout();
             menuStrip1.ResumeLayout(false);
@@ -365,5 +389,7 @@ namespace FEngViewer
         private ToolStripComboBox toolStripScriptSpeedCombox;
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripLabel toolStripLabel1;
+        private Panel viewOutputControlPanel;
+        private TrackEditorControl trackEditorControl;
     }
 }

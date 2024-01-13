@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Windows.Forms;
 using CommandLine;
 using FEngLib;
@@ -28,6 +29,7 @@ public partial class PackageView : Form
     private RenderTree _currentRenderTree;
 
     private TreeNode _rootNode;
+    private Dictionary<RenderTreeNode, int> _savedScriptTimes = new Dictionary<RenderTreeNode, int>();
 
     static PackageView()
     {
@@ -76,6 +78,15 @@ public partial class PackageView : Form
         toolStripScriptSpeedCombox.ComboBox!.DisplayMember = "Description";
         toolStripScriptSpeedCombox.ComboBox!.ValueMember = null;
         toolStripScriptSpeedCombox.SelectedIndex = 1; // 1.0x default speed
+
+        viewOutput.FrameRender += () => trackEditorControl.UpdateData();
+        trackEditorControl.OnTimeChanged += time =>
+        {
+            if (!_savedScriptTimes.ContainsKey(trackEditorControl.SelectedNode))
+                _savedScriptTimes[trackEditorControl.SelectedNode] = trackEditorControl.SelectedNode.GetScriptTime();
+            trackEditorControl.SelectedNode.SetScriptTime(time);
+            viewOutput.RefreshInstant();
+        };
     }
 
     private void PackageView_Load(object sender, EventArgs e)
@@ -236,35 +247,34 @@ public partial class PackageView : Form
         if (track == null)
             return;
 
-        var trackNode = scriptNode.Nodes.Add(name);
-        trackNode.ImageKey = trackNode.SelectedImageKey = "TreeItem_ScriptTrack";
+        var trackTreeNode = scriptNode.Nodes.Add(name);
+        trackTreeNode.ImageKey = trackTreeNode.SelectedImageKey = "TreeItem_ScriptTrack";
+        trackTreeNode.Tag = track;
 
-        void AddNodeKey(int time, object value)
+        void AddNodeKey(int time, TrackNode trackNode)
         {
-            var timecode = time == -1 ? "Base" : $"T={time}";
-            var node = trackNode.Nodes.Add($"{timecode}: {value}");
-            node.ImageKey = node.SelectedImageKey = "TreeItem_Keyframe";
-            if (time == -1)
-                node.NodeFont = new Font(treeView1.Font, FontStyle.Bold);
+            var nodeTreeNode = trackTreeNode.Nodes.Add($"T={time}: {trackNode.GetValue()}");
+            nodeTreeNode.ImageKey = nodeTreeNode.SelectedImageKey = "TreeItem_Keyframe";
+            nodeTreeNode.Tag = trackNode;
         }
 
         switch (track)
         {
             case Vector2Track vector2Track:
-                AddNodeKey(-1, vector2Track.BaseKey);
-                foreach (var deltaKey in vector2Track.DeltaKeys) AddNodeKey(deltaKey.Time, deltaKey.Val);
+                //AddNodeKey(-1, vector2Track.BaseKey);
+                foreach (var deltaKey in vector2Track.DeltaKeys) AddNodeKey(deltaKey.Time, deltaKey);
                 break;
             case Vector3Track vector3Track:
-                AddNodeKey(-1, vector3Track.BaseKey);
-                foreach (var deltaKey in vector3Track.DeltaKeys) AddNodeKey(deltaKey.Time, deltaKey.Val);
+                //AddNodeKey(-1, vector3Track.BaseKey);
+                foreach (var deltaKey in vector3Track.DeltaKeys) AddNodeKey(deltaKey.Time, deltaKey);
                 break;
             case QuaternionTrack quaternionTrack:
-                AddNodeKey(-1, quaternionTrack.BaseKey);
-                foreach (var deltaKey in quaternionTrack.DeltaKeys) AddNodeKey(deltaKey.Time, deltaKey.Val);
+                //AddNodeKey(-1, quaternionTrack.BaseKey);
+                foreach (var deltaKey in quaternionTrack.DeltaKeys) AddNodeKey(deltaKey.Time, deltaKey);
                 break;
             case ColorTrack colorTrack:
-                AddNodeKey(-1, colorTrack.BaseKey);
-                foreach (var deltaKey in colorTrack.DeltaKeys) AddNodeKey(deltaKey.Time, deltaKey.Val);
+                //AddNodeKey(-1, colorTrack.BaseKey);
+                foreach (var deltaKey in colorTrack.DeltaKeys) AddNodeKey(deltaKey.Time, deltaKey);
                 break;
             default:
                 throw new NotImplementedException($"Unsupported: {track.GetType()}");
@@ -341,12 +351,42 @@ public partial class PackageView : Form
                 MultiImage mi => new MultiImageObjectViewWrapper(mi),
                 _ => new DefaultObjectViewWrapper(wrappedObject)
             };
+
+            trackEditorControl.SelectedNode = viewNode;
         }
-        else if (e.Node?.Tag is Script script)
+        else
         {
-            // todo: this is ugly. fix this stupid tree node tagging mess you've made
-            var scriptAssociatedNode = (RenderTreeNode)e.Node.Parent.Parent.Tag;
-            objectPropertyGrid.SelectedObject = new ScriptViewWrapper(script, scriptAssociatedNode.GetObject(), _scriptHashList);
+            trackEditorControl.SelectedNode = null;
+            if (e.Node?.Tag is Script script)
+            {
+                // todo: this is ugly. fix this stupid tree node tagging mess you've made
+                var scriptAssociatedNode = (RenderTreeNode)e.Node.Parent.Parent.Tag;
+                objectPropertyGrid.SelectedObject =
+                    new ScriptViewWrapper(script, scriptAssociatedNode.GetObject(), _scriptHashList);
+            }
+            else if (e.Node?.Tag is Track track)
+            {
+                var trackAssociatedScript = (Script)e.Node.Parent.Tag;
+                if (track is ColorTrack colorTrack)
+                    objectPropertyGrid.SelectedObject = new ColorTrackViewWrapper(colorTrack, trackAssociatedScript);
+                else if (track is Vector3Track vector3Track)
+                    objectPropertyGrid.SelectedObject = new Vector3TrackViewWrapper(vector3Track, trackAssociatedScript);
+                else if (track is Vector2Track vector2Track)
+                    objectPropertyGrid.SelectedObject = new Vector2TrackViewWrapper(vector2Track, trackAssociatedScript);
+            }
+            else if (e.Node?.Tag is TrackNode trackNode)
+            {
+                var trackNodeAssociatedTrack = (Track)e.Node.Parent.Tag;
+                if (trackNodeAssociatedTrack is ColorTrack colorTrack)
+                    objectPropertyGrid.SelectedObject =
+                        new ColorDeltaKeyViewWrapper(colorTrack, (TrackNode<Color4>)trackNode);
+                else if (trackNodeAssociatedTrack is Vector3Track vector3Track)
+                    objectPropertyGrid.SelectedObject =
+                        new Vector3DeltaKeyViewWrapper(vector3Track, (TrackNode<Vector3>)trackNode);
+                else if (trackNodeAssociatedTrack is Vector2Track vector2Track)
+                    objectPropertyGrid.SelectedObject =
+                        new Vector2DeltaKeyViewWrapper(vector2Track, (TrackNode<Vector2>)trackNode);
+            }
         }
     }
 
@@ -383,7 +423,7 @@ public partial class PackageView : Form
             var top = candidates.First();
 
             var feObj = top.GetObject();
-            var key = $"{feObj.Name ?? feObj.NameHash.ToString("X")}";
+            var key = feObj.Name ?? _objHashList.Lookup(feObj.NameHash);
             var foundNodes = treeView1.Nodes.Find(key, true);
             treeView1.SelectedNode = foundNodes[0];
             treeView1.Focus();
@@ -416,7 +456,9 @@ public partial class PackageView : Form
         viewOutput.Init(Path.Combine(Path.GetDirectoryName(path) ?? "", "textures"));
         toolStripStatusLabel1.Text = path;
         _currentPackage = package;
-        UpdatePausePlayState(true);
+        _savedScriptTimes.Clear();
+        AppService.Instance.PlaybackEnabled = true;
+        UpdatePausePlayState();
         CurrentPackageWasModified();
     }
 
@@ -518,13 +560,22 @@ public partial class PackageView : Form
 
     private void toolStripPausePlayButton_Click(object sender, EventArgs e)
     {
-        UpdatePausePlayState(!viewOutput.PlayEnabled);
+        if (!AppService.Instance.PlaybackEnabled)
+        {
+            foreach (var (node, savedScriptTime) in _savedScriptTimes)
+            {
+                node.SetScriptTime(savedScriptTime);
+            }
+            _savedScriptTimes.Clear();
+        }
+        AppService.Instance.PlaybackEnabled = !AppService.Instance.PlaybackEnabled;
+        UpdatePausePlayState();
     }
 
-    private void UpdatePausePlayState(bool isPlaying)
+    private void UpdatePausePlayState()
     {
         toolStripPausePlayButton.Enabled = _currentPackage != null;
-        if (isPlaying)
+        if (AppService.Instance.PlaybackEnabled)
         {
             toolStripPausePlayButton.Text = toolStripPausePlayButton.ToolTipText = "Pause";
             toolStripPausePlayButton.Image = Resources.Action_Pause;
@@ -534,8 +585,5 @@ public partial class PackageView : Form
             toolStripPausePlayButton.Text = toolStripPausePlayButton.ToolTipText = "Play";
             toolStripPausePlayButton.Image = Resources.Action_Play;
         }
-
-
-        viewOutput.PlayEnabled = _currentPackage != null && isPlaying;
     }
 }

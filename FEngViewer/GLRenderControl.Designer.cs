@@ -31,38 +31,37 @@ namespace FEngViewer
         /// </summary>
         private void InitializeComponent()
         {
-            this.openglControl1 = new SharpGL.OpenGLControl();
-            ((System.ComponentModel.ISupportInitialize)(this.openglControl1)).BeginInit();
-            this.SuspendLayout();
+            openglControl1 = new SharpGL.OpenGLControl();
+            ((ISupportInitialize)openglControl1).BeginInit();
+            SuspendLayout();
             // 
             // openglControl1
             // 
-            this.openglControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.openglControl1.DrawFPS = false;
-            this.openglControl1.Location = new System.Drawing.Point(0, 0);
-            this.openglControl1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.openglControl1.Name = "openglControl1";
-            this.openglControl1.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1;
-            this.openglControl1.RenderContextType = SharpGL.RenderContextType.DIBSection;
-            this.openglControl1.RenderTrigger = SharpGL.RenderTrigger.TimerBased;
-            this.openglControl1.Size = new System.Drawing.Size(640, 480);
-            this.openglControl1.TabIndex = 0;
-            this.openglControl1.OpenGLInitialized += new System.EventHandler(this.openglControl1_OpenGLInitialized);
-            this.openglControl1.OpenGLDraw += new SharpGL.RenderEventHandler(this.openglControl1_OpenGLDraw);
-            this.openglControl1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.openglControl1_MouseMove);
-            this.openglControl1.MouseClick +=
-                new System.Windows.Forms.MouseEventHandler(this.openglControl1_MouseClick);
+            openglControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            openglControl1.DrawFPS = false;
+            openglControl1.Location = new System.Drawing.Point(0, 0);
+            openglControl1.Margin = new System.Windows.Forms.Padding(4);
+            openglControl1.Name = "openglControl1";
+            openglControl1.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1;
+            openglControl1.RenderContextType = SharpGL.RenderContextType.DIBSection;
+            openglControl1.RenderTrigger = SharpGL.RenderTrigger.TimerBased;
+            openglControl1.Size = new System.Drawing.Size(560, 360);
+            openglControl1.TabIndex = 0;
+            openglControl1.OpenGLInitialized += openglControl1_OpenGLInitialized;
+            openglControl1.OpenGLDraw += openglControl1_OpenGLDraw;
+            openglControl1.MouseClick += openglControl1_MouseClick;
+            openglControl1.MouseMove += openglControl1_MouseMove;
             // 
             // GLRenderControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.openglControl1);
-            this.Name = "GLRenderControl";
-            this.Size = new System.Drawing.Size(640, 480);
-            ((System.ComponentModel.ISupportInitialize)(this.openglControl1)).EndInit();
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            Controls.Add(openglControl1);
+            Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            Name = "GLRenderControl";
+            Size = new System.Drawing.Size(560, 360);
+            ((ISupportInitialize)openglControl1).EndInit();
+            ResumeLayout(false);
         }
 
         #endregion

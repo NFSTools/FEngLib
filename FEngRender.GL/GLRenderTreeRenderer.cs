@@ -32,6 +32,7 @@ public class GLRenderTreeRenderer
     private InternalRenderNode _selectedRenderNode;
     private Stopwatch _stopwatch;
     private List<RenderTreeNode> _treeRootNodes;
+    private bool _justForcedTime;
 
     public GLRenderTreeRenderer(OpenGL gl, ITextureProvider textureProvider)
     {
@@ -95,6 +96,25 @@ public class GLRenderTreeRenderer
         _stopwatch = Stopwatch.StartNew();
     }
 
+    //public void ForceTime(int time)
+    //{
+    //    ForceTimeInternal(_treeRootNodes);
+    //    _justForcedTime = true;
+    //    // we can pass 0 as the time stretch factor because we're forcing an update
+    //    Render(true, 0.0f);
+    //    return;
+
+    //    void ForceTimeInternal(IEnumerable<RenderTreeNode> nodes)
+    //    {
+    //        foreach (var node in nodes)
+    //        {
+    //            node.SetScriptTime(time);
+    //            if (node is RenderTreeGroup grp)
+    //                ForceTimeInternal(grp);
+    //        }
+    //    }
+    //}
+
     public void Render(bool shouldUpdateNodes, float timeStretch)
     {
         _gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
@@ -104,7 +124,18 @@ public class GLRenderTreeRenderer
         _gl.DepthMask(0);
 
         var dt = (_stopwatch.ElapsedMilliseconds - _lastRenderTime);
-        var renderDt = (int)(dt * timeStretch);
+        int renderDt;
+
+        // this is a dirty hack but WHATEVER! we can make it nicer later :)
+        if (_justForcedTime)
+        {
+            renderDt = 0;
+            _justForcedTime = false;
+        }
+        else
+        {
+            renderDt = (int)(dt * timeStretch);
+        }
 
         DoNodeRender(renderDt, shouldUpdateNodes);
 

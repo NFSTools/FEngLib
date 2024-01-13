@@ -33,6 +33,9 @@ public abstract class RenderTreeNode
 
     public abstract void SetCurrentScript(uint? id);
 
+    public abstract int GetScriptTime();
+    public abstract void SetScriptTime(int time);
+
     public abstract bool IsHidden();
 
     /// <summary>
@@ -107,11 +110,22 @@ public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTr
     public Vector3 Pivot { get; private set; }
     public Color4 Color { get; private set; }
 
+    public override int GetScriptTime()
+    {
+        return CurrentScriptTime;
+    }
+
+    public override void SetScriptTime(int time)
+    {
+        if (time < -1)
+            throw new ArgumentOutOfRangeException(nameof(time));
+        CurrentScriptTime = time;
+    }
+
     public override void Update(RenderContext context, int deltaMs)
     {
         if (CurrentScript == null)
         {
-            LoadProperties();
             SetCurrentScript(Hashing.BinHash("INIT"));
             if (CurrentScript == null)
                 throw new Exception($"Init script not found for object 0x{FrontendObject.Guid:X}");
@@ -138,7 +152,7 @@ public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTr
             {
                 ApplyScript(CurrentScript, CurrentScript.Tracks);
 
-                Debug.WriteLine("Script 0x{0:X} has ended, starting chained script 0x{1:X}", CurrentScript.Id, chainedScriptId);
+                //Debug.WriteLine("Script 0x{0:X} has ended, starting chained script 0x{1:X}", CurrentScript.Id, chainedScriptId);
                 var chainedScript = FrontendObject.FindScript(chainedScriptId) ??
                                     throw new Exception($"Could not find chained script: 0x{chainedScriptId:X}");
                 // "overtime" is how far beyond the end of the script we got
@@ -157,7 +171,7 @@ public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTr
                     // TODO: Implement script events (FEPackage::IssueScriptMessages)
                 }
 
-                Debug.WriteLine("Activated chained script 0x{0:X} at time {1}", CurrentScript.Id, CurrentScriptTime);
+                //Debug.WriteLine("Activated chained script 0x{0:X} at time {1}", CurrentScript.Id, CurrentScriptTime);
             }
             else if ((CurrentScript.Flags & 2) == 2)
             {
@@ -181,7 +195,7 @@ public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTr
                     }
 
                     CurrentScriptTime %= currentScriptLength;
-                    Debug.WriteLine("Looping script 0x{0:X}, time is now {1}", CurrentScript.Id, CurrentScriptTime);
+                    //Debug.WriteLine("Looping script 0x{0:X}, time is now {1}", CurrentScript.Id, CurrentScriptTime);
                 }
                 else
                 {
@@ -205,49 +219,6 @@ public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTr
         {
             ApplyScript(CurrentScript, CurrentScript.Tracks);
         }
-
-        //if (CurrentScript is { } currentScript
-        //    && CurrentScriptTime >= 0)
-        //{
-        //    ApplyScript(currentScript, currentScript.Tracks);
-
-        //    if (CurrentScriptTime >= CurrentScript.Length)
-        //    {
-        //        if ((CurrentScript.Flags & 1) == 1)
-        //        {
-        //            Debug.WriteLine("Looping script {0:X} for object {1:X}", CurrentScript.Id,
-        //                FrontendObject.NameHash);
-        //            if (CurrentScript.Length > 0)
-        //            {
-        //                CurrentScriptTime %= (int)CurrentScript.Length;
-        //                Debug.WriteLine("Rolled time over to {0}", CurrentScriptTime);
-        //            }
-        //            else
-        //            {
-        //                CurrentScriptTime = 0;
-        //            }
-        //        }
-        //        else if (CurrentScript.ChainedId is { } currentScriptChainedId)
-        //        {
-        //            var nextScript = FrontendObject.FindScript(currentScriptChainedId) ??
-        //                             throw new Exception(
-        //                                 $"Cannot find chained script (object {FrontendObject.NameHash:X}, base script {CurrentScript.Id:X}): {currentScriptChainedId:X}");
-        //            Debug.WriteLine("Activating chained script for object {1:X}: {0}",
-        //                nextScript.Name ?? nextScript.Id.ToString("X"), FrontendObject.NameHash);
-
-        //            SetCurrentScript(nextScript);
-        //        }
-        //        else
-        //        {
-        //            Debug.WriteLine("Current script for object {0:X} has ended", FrontendObject.NameHash);
-        //            SetCurrentScript(null);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        CurrentScriptTime += deltaMs;
-        //    }
-        //}
 
         var scaleMatrix = Matrix4x4.CreateScale(Size);
         var rotateMatrix = Matrix4x4.CreateFromQuaternion(Rotation);
@@ -296,6 +267,7 @@ public abstract class RenderTreeNode<TObject, TScript, TScriptTracks> : RenderTr
     {
         CurrentScript = script;
         CurrentScriptTime = script == null ? -1 : 0;
+        LoadProperties();
     }
 
     protected virtual void LoadProperties()
